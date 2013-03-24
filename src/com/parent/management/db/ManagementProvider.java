@@ -3,19 +3,26 @@ package com.parent.management.db;
 import java.io.File;
 
 import android.content.ContentProvider;
+import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteDiskIOException;
 import android.database.sqlite.SQLiteException;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.net.Uri;
 import android.os.Environment;
 import android.provider.BaseColumns;
+import android.text.TextUtils;
 import android.util.Log;
 
 import com.parent.management.ManagementApplication;
+import com.streamwide.vvmclient.android.R;
+import com.streamwide.vvmclient.android.storage.Message;
+import com.streamwide.vvmclient.android.storage.VVMProvider.Messages;
+import com.streamwide.vvmclient.android.tools.VVMApplication;
 
 public class ManagementProvider extends ContentProvider {
 	
@@ -120,7 +127,7 @@ public class ManagementProvider extends ContentProvider {
 
         private void createBrowserHistoryTable(final SQLiteDatabase db) {
             db.execSQL("CREATE TABLE " + BrowserHistory.TABLE_NAME + " ("
-                + BrowserHistory._ID + INTEGER + "PRIMARY KEY,"
+                + BrowserHistory.ID + INTEGER + "PRIMARY KEY,"
                 + BrowserHistory.URL + TEXT + COMMA
                 + BrowserHistory.TITLE + TEXT + COMMA
                 + BrowserHistory.VISIT_COUNT + INTEGER + COMMA 
@@ -331,6 +338,8 @@ public class ManagementProvider extends ContentProvider {
 			}
 		}
 	}
+	
+	private ManagementDatabaseHelper mOpenHelper;
 
 	@Override
 	public int delete(Uri uri, String selection, String[] selectionArgs) {
@@ -361,11 +370,45 @@ public class ManagementProvider extends ContentProvider {
 		// TODO Auto-generated method stub
 		return null;
 	}
+	private Uri insertInBrowserHistory(final ContentValues initialValues){
+		ContentValues values;
+		if (null == initialValues  || null == mOpenHelper ) {
+			return null;
+		} else {
+			values = new ContentValues(initialValues);
+		}
+
+		final Long now = Long.valueOf(System.currentTimeMillis());
+		
+
+		try {
+			final SQLiteDatabase db = mOpenHelper.getWritableDatabase();
+			final long rowId = db.insert(BrowserHistory.TABLE_NAME, null, values);
+			if (rowId > 0) {
+				final Uri insertUri = ContentUris.withAppendedId( Messages.CONTENT_URI, rowId);
+				getContext().getContentResolver().notifyChange(insertUri, null);
+				return insertUri;
+			}
+		} catch (NullPointerException npe) {
+			//we catch npe that may happen if the sd card is not present
+			Log.e(TAG, "NullPointerException while trying to insert entry in " + BrowserHistory.TABLE_NAME +" database");
+        } catch (SQLiteException sqlioe) {
+            //we catch disk io that may happen if SD card full or faulty
+            Log.e(TAG, "SQLiteException  while trying to insert entry in " + BrowserHistory.TABLE_NAME +" database");
+            // arm flag indicating that the application cannot write the db
+//            VVMApplication.readOnlyMode(true);
+        }
+		return null;
+	}
 
 	@Override
 	public boolean onCreate() {
-		// TODO Auto-generated method stub
-		return false;
+		try {
+			mOpenHelper = new ManagementDatabaseHelper(getContext());
+		} catch (SQLiteDiskIOException e) {
+			return false;
+		}
+		return true;
 	}
 
 	@Override
