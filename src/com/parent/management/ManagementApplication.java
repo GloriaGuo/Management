@@ -22,6 +22,8 @@ public class ManagementApplication extends android.app.Application {
     
     private static final String SHARED_PREFS_NAME = 
         Application.class.getName() + ".preferences";
+
+	public static final boolean DEBUG = true;
 	
     /**
      * The application context
