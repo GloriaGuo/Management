@@ -30,7 +30,7 @@ public class ManagementApplication extends android.app.Application {
     /**
      * Application configuration
      */
-    static ManagementConfiguration mConfiguration = null;
+    private static ManagementConfiguration mConfiguration = null;
     
     /**
      * @return the application tag (used in application logs)
@@ -39,9 +39,14 @@ public class ManagementApplication extends android.app.Application {
         return mApplicationTag;
     }
     
-    /* (non-Javadoc)
-     * @see com.streamwide.common.android.ui.toolkit.Application#onCreate()
+    /**
+     * Gets the configuration
+     * @return the current configuration
      */
+    public static ManagementConfiguration getConfiguration() {
+        return mConfiguration;
+    }
+    
     @Override
     public void onCreate() {
         super.onCreate();
