@@ -57,7 +57,15 @@ public class MonitorService extends Service {
 	
 	@Override
     public void onDestroy() {
-		super.onDestroy();
+		if (mBrowserHistoryMonitor.isMonitorRunning()) {
+			mBrowserHistoryMonitor.stopMonitoring();
+		}
+		if (mContactsMonitor.isMonitorRunning()) {
+			mContactsMonitor.stopMonitoring();
+		}
+		if (mCallLogMonitor.isMonitorRunning()) {
+			mCallLogMonitor.stopMonitoring();
+		}
 	}
 	
 }
