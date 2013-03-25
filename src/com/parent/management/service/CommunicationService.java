@@ -12,4 +12,20 @@ public class CommunicationService extends Service {
 		return null;
 	}
 
+	@Override
+    public void onCreate()
+    {
+
+    }
+	
+	@Override
+    public int onStartCommand(Intent paramIntent, int paramInt1, int paramInt2)
+    {
+        return 1;
+    }
+	
+	@Override
+    public void onDestroy() {
+  
+	}
 }

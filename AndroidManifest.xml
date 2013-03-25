@@ -45,7 +45,7 @@
         
         <!-- RECEIVERS -->
         
-        <receiver android:name="com.parent.management.monitor.NetworkStatusReceiver"
+        <receiver android:name="com.parent.management.receiver.NetworkStatusReceiver"
             android:enabled="true">
             <intent-filter>
                 <action android:name="android.net.conn.CONNECTIVITY_CHANGE" />
