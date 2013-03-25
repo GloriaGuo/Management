@@ -23,10 +23,7 @@ public class ManagementApplication extends android.app.Application {
     protected static String mApplicationTag = "PM";
     private static String mInternalPath = null;
     
-    private static final String SHARED_PREFS_NAME = 
-        Application.class.getName() + ".preferences";
-
-	public static final boolean DEBUG = true;
+    public static final boolean DEBUG = true;
 	
     /**
      * The application context

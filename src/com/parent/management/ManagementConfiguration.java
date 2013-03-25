@@ -1,36 +1,34 @@
 package com.parent.management;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 
 public class ManagementConfiguration {
 	
     private final Context mContext;
     
-    static public boolean isMonitorBrowserHistory;
-    static public boolean isMonitorGpsInfo;
-    static public boolean isMonitorInstalledApps;
-    static public boolean isMonitorAppsUsedInfo;
-    static public boolean isMonitorContacts;
-    static public boolean isMonitorCallLog;
+    private final SharedPreferences mSharedPreferences;
     
-	/**
+    private static final String SHARED_PREFS_NAME = "management.preferences";
+    
+    private static final String PREFERENCE_KEY_INTERVAL_TIME = "interval_time";
+    
+    /**
      * Creates a new Configuration instance 
      * @param appContext application context
      */
     ManagementConfiguration(final Context appContext) {
         this.mContext = appContext;
+        mSharedPreferences = mContext.getSharedPreferences(SHARED_PREFS_NAME, Context.MODE_PRIVATE);  
     }
     
-	/**
-     * Load configuration parameter 
-     */
-    void init() {
-    	isMonitorBrowserHistory = mContext.getResources().getBoolean(R.attr.monitor_browser_history);
-    	isMonitorGpsInfo = mContext.getResources().getBoolean(R.attr.monitor_gps_info);
-    	isMonitorInstalledApps = mContext.getResources().getBoolean(R.attr.monitor_installed_apps);
-    	isMonitorAppsUsedInfo = mContext.getResources().getBoolean(R.attr.monitor_apps_used_info);
-    	isMonitorContacts = mContext.getResources().getBoolean(R.attr.monitor_contacts);
-    	isMonitorCallLog = mContext.getResources().getBoolean(R.attr.monitor_call_log);
+	public int getIntervalTime() {
+        return this.mSharedPreferences.getInt(PREFERENCE_KEY_INTERVAL_TIME, 1800000);
+    }
+    
+    public void setIntervalTime(int time) {
+        mSharedPreferences.edit().putInt(
+                PREFERENCE_KEY_INTERVAL_TIME, time).commit();
     }
 
 }

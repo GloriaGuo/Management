@@ -1,10 +1,10 @@
-package com.parent.management.communication;
+package com.parent.management.receiver;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 
-public class CommunicationReceiver extends BroadcastReceiver {
+public class ManagementReceiver extends BroadcastReceiver {
 
 	@Override
 	public void onReceive(Context context, Intent intent) {

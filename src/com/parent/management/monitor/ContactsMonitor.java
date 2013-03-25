@@ -10,7 +10,7 @@ public class ContactsMonitor extends Monitor {
 
 	private ContactsObserver contentObserver = null;
 
-	ContactsMonitor(Context context) {
+	public ContactsMonitor(Context context) {
 		super(context);
 		this.contentUri = ContactsContract.Data.CONTENT_URI;
 	    this.contentObserver = new ContactsObserver(new Handler());

@@ -1,4 +1,4 @@
-package com.parent.management.monitor;
+package com.parent.management.receiver;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;

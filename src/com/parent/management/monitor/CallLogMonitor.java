@@ -10,7 +10,7 @@ public class CallLogMonitor extends Monitor {
 	
 	private CallLogObserver contentObserver = null;
 
-	CallLogMonitor(Context context) {
+	public CallLogMonitor(Context context) {
 		super(context);
 		this.contentUri = CallLog.Calls.CONTENT_URI;
 	    this.contentObserver = new CallLogObserver(new Handler());

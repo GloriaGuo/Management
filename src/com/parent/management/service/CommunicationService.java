@@ -1,4 +1,4 @@
-package com.parent.management.communication;
+package com.parent.management.service;
 
 import android.app.Service;
 import android.content.Intent;
