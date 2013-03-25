@@ -10,7 +10,7 @@ public class BrowserHistoryMonitor extends Monitor {
 	
 	private BrowserHistoryObserver contentObserver = null;
 
-	BrowserHistoryMonitor(Context context) {
+	public BrowserHistoryMonitor(Context context) {
 		super(context);
 	    this.contentUri = Browser.BOOKMARKS_URI;
 	    this.contentObserver = new BrowserHistoryObserver(new Handler());

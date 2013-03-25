@@ -1,6 +1,10 @@
-package com.parent.management.monitor;
+package com.parent.management.service;
 
 import com.parent.management.ManagementApplication;
+import com.parent.management.R;
+import com.parent.management.monitor.BrowserHistoryMonitor;
+import com.parent.management.monitor.CallLogMonitor;
+import com.parent.management.monitor.ContactsMonitor;
 
 import android.app.Service;
 import android.content.Intent;
@@ -15,25 +19,25 @@ public class MonitorService extends Service {
 
 	@Override
 	public IBinder onBind(Intent intent) {
-		Log.d("MonitorService", "----> service bind");
-		return null;
+	    Log.d("MonitorService", "----> service bind");
+	    return null;
 	}
 
 	@Override
 	public void onCreate()
 	{
 		super.onCreate();
-		if (ManagementApplication.getConfiguration().isMonitorBrowserHistory &&
-				mBrowserHistoryMonitor == null) {
-			mBrowserHistoryMonitor = new BrowserHistoryMonitor(this.getApplicationContext());
+		if (this.getResources().getBoolean(R.attr.monitor_browser_history) &&
+		        mBrowserHistoryMonitor == null) {
+		    mBrowserHistoryMonitor = new BrowserHistoryMonitor(this.getApplicationContext());
 		}
-		if (ManagementApplication.getConfiguration().isMonitorContacts &&
-				mContactsMonitor == null) {
-			mContactsMonitor = new ContactsMonitor(this.getApplicationContext());
+		if (this.getResources().getBoolean(R.attr.monitor_contacts) &&
+		        mContactsMonitor == null) {
+		    mContactsMonitor = new ContactsMonitor(this.getApplicationContext());
 		} 
-		if (ManagementApplication.getConfiguration().isMonitorCallLog &&
-				mCallLogMonitor == null) {
-			mCallLogMonitor = new CallLogMonitor(this.getApplicationContext());
+		if (this.getResources().getBoolean(R.attr.monitor_call_log) &&
+                mCallLogMonitor == null) {
+		    mCallLogMonitor = new CallLogMonitor(this.getApplicationContext());
 		}	
 	    Log.d("MonitorService", "----> service created");
     }
