@@ -6,6 +6,7 @@ import android.content.ContentProvider;
 import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.UriMatcher;
 import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
@@ -15,14 +16,9 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.net.Uri;
 import android.os.Environment;
 import android.provider.BaseColumns;
-import android.text.TextUtils;
 import android.util.Log;
 
 import com.parent.management.ManagementApplication;
-import com.streamwide.vvmclient.android.R;
-import com.streamwide.vvmclient.android.storage.Message;
-import com.streamwide.vvmclient.android.storage.VVMProvider.Messages;
-import com.streamwide.vvmclient.android.tools.VVMApplication;
 
 public class ManagementProvider extends ContentProvider {
 	
@@ -35,11 +31,25 @@ public class ManagementProvider extends ContentProvider {
 	public static final String TAG = "Management.Provider";
 	public static final String EXTERNAL_STORAGE_PATH = Environment.getExternalStorageDirectory() + "/" + ".management";
 	
+
+	private static final UriMatcher sUriMatcher;
+//	private static final int MESSAGES_ID   = 101;
+//	private static final int MESSAGES_HAS  = 102;
+//	private static final int GREETINGS     = 200;
+//	private static final int GREETINGS_ID  = 201;
+	
 	/**
 	 * BrowserHistory wrapper class for content provider
 	 */
 	public static final class BrowserHistory implements BaseColumns {
         public static final String TABLE_NAME = "BrowserHistory";
+    	public static final String PATH = "browserhistory";
+    	private static final int MATCHER      = 100;
+        /**
+         * The content:// style URL for this table
+         */
+        public static final Uri CONTENT_URI = Uri.parse("content://"
+                + AUTHORITY + "/" + PATH);
         public static final String ID = "Id";
         public static final String URL = "URL";
         public static final String TITLE = "Title";
@@ -366,9 +376,19 @@ public class ManagementProvider extends ContentProvider {
 	}
 
 	@Override
-	public Uri insert(Uri uri, ContentValues values) {
-		// TODO Auto-generated method stub
-		return null;
+	public Uri insert(final Uri uri, final ContentValues values) {
+		switch (sUriMatcher.match(uri)){ // NOPMD
+		case BrowserHistory.MATCHER:
+			return insertInBrowserHistory(values);
+//		case GREETINGS:
+//			return insertInGreetings(initialValues);
+//		case GREETINGS_ID:
+//		case MESSAGES_ID:
+//			Log.e(TAG, "database insertion failed, URI does not support insertion");
+//			return null;
+		default:
+			throw new IllegalArgumentException("Unsupported URI: " + uri);
+		} 
 	}
 	private Uri insertInBrowserHistory(final ContentValues initialValues){
 		ContentValues values;
@@ -385,7 +405,7 @@ public class ManagementProvider extends ContentProvider {
 			final SQLiteDatabase db = mOpenHelper.getWritableDatabase();
 			final long rowId = db.insert(BrowserHistory.TABLE_NAME, null, values);
 			if (rowId > 0) {
-				final Uri insertUri = ContentUris.withAppendedId( Messages.CONTENT_URI, rowId);
+				final Uri insertUri = ContentUris.withAppendedId(BrowserHistory.CONTENT_URI, rowId);
 				getContext().getContentResolver().notifyChange(insertUri, null);
 				return insertUri;
 			}
@@ -425,4 +445,14 @@ public class ManagementProvider extends ContentProvider {
 		return 0;
 	}
 
+	// initialize URI matcher
+	static {
+		sUriMatcher = new UriMatcher(UriMatcher.NO_MATCH);
+		sUriMatcher.addURI(ManagementProvider.AUTHORITY, BrowserHistory.PATH, BrowserHistory.MATCHER);
+//		sUriMatcher.addURI(VVMProvider.AUTHORITY, MESSAGES_PATH + "/#", MESSAGES_ID);
+//		sUriMatcher.addURI(VVMProvider.AUTHORITY, MESSAGE_HAS_PATH, MESSAGES_HAS);
+//		sUriMatcher.addURI(VVMProvider.AUTHORITY, GREETINGS_PATH, GREETINGS);
+//		sUriMatcher.addURI(VVMProvider.AUTHORITY, GREETINGS_PATH + "/#", GREETINGS_ID);
+//		sUriMatcher.addURI(VVMProvider.AUTHORITY, RESET_PATH, RESET);
+	}
 }
