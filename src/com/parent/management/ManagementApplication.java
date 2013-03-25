@@ -8,6 +8,8 @@ package com.parent.management;
 
 import java.io.File;
 
+import com.parent.management.monitor.BrowserHistoryMonitor;
+
 import android.app.Application;
 import android.content.Context;
 import android.os.Environment;
@@ -19,6 +21,7 @@ public class ManagementApplication extends android.app.Application {
      * Log tag for this application.
      */
     protected static String mApplicationTag = "PM";
+    private static String mInternalPath = null;
     
     private static final String SHARED_PREFS_NAME = 
         Application.class.getName() + ".preferences";
@@ -49,6 +52,9 @@ public class ManagementApplication extends android.app.Application {
         return mConfiguration;
     }
     
+    public static Context getContext() {
+        return mContext;
+    }
     @Override
     public void onCreate() {
         super.onCreate();
@@ -66,7 +72,17 @@ public class ManagementApplication extends android.app.Application {
         
         // Configuration
         mConfiguration = new ManagementConfiguration(mContext);
+        mInternalPath = mContext.getDir(".management",Context.MODE_PRIVATE).getAbsolutePath();
 
-        
+        BrowserHistoryMonitor tmp_monitor = new BrowserHistoryMonitor(mContext);
+        tmp_monitor.startMonitoring();
+    }
+    
+    /**
+     * Gets the internal storage path
+     * @return the internal storage path
+     */
+    public static String getInternalPath() {
+        return mInternalPath;
     }
 }

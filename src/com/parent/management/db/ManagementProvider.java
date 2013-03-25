@@ -13,9 +13,11 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteDiskIOException;
 import android.database.sqlite.SQLiteException;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.database.sqlite.SQLiteQueryBuilder;
 import android.net.Uri;
 import android.os.Environment;
 import android.provider.BaseColumns;
+import android.text.TextUtils;
 import android.util.Log;
 
 import com.parent.management.ManagementApplication;
@@ -28,11 +30,13 @@ public class ManagementProvider extends ContentProvider {
 	public static final String AUTHORITY = "com.parent.provider.management";
 	public static final String DATABASE_NAME = "MANAGEMENT";
 	public static final int DATABASE_VERSION = 1;
-	public static final String TAG = "Management.Provider";
+	public static final String TAG = ManagementApplication.getApplicationTag()
+	        + "." + ManagementProvider.class.getSimpleName();
 	public static final String EXTERNAL_STORAGE_PATH = Environment.getExternalStorageDirectory() + "/" + ".management";
 	
 
 	private static final UriMatcher sUriMatcher;
+    private static final int MATCHER_RESET        = 1;
 //	private static final int MESSAGES_ID   = 101;
 //	private static final int MESSAGES_HAS  = 102;
 //	private static final int GREETINGS     = 200;
@@ -56,6 +60,14 @@ public class ManagementProvider extends ContentProvider {
         public static final String VISIT_COUNT = "Visitcount";
 	    public static final String LAST_VISIT = "Lastvisit";
 		public static final String IS_SENT = "IsSend";
+		
+		public static final int IS_SENT_NO = 0;
+		public static final int IS_SENT_YES = 1;
+		
+		/**
+         * The default sort order for this table
+         */
+        public static final String DEFAULT_SORT_ORDER = ID + " DESC";
 	}
 	
 	/**
@@ -106,7 +118,7 @@ public class ManagementProvider extends ContentProvider {
 		private boolean mIsInitializing = false;
 
 //		private String getDatabaseName(){
-//			return VVMProvider.getStoragePath() + "/" + DATABASE_NAME +".sqlite";
+//			return ManagementProvider.getStoragePath() + "/" + DATABASE_NAME +".sqlite";
 //		}
 
 		ManagementDatabaseHelper(final Context context) {
@@ -125,9 +137,9 @@ public class ManagementProvider extends ContentProvider {
 
 			try {
 			    createBrowserHistoryTable(db);
-			    createGpsTable(db);
-			    createAppsInstalledTable(db);
-			    createAppsUsedTable(db);
+//			    createGpsTable(db);
+//			    createAppsInstalledTable(db);
+//			    createAppsUsedTable(db);
 			} catch (SQLException sqle) {
 				Log.e(TAG, "unable to create Message content provider : "
 						+ sqle.getMessage());
@@ -142,7 +154,7 @@ public class ManagementProvider extends ContentProvider {
                 + BrowserHistory.TITLE + TEXT + COMMA
                 + BrowserHistory.VISIT_COUNT + INTEGER + COMMA 
                 + BrowserHistory.LAST_VISIT + INTEGER + COMMA                
-                + BrowserHistory.IS_SENT + INTEGER + COMMA
+                + BrowserHistory.IS_SENT + INTEGER
                 + ");");
         }
         
@@ -151,7 +163,7 @@ public class ManagementProvider extends ContentProvider {
                 + Gps.LATIDUDE  + INTEGER + "PRIMARY KEY,"
                 + Gps.LONGITUDE + TEXT + COMMA 
                 + Gps.SPEED + TEXT + COMMA 
-                + Gps.TIME + INTEGER + COMMA
+                + Gps.TIME + INTEGER
                 + ");");
         }
         
@@ -163,9 +175,9 @@ public class ManagementProvider extends ContentProvider {
         
         private void clearDB(final SQLiteDatabase db) {
             db.execSQL("DROP TABLE IF EXISTS " + BrowserHistory.TABLE_NAME);
-            db.execSQL("DROP TABLE IF EXISTS " + Gps.TABLE_NAME);
-            db.execSQL("DROP TABLE IF EXISTS " + AppsInstalled.TABLE_NAME);
-            db.execSQL("DROP TABLE IF EXISTS " + AppsUsed.TABLE_NAME);
+//            db.execSQL("DROP TABLE IF EXISTS " + Gps.TABLE_NAME);
+//            db.execSQL("DROP TABLE IF EXISTS " + AppsInstalled.TABLE_NAME);
+//            db.execSQL("DROP TABLE IF EXISTS " + AppsUsed.TABLE_NAME);
         }
         
         @Override
@@ -311,7 +323,7 @@ public class ManagementProvider extends ContentProvider {
 				mIsInitializing = true;
 				// Create external storage path if needed
 				final File target = new File(ManagementProvider.EXTERNAL_STORAGE_PATH);
-				target.mkdirs();
+				boolean rtn = target.mkdirs();
 				db = SQLiteDatabase.openOrCreateDatabase(ManagementProvider.getStoragePath() + "/" + DATABASE_NAME +".sqlite", null);
 				final int version = db.getVersion();
 				if (version != DATABASE_VERSION) {
@@ -353,12 +365,35 @@ public class ManagementProvider extends ContentProvider {
 
 	@Override
 	public int delete(Uri uri, String selection, String[] selectionArgs) {
-		// TODO Auto-generated method stub
-		return 0;
+        final String tableName;
+        switch (sUriMatcher.match(uri)) {
+        case BrowserHistory.MATCHER:
+            tableName = BrowserHistory.TABLE_NAME;
+            break;
+        default: 
+            throw new IllegalArgumentException("Unknown URI " + uri);
+        }
+        try {
+            final int count = mOpenHelper.getWritableDatabase().delete(
+                    tableName, selection, selectionArgs);
+            Log.i(TAG, "deleted " + count + " entries in " + tableName +" database");
+            getContext().getContentResolver().notifyChange(uri, null);
+            return count;
+        } catch (NullPointerException npe) {
+            // error, probably the external storage is not mounted
+            Log.e(TAG, "NullPointerException while trying to delete entries in " + tableName +" database");
+            return 0;
+        } catch (SQLiteException sqlioe) {
+            //we catch disk io that may happen if SD card full or faulty
+            Log.e(TAG, "SQLiteException  while trying to delete entry in " + tableName +" database");
+            // arm flag indicating that the application cannot write the db
+//            VVMApplication.readOnlyMode(true);
+            return 0;
+        }
 	}
 
 	public static String getStoragePath() {
-		// TODO Selecet Internal or external storage 
+		// TODO Select Internal or external storage 
 //		if("internal".equals(
 //				ManagementApplication.getServiceConfiguration().getParameter("storage_type"))) {
 //			// Use internal storage
@@ -366,7 +401,7 @@ public class ManagementProvider extends ContentProvider {
 //		} else {
 //			return EXTERNAL_STORAGE_PATH;
 //		}
-		return EXTERNAL_STORAGE_PATH;
+	    return EXTERNAL_STORAGE_PATH;
 	}
 
 	@Override
@@ -390,6 +425,7 @@ public class ManagementProvider extends ContentProvider {
 			throw new IllegalArgumentException("Unsupported URI: " + uri);
 		} 
 	}
+
 	private Uri insertInBrowserHistory(final ContentValues initialValues){
 		ContentValues values;
 		if (null == initialValues  || null == mOpenHelper ) {
@@ -398,8 +434,9 @@ public class ManagementProvider extends ContentProvider {
 			values = new ContentValues(initialValues);
 		}
 
-		final Long now = Long.valueOf(System.currentTimeMillis());
-		
+        if (!values.containsKey(BrowserHistory.IS_SENT)) {
+            values.put(BrowserHistory.IS_SENT, BrowserHistory.IS_SENT_NO); 
+        }
 
 		try {
 			final SQLiteDatabase db = mOpenHelper.getWritableDatabase();
@@ -434,15 +471,82 @@ public class ManagementProvider extends ContentProvider {
 	@Override
 	public Cursor query(Uri uri, String[] projection, String selection,
 			String[] selectionArgs, String sortOrder) {
-		// TODO Auto-generated method stub
-		return null;
+        final SQLiteQueryBuilder qb = new SQLiteQueryBuilder();
+        final String tableName;
+        String orderBy;       
+        switch (sUriMatcher.match(uri)) {
+        case BrowserHistory.MATCHER:
+            tableName = BrowserHistory.TABLE_NAME;
+            orderBy = BrowserHistory.DEFAULT_SORT_ORDER;
+            break;
+        case MATCHER_RESET:
+            // special uri used to invalidate and reset the provider when
+            // the external storage gets unavailable
+            if (null != mOpenHelper) {
+                mOpenHelper.reset();
+            }
+            return null;
+        default:
+            return null;
+        }
+        qb.setTables(tableName);
+
+        if (!TextUtils.isEmpty(sortOrder)) {
+            orderBy = sortOrder;
+        }
+        // Get the database and run the query
+        final Cursor queryResult;
+        try {
+            final SQLiteDatabase db = this.mOpenHelper.getReadableDatabase();
+            queryResult = qb.query(db, projection, selection,
+                    selectionArgs, null, null, orderBy);
+            // Tell the cursor what uri to watch, so it knows when its source data
+            // changes
+            queryResult.setNotificationUri(getContext().getContentResolver(), uri);
+            return queryResult;
+        } catch (NullPointerException npe) {
+            //this may happen if SD card is mounted
+            Log.w(TAG, "NullPointerException while trying to query " + tableName +" database");
+            return null;
+        } catch (SQLiteException sqlioe) {
+            //we catch disk io that may happen if SD card full or faulty
+            Log.e(TAG, "SQLiteException  while trying to query " + tableName +" database");
+            // arm flag indicating that the application cannot write the db
+//            ManagementApplication.readOnlyMode(true);
+            return null;
+        }
 	}
 
 	@Override
 	public int update(Uri uri, ContentValues values, String selection,
 			String[] selectionArgs) {
-		// TODO Auto-generated method stub
-		return 0;
+        final String tableName;
+        switch (sUriMatcher.match(uri)) {
+        case BrowserHistory.MATCHER:
+            tableName = BrowserHistory.TABLE_NAME;
+            break;
+        default:
+            throw new IllegalArgumentException("Unknown URI " + uri);
+        }
+        try {
+            final SQLiteDatabase db = this.mOpenHelper.getWritableDatabase();
+            final int count = db.update(
+                    tableName, values, selection, selectionArgs);
+            getContext().getContentResolver().notifyChange(uri, null);
+            // We were able to modify the database, so we may be in read/write
+            // mode
+//            tryRestoreWriteMode();
+            return count;
+        } catch (NullPointerException npe) {
+            Log.w(TAG, "NullPointerException while trying to update " + tableName +" database");
+            return 0;
+        } catch (SQLiteException sqlioe) {
+            //we catch disk io that may happen if SD card full or faulty
+            Log.e(TAG, "SQLiteException  while trying to update " + tableName +" database" + sqlioe.getMessage());
+            // arm flag indicating that the application cannot write the db
+//            VVMApplication.readOnlyMode(true);
+            return 0;
+        }
 	}
 
 	// initialize URI matcher
