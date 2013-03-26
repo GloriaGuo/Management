@@ -11,6 +11,15 @@ public abstract class Monitor {
 	public boolean monitorStatus = false;
 	public Uri contentUri;
 	
+	public enum Type {
+	    BROWSER_HISTORY,
+	    GPS_INFO,
+	    APP_INSTALLED,
+	    APP_USED,
+	    CONTACTS,
+	    CALL_LOG
+	}
+	
 	Monitor(Context context) {
 		contentResolver = context.getApplicationContext().getContentResolver();
 	}
