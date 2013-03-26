@@ -33,7 +33,7 @@ public class CommunicationService extends Service {
 	        mWifilock.acquire();
 	    }
 	    //getLock(this).acquire();
-	    SendJob();
+//	    SendJob();
 	    mWifilock.release();
         return 1;
     }

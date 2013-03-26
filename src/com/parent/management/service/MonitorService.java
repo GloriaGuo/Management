@@ -1,21 +1,22 @@
 package com.parent.management.service;
 
-import com.parent.management.ManagementApplication;
-import com.parent.management.R;
-import com.parent.management.monitor.BrowserHistoryMonitor;
-import com.parent.management.monitor.CallLogMonitor;
-import com.parent.management.monitor.ContactsMonitor;
-
 import android.app.Service;
 import android.content.Intent;
 import android.os.IBinder;
 import android.util.Log;
+
+import com.parent.management.R;
+import com.parent.management.monitor.BrowserHistoryMonitor;
+import com.parent.management.monitor.CallLogMonitor;
+import com.parent.management.monitor.ContactsMonitor;
+import com.parent.management.monitor.GpsMonitor;
 
 public class MonitorService extends Service {
 	
 	private BrowserHistoryMonitor mBrowserHistoryMonitor;
 	private ContactsMonitor mContactsMonitor;
 	private CallLogMonitor mCallLogMonitor;
+	private GpsMonitor mGpsMonitor;
 
 	@Override
 	public IBinder onBind(Intent intent) {
@@ -38,7 +39,11 @@ public class MonitorService extends Service {
 		if (this.getResources().getBoolean(R.attr.monitor_call_log) &&
                 mCallLogMonitor == null) {
 		    mCallLogMonitor = new CallLogMonitor(this.getApplicationContext());
-		}	
+		}
+        if (this.getResources().getBoolean(R.attr.monitor_gps_info) &&
+                mGpsMonitor == null) {
+            mGpsMonitor = new GpsMonitor(this.getApplicationContext());
+        }
 	    Log.d("MonitorService", "----> service created");
     }
 	
@@ -49,11 +54,14 @@ public class MonitorService extends Service {
 		if (!mBrowserHistoryMonitor.isMonitorRunning()) {
 			mBrowserHistoryMonitor.startMonitoring();
 		}
+        if (!mBrowserHistoryMonitor.isMonitorRunning()) {
+            mBrowserHistoryMonitor.startMonitoring();
+        }
 		if (!mContactsMonitor.isMonitorRunning()) {
 			mContactsMonitor.startMonitoring();
 		}
-		if (!mCallLogMonitor.isMonitorRunning()) {
-			mCallLogMonitor.startMonitoring();
+		if (!mGpsMonitor.isMonitorRunning()) {
+		    mGpsMonitor.startMonitoring();
 		}
 		
 		return 1;
