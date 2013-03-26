@@ -7,12 +7,12 @@
 package com.parent.management;
 
 import java.io.File;
-import java.util.List;
+import java.util.HashMap;
 
 import com.parent.management.monitor.BrowserHistoryMonitor;
 import com.parent.management.monitor.Monitor;
+import com.parent.management.monitor.Monitor.Type;
 
-import android.app.Application;
 import android.content.Context;
 import android.os.Environment;
 import android.util.Log;
@@ -27,7 +27,7 @@ public class ManagementApplication extends android.app.Application {
     
     public static final boolean DEBUG = true;
     
-    public static final List<Monitor> monitorList = null;
+    public static HashMap<Type, Monitor> monitorList = null;
 	
     /**
      * The application context

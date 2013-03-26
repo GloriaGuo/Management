@@ -23,7 +23,6 @@ public class CallLogMonitor extends Monitor {
 	public void startMonitoring() {
 		this.contentResolver.registerContentObserver(this.contentUri, true, this.contentObserver);
 	    this.monitorStatus = true;
-	    ManagementApplication.monitorList.add(this);
 	    Log.d("CallLogMonitor", "----> startMonitoring");
 	}
 
@@ -31,8 +30,7 @@ public class CallLogMonitor extends Monitor {
 	public void stopMonitoring() {
 		this.contentResolver.unregisterContentObserver(this.contentObserver);
 		this.monitorStatus = false;
-		ManagementApplication.monitorList.remove(this);
-	    Log.d("CallLogMonitor", "----> stopMonitoring");
+		Log.d("CallLogMonitor", "----> stopMonitoring");
 	}
 	
 	private class CallLogObserver extends ContentObserver {
