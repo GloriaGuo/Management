@@ -27,6 +27,7 @@ public class BrowserHistoryMonitor extends Monitor {
 	public void startMonitoring() {
 		this.contentResolver.registerContentObserver(this.contentUri, true, this.contentObserver);
 	    this.monitorStatus = true;
+	    ManagementApplication.monitorList.add(this);
 	    Log.d(TAG, "----> startMonitoring");
 	}
 
@@ -34,6 +35,7 @@ public class BrowserHistoryMonitor extends Monitor {
 	public void stopMonitoring() {
         this.contentResolver.unregisterContentObserver(this.contentObserver);
         this.monitorStatus = false;
+        ManagementApplication.monitorList.remove(this);
 	    Log.d(TAG, "----> stopMonitoring");
 	}
 	
@@ -116,5 +118,11 @@ public class BrowserHistoryMonitor extends Monitor {
 		}
 		
 	}
+
+    @Override
+    public Cursor extraData() {
+        // TODO Auto-generated method stub
+        return null;
+    }
 
 }

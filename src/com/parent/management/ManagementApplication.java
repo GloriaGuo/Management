@@ -7,8 +7,10 @@
 package com.parent.management;
 
 import java.io.File;
+import java.util.List;
 
 import com.parent.management.monitor.BrowserHistoryMonitor;
+import com.parent.management.monitor.Monitor;
 
 import android.app.Application;
 import android.content.Context;
@@ -24,6 +26,8 @@ public class ManagementApplication extends android.app.Application {
     private static String mInternalPath = null;
     
     public static final boolean DEBUG = true;
+    
+    public static final List<Monitor> monitorList = null;
 	
     /**
      * The application context

@@ -2,6 +2,7 @@ package com.parent.management.monitor;
 
 import android.content.ContentResolver;
 import android.content.Context;
+import android.database.Cursor;
 import android.net.Uri;
 
 public abstract class Monitor {
@@ -22,5 +23,7 @@ public abstract class Monitor {
 	public abstract void startMonitoring();
 
 	public abstract void stopMonitoring();
+	
+	public abstract Cursor extraData();
 
 }
