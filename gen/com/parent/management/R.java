@@ -9,6 +9,7 @@ package com.parent.management;
 
 public final class R {
     public static final class attr {
+        public static final int default_interval_time=0x7f010006;
         public static final int monitor_apps_installed=0x7f010002;
         public static final int monitor_apps_used=0x7f010003;
         public static final int monitor_browser_history=0x7f010000;

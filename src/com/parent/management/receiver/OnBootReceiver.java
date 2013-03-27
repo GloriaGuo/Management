@@ -9,6 +9,7 @@ import android.content.Intent;
 import android.os.SystemClock;
 
 import com.parent.management.ManagementApplication;
+import com.parent.management.R;
 
 public class OnBootReceiver extends BroadcastReceiver {
 
@@ -18,10 +19,11 @@ public class OnBootReceiver extends BroadcastReceiver {
 	    PendingIntent mPendingIntent = PendingIntent.getBroadcast(
 	    		context, 0, new Intent(context, ManagementReceiver.class), PendingIntent.FLAG_CANCEL_CURRENT);
 	    
-	    int i = ManagementApplication.getConfiguration().getIntervalTime();
-	    if (i < 60000)
-	        i = 1800000;
-	    mAlarmManager.setRepeating(2, 5000L + SystemClock.elapsedRealtime(), i, mPendingIntent);
+	    mAlarmManager.setRepeating(
+	            2, 
+	            5000L + SystemClock.elapsedRealtime(), 
+	            ManagementApplication.getConfiguration().getIntervalTime(),
+	            mPendingIntent);
 	}
 
 }

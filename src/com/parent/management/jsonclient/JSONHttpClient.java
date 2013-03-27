@@ -46,17 +46,6 @@ public class JSONHttpClient {
     // HTTP 1.0
     private static final ProtocolVersion PROTOCOL_VERSION = new ProtocolVersion("HTTP", 1, 0);
     
-    // protocol
-    private static final int MC_BASIC = 1;
-    private static final int MC_CONFIG = 2;
-    
-    private static final int MT_BASIC_REG_REQ = 1;
-    private static final int MT_BASIC_REG_RESP = 2;
-    private static final int MT_BASIC_DATA_UPLOAD_REQ = 3;
-    private static final int MT_BASIC_DATA_UPLOAD_RESP = 4;
-    private static final int MT_CONFIG_GET_INTERVAL_REQ = 1;
-    private static final int MT_CONFIG_GET_INTERVAL_RESP = 2;
-    
     private static final int MS_SUCCESS = 0;
     
     public JSONHttpClient(HttpClient cleint, String uri){
@@ -163,7 +152,7 @@ public class JSONHttpClient {
         JSONArray jsonParams = new JSONArray();
         for (int i=0; i<params.length; i++)
         {
-            if(params[i].getClass().isArray()){
+            if (params[i].getClass().isArray()) {
                 jsonParams.put(getJSONArray((Object[])params[i]));
             }
             jsonParams.put(params[i]);
@@ -172,12 +161,12 @@ public class JSONHttpClient {
         //Create the json request object
         JSONObject jsonRequest = new JSONObject();
         try {
-            jsonRequest.put("pv", "1.0");
-            jsonRequest.put("mc", MC_BASIC);
-            jsonRequest.put("mt", MT_BASIC_DATA_UPLOAD_REQ);
-            jsonRequest.put("seq", UUID.randomUUID().hashCode());
-            jsonRequest.put("imei", ManagementApplication.getIMEI());
-            jsonRequest.put("payload", jsonParams);
+            jsonRequest.put(JSONParams.PROTOCOL_VERSION, "1.0");
+            jsonRequest.put(JSONParams.MESSAGE_CLASS, JSONParams.MC_BASIC);
+            jsonRequest.put(JSONParams.MESSAGE_TYPE, JSONParams.MT_BASIC_DATA_UPLOAD_REQ);
+            jsonRequest.put(JSONParams.REQUEST_SEQUENCE, UUID.randomUUID().hashCode());
+            jsonRequest.put(JSONParams.DEVICE_IMEI, ManagementApplication.getIMEI());
+            jsonRequest.put(JSONParams.PAYLOAD, jsonParams);
         } catch (JSONException e1) {
             throw new JSONClientException("Invalid JSON request", e1);
         }
@@ -191,24 +180,24 @@ public class JSONHttpClient {
         
         try {
             JSONObject jsonParams = new JSONObject();
-            jsonParams.put("ma", account);
-            jsonParams.put("vc", code);
-            jsonParams.put("ot", android.os.Build.MODEL);
-            jsonParams.put("ov", android.os.Build.VERSION.RELEASE);
+            jsonParams.put(JSONParams.MANAGER_ACCOUNT, account);
+            jsonParams.put(JSONParams.VERIFY_CODE, code);
+            jsonParams.put(JSONParams.OS_TYPE, android.os.Build.MODEL);
+            jsonParams.put(JSONParams.OS_VERSION, android.os.Build.VERSION.RELEASE);
         
-            jsonRequest.put("pv", "1.0");
-            jsonRequest.put("mc", MC_BASIC);
-            jsonRequest.put("mt", MT_BASIC_REG_REQ);
+            jsonRequest.put(JSONParams.PROTOCOL_VERSION, "1.0");
+            jsonRequest.put(JSONParams.MESSAGE_CLASS, JSONParams.MC_BASIC);
+            jsonRequest.put(JSONParams.MESSAGE_TYPE, JSONParams.MT_BASIC_REG_REQ);
             int id = UUID.randomUUID().hashCode();
-            jsonRequest.put("seq", id);
-            jsonRequest.put("imei", ManagementApplication.getIMEI());
-            jsonRequest.put("payload", jsonParams);
+            jsonRequest.put(JSONParams.REQUEST_SEQUENCE, id);
+            jsonRequest.put(JSONParams.DEVICE_IMEI, ManagementApplication.getIMEI());
+            jsonRequest.put(JSONParams.PAYLOAD, jsonParams);
             
             JSONObject result = doJSONRequest(jsonRequest);
             
-            if (result.getInt("mt") == MT_BASIC_REG_RESP && 
-                result.getInt("seq") == id &&
-                result.getInt("sc") == MS_SUCCESS) {
+            if (result.getInt(JSONParams.MESSAGE_TYPE) == JSONParams.MT_BASIC_REG_RESP && 
+                result.getInt(JSONParams.REQUEST_SEQUENCE) == id &&
+                result.getInt(JSONParams.RESPONSE_STATUS_CODE) == MS_SUCCESS) {
                 return true;
             }
             return false;
@@ -224,21 +213,21 @@ public class JSONHttpClient {
         JSONObject jsonRequest = new JSONObject();
         
         try {
-            jsonRequest.put("pv", "1.0");
-            jsonRequest.put("mc", MC_CONFIG);
-            jsonRequest.put("mt", MT_CONFIG_GET_INTERVAL_REQ);
+            jsonRequest.put(JSONParams.PROTOCOL_VERSION, "1.0");
+            jsonRequest.put(JSONParams.MESSAGE_CLASS, JSONParams.MC_CONFIG);
+            jsonRequest.put(JSONParams.MESSAGE_TYPE, JSONParams.MT_CONFIG_GET_INTERVAL_REQ);
             int id = UUID.randomUUID().hashCode();
-            jsonRequest.put("seq", id);
-            jsonRequest.put("imei", ManagementApplication.getIMEI());
+            jsonRequest.put(JSONParams.REQUEST_SEQUENCE, id);
+            jsonRequest.put(JSONParams.DEVICE_IMEI, ManagementApplication.getIMEI());
             
             JSONObject result = doJSONRequest(jsonRequest);
             
-            if (result.getInt("mt") == MT_CONFIG_GET_INTERVAL_RESP && 
-                result.getInt("seq") == id &&
-                result.getInt("sc") == MS_SUCCESS) {
-                return result.getInt("interval");
+            if (result.getInt(JSONParams.MESSAGE_TYPE) == JSONParams.MT_CONFIG_GET_INTERVAL_RESP && 
+                result.getInt(JSONParams.REQUEST_SEQUENCE) == id &&
+                result.getInt(JSONParams.RESPONSE_STATUS_CODE) == MS_SUCCESS) {
+                return result.getInt(JSONParams.INTERVAL_TIME);
             }
-            return 1800000;
+            return 0;
         } catch (JSONException e1) {
             throw new JSONClientException("Invalid JSON request", e1);
         }

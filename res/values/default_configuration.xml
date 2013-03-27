@@ -20,5 +20,11 @@
         false
     </item>
     
+    <item name="default_interval_time" type="attr" format="integer">
+        1800000
+    </item>
+    
     <string name="server_address">http://61.148.201.134:880</string>
+    
+    
 </resources>

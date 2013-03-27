@@ -23,7 +23,9 @@ public class ManagementConfiguration {
     }
     
 	public int getIntervalTime() {
-        return this.mSharedPreferences.getInt(PREFERENCE_KEY_INTERVAL_TIME, 1800000);
+        return this.mSharedPreferences.getInt(
+                PREFERENCE_KEY_INTERVAL_TIME, 
+                mContext.getResources().getInteger(R.attr.default_interval_time));
     }
     
     public void setIntervalTime(int time) {
