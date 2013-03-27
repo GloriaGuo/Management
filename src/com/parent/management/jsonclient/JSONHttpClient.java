@@ -21,9 +21,9 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import android.util.Log;
-
 import com.parent.management.ManagementApplication;
+
+import android.util.Log;
 
 public class JSONHttpClient {
     
@@ -54,6 +54,8 @@ public class JSONHttpClient {
     private static final int MT_BASIC_REG_RESP = 2;
     private static final int MT_BASIC_DATA_UPLOAD_REQ = 3;
     private static final int MT_BASIC_DATA_UPLOAD_RESP = 4;
+    private static final int MT_CONFIG_GET_INTERVAL_REQ = 1;
+    private static final int MT_CONFIG_GET_INTERVAL_RESP = 2;
     
     private static final int MS_SUCCESS = 0;
     
@@ -130,16 +132,7 @@ public class JSONHttpClient {
             
             Log.d(TAG, "Response: " + responseString);
             
-            JSONObject jsonResponse = new JSONObject(responseString);
-            // Check for remote errors
-            if (jsonResponse.has("sc")) {
-                Object jsonError = jsonResponse.get("sc");
-                if (!jsonError.equals(null))
-                    throw new JSONClientException(jsonResponse.get("error"));
-                return jsonResponse; 
-            } else {
-                return jsonResponse; 
-            }
+            return new JSONObject(responseString);
         }
         // Underlying errors are wrapped into a JSONRPCException instance
         catch (ClientProtocolException e) {
@@ -196,7 +189,6 @@ public class JSONHttpClient {
         //Create the json request object
         JSONObject jsonRequest = new JSONObject();
         
-        int id = UUID.randomUUID().hashCode();
         try {
             JSONObject jsonParams = new JSONObject();
             jsonParams.put("ma", account);
@@ -207,6 +199,7 @@ public class JSONHttpClient {
             jsonRequest.put("pv", "1.0");
             jsonRequest.put("mc", MC_BASIC);
             jsonRequest.put("mt", MT_BASIC_REG_REQ);
+            int id = UUID.randomUUID().hashCode();
             jsonRequest.put("seq", id);
             jsonRequest.put("imei", ManagementApplication.getIMEI());
             jsonRequest.put("payload", jsonParams);
@@ -219,6 +212,33 @@ public class JSONHttpClient {
                 return true;
             }
             return false;
+        } catch (JSONException e1) {
+            throw new JSONClientException("Invalid JSON request", e1);
+        }
+        
+    }
+    
+    public int doConfiguration() throws JSONClientException 
+    {
+        //Create the json request object
+        JSONObject jsonRequest = new JSONObject();
+        
+        try {
+            jsonRequest.put("pv", "1.0");
+            jsonRequest.put("mc", MC_CONFIG);
+            jsonRequest.put("mt", MT_CONFIG_GET_INTERVAL_REQ);
+            int id = UUID.randomUUID().hashCode();
+            jsonRequest.put("seq", id);
+            jsonRequest.put("imei", ManagementApplication.getIMEI());
+            
+            JSONObject result = doJSONRequest(jsonRequest);
+            
+            if (result.getInt("mt") == MT_CONFIG_GET_INTERVAL_RESP && 
+                result.getInt("seq") == id &&
+                result.getInt("sc") == MS_SUCCESS) {
+                return result.getInt("interval");
+            }
+            return 1800000;
         } catch (JSONException e1) {
             throw new JSONClientException("Invalid JSON request", e1);
         }
