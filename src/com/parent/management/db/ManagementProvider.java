@@ -34,14 +34,13 @@ public class ManagementProvider extends ContentProvider {
 	        + "." + ManagementProvider.class.getSimpleName();
 	public static final String EXTERNAL_STORAGE_PATH = Environment.getExternalStorageDirectory() + "/" + ".management";
 	
-
 	private static final UriMatcher sUriMatcher;
-    private static final int MATCHER_RESET        = 1;
-//	private static final int MESSAGES_ID   = 101;
-//	private static final int MESSAGES_HAS  = 102;
-//	private static final int GREETINGS     = 200;
-//	private static final int GREETINGS_ID  = 201;
-	
+    private static final int MATCHER_RESET = 1;
+    private static final String RESET_PATH = ".reset";
+    public static final int IS_SENT_NO = 0;
+    public static final int IS_SENT_YES = 1;
+    
+
 	/**
 	 * BrowserHistory wrapper class for content provider
 	 */
@@ -57,12 +56,9 @@ public class ManagementProvider extends ContentProvider {
         public static final String ID = "Id";
         public static final String URL = "URL";
         public static final String TITLE = "Title";
-        public static final String VISIT_COUNT = "Visitcount";
+        public static final String VISIT_COUNT = "VisitCount";
 	    public static final String LAST_VISIT = "Lastvisit";
 		public static final String IS_SENT = "IsSend";
-		
-		public static final int IS_SENT_NO = 0;
-		public static final int IS_SENT_YES = 1;
 		
 		/**
          * The default sort order for this table
@@ -75,10 +71,22 @@ public class ManagementProvider extends ContentProvider {
 	 */
 	public static final class Gps implements BaseColumns {
         public static final String TABLE_NAME = "Gps";
+        public static final String PATH = "gps";
+        private static final int MATCHER      = 101;
+        /**
+         * The content:// style URL for this table
+         */
+        public static final Uri CONTENT_URI = Uri.parse("content://"
+                + AUTHORITY + "/" + PATH);
         public static final String LATIDUDE = "Latitude";
         public static final String LONGITUDE = "Longitude";
         public static final String SPEED = "Speed";
         public static final String TIME = "Time";
+        public static final String IS_SENT = "IsSend";
+        /**
+         * The default sort order for this table
+         */
+        public static final String DEFAULT_SORT_ORDER = _ID + " DESC";
 	}
 	
 	/**
@@ -86,6 +94,24 @@ public class ManagementProvider extends ContentProvider {
 	 */
 	public static final class AppsInstalled implements BaseColumns {
         public static final String TABLE_NAME = "AppsInstalled";
+        public static final String PATH = "appsinstalled";
+        private static final int MATCHER      = 102;
+        /**
+         * The content:// style URL for this table
+         */
+        public static final Uri CONTENT_URI = Uri.parse("content://"
+                + AUTHORITY + "/" + PATH);
+        
+        public static final String APP_NAME = "AppName";
+        public static final String PACKAGE_NAME = "PackageName";
+        public static final String URL = "Url";
+        public static final String VERSION_CODE = "VersionCode";
+        public static final String VERSION_NAME = "VersionName";
+        public static final String IS_SENT = "IsSend";
+        /**
+         * The default sort order for this table
+         */
+        public static final String DEFAULT_SORT_ORDER = _ID + " DESC";
 	}
 	
 	/**
@@ -117,10 +143,6 @@ public class ManagementProvider extends ContentProvider {
 		private SQLiteDatabase mDatabase = null;
 		private boolean mIsInitializing = false;
 
-//		private String getDatabaseName(){
-//			return ManagementProvider.getStoragePath() + "/" + DATABASE_NAME +".sqlite";
-//		}
-
 		ManagementDatabaseHelper(final Context context) {
 			super(context, DATABASE_NAME, null, DATABASE_VERSION);
 			if (! EXTERNAL_DB) {
@@ -137,9 +159,8 @@ public class ManagementProvider extends ContentProvider {
 
 			try {
 			    createBrowserHistoryTable(db);
-//			    createGpsTable(db);
-//			    createAppsInstalledTable(db);
-//			    createAppsUsedTable(db);
+			    createGpsTable(db);
+			    createAppsInstalledTable(db);
 			} catch (SQLException sqle) {
 				Log.e(TAG, "unable to create Message content provider : "
 						+ sqle.getMessage());
@@ -149,35 +170,42 @@ public class ManagementProvider extends ContentProvider {
 
         private void createBrowserHistoryTable(final SQLiteDatabase db) {
             db.execSQL("CREATE TABLE " + BrowserHistory.TABLE_NAME + " ("
-                + BrowserHistory.ID + INTEGER + "PRIMARY KEY,"
-                + BrowserHistory.URL + TEXT + COMMA
-                + BrowserHistory.TITLE + TEXT + COMMA
-                + BrowserHistory.VISIT_COUNT + INTEGER + COMMA 
-                + BrowserHistory.LAST_VISIT + INTEGER + COMMA                
-                + BrowserHistory.IS_SENT + INTEGER
-                + ");");
+                    + BrowserHistory.ID + INTEGER + "PRIMARY KEY,"
+                    + BrowserHistory.URL + TEXT + COMMA
+                    + BrowserHistory.TITLE + TEXT + COMMA
+                    + BrowserHistory.VISIT_COUNT + INTEGER + COMMA 
+                    + BrowserHistory.LAST_VISIT + INTEGER + COMMA                
+                    + BrowserHistory.IS_SENT + INTEGER
+                    + ");");
         }
         
         private void createGpsTable(final SQLiteDatabase db) {
             db.execSQL("CREATE TABLE " + Gps.TABLE_NAME + " ("
-                + Gps.LATIDUDE  + INTEGER + "PRIMARY KEY,"
-                + Gps.LONGITUDE + TEXT + COMMA 
-                + Gps.SPEED + TEXT + COMMA 
-                + Gps.TIME + INTEGER
-                + ");");
-        }
-        
-        private void createAppsInstalledTable(final SQLiteDatabase db) {
+                    + Gps._ID + INTEGER + "PRIMARY KEY,"
+                    + Gps.LATIDUDE  + INTEGER + COMMA 
+                    + Gps.LONGITUDE + TEXT + COMMA 
+                    + Gps.SPEED + TEXT + COMMA 
+                    + Gps.TIME + INTEGER + COMMA 
+                    + Gps.IS_SENT + INTEGER
+                    + ");");
         }
 
-        private void createAppsUsedTable(final SQLiteDatabase db) {
+        private void createAppsInstalledTable(final SQLiteDatabase db) {
+            db.execSQL("CREATE TABLE " + AppsInstalled.TABLE_NAME + " ("
+                    + AppsInstalled._ID + INTEGER + "PRIMARY KEY,"
+                    + AppsInstalled.APP_NAME + TEXT + COMMA 
+                    + AppsInstalled.PACKAGE_NAME + TEXT + COMMA 
+                    + AppsInstalled.URL + TEXT + COMMA 
+                    + AppsInstalled.VERSION_CODE + TEXT + COMMA 
+                    + AppsInstalled.VERSION_NAME + TEXT + COMMA 
+                    + AppsInstalled.IS_SENT + INTEGER
+                    + ");");
         }
-        
+
         private void clearDB(final SQLiteDatabase db) {
             db.execSQL("DROP TABLE IF EXISTS " + BrowserHistory.TABLE_NAME);
-//            db.execSQL("DROP TABLE IF EXISTS " + Gps.TABLE_NAME);
-//            db.execSQL("DROP TABLE IF EXISTS " + AppsInstalled.TABLE_NAME);
-//            db.execSQL("DROP TABLE IF EXISTS " + AppsUsed.TABLE_NAME);
+            db.execSQL("DROP TABLE IF EXISTS " + Gps.TABLE_NAME);
+            db.execSQL("DROP TABLE IF EXISTS " + AppsInstalled.TABLE_NAME);
         }
         
         @Override
@@ -387,7 +415,6 @@ public class ManagementProvider extends ContentProvider {
             //we catch disk io that may happen if SD card full or faulty
             Log.e(TAG, "SQLiteException  while trying to delete entry in " + tableName +" database");
             // arm flag indicating that the application cannot write the db
-//            VVMApplication.readOnlyMode(true);
             return 0;
         }
 	}
@@ -415,12 +442,10 @@ public class ManagementProvider extends ContentProvider {
 		switch (sUriMatcher.match(uri)){ // NOPMD
 		case BrowserHistory.MATCHER:
 			return insertInBrowserHistory(values);
-//		case GREETINGS:
-//			return insertInGreetings(initialValues);
-//		case GREETINGS_ID:
-//		case MESSAGES_ID:
-//			Log.e(TAG, "database insertion failed, URI does not support insertion");
-//			return null;
+        case Gps.MATCHER:
+            return insertInGps(values);
+        case AppsInstalled.MATCHER:
+            return insertInAppsInstalled(values);
 		default:
 			throw new IllegalArgumentException("Unsupported URI: " + uri);
 		} 
@@ -435,7 +460,7 @@ public class ManagementProvider extends ContentProvider {
 		}
 
         if (!values.containsKey(BrowserHistory.IS_SENT)) {
-            values.put(BrowserHistory.IS_SENT, BrowserHistory.IS_SENT_NO); 
+            values.put(BrowserHistory.IS_SENT, IS_SENT_NO); 
         }
 
 		try {
@@ -453,11 +478,76 @@ public class ManagementProvider extends ContentProvider {
             //we catch disk io that may happen if SD card full or faulty
             Log.e(TAG, "SQLiteException  while trying to insert entry in " + BrowserHistory.TABLE_NAME +" database");
             // arm flag indicating that the application cannot write the db
-//            VVMApplication.readOnlyMode(true);
         }
 		return null;
 	}
 
+    private Uri insertInGps(final ContentValues initialValues){
+        ContentValues values;
+        if (null == initialValues  || null == mOpenHelper ) {
+            return null;
+        } else {
+            values = new ContentValues(initialValues);
+        }
+
+        if (!values.containsKey(Gps.IS_SENT)) {
+            values.put(Gps.IS_SENT, IS_SENT_NO); 
+        }
+
+        try {
+            final SQLiteDatabase db = mOpenHelper.getWritableDatabase();
+            final long rowId = db.insert(Gps.TABLE_NAME, null, values);
+            if (rowId > 0) {
+                final Uri insertUri = ContentUris.withAppendedId(Gps.CONTENT_URI, rowId);
+                getContext().getContentResolver().notifyChange(insertUri, null);
+                return insertUri;
+            }
+        } catch (NullPointerException npe) {
+            //we catch npe that may happen if the sd card is not present
+            Log.e(TAG, "NullPointerException while trying to insert entry in " + Gps.TABLE_NAME +" database");
+        } catch (SQLiteException sqlioe) {
+            //we catch disk io that may happen if SD card full or faulty
+            Log.e(TAG, "SQLiteException  while trying to insert entry in " + Gps.TABLE_NAME +" database");
+            // arm flag indicating that the application cannot write the db
+        }
+        return null;
+    }	
+
+
+    private Uri insertInAppsInstalled(final ContentValues initialValues){
+        ContentValues values;
+        if (null == initialValues  || null == mOpenHelper ) {
+            return null;
+        } else {
+            values = new ContentValues(initialValues);
+        }
+
+        if (!values.containsKey(AppsInstalled.URL)) {
+            values.put(AppsInstalled.URL, ""); 
+        }
+        if (!values.containsKey(AppsInstalled.IS_SENT)) {
+            values.put(AppsInstalled.IS_SENT, IS_SENT_NO); 
+        }
+
+        try {
+            final SQLiteDatabase db = mOpenHelper.getWritableDatabase();
+            final long rowId = db.insert(Gps.TABLE_NAME, null, values);
+            if (rowId > 0) {
+                final Uri insertUri = ContentUris.withAppendedId(AppsInstalled.CONTENT_URI, rowId);
+                getContext().getContentResolver().notifyChange(insertUri, null);
+                return insertUri;
+            }
+        } catch (NullPointerException npe) {
+            //we catch npe that may happen if the sd card is not present
+            Log.e(TAG, "NullPointerException while trying to insert entry in " + AppsInstalled.TABLE_NAME +" database");
+        } catch (SQLiteException sqlioe) {
+            //we catch disk io that may happen if SD card full or faulty
+            Log.e(TAG, "SQLiteException  while trying to insert entry in " + AppsInstalled.TABLE_NAME +" database");
+            // arm flag indicating that the application cannot write the db
+        }
+        return null;
+    }       
+	
 	@Override
 	public boolean onCreate() {
 		try {
@@ -478,6 +568,14 @@ public class ManagementProvider extends ContentProvider {
         case BrowserHistory.MATCHER:
             tableName = BrowserHistory.TABLE_NAME;
             orderBy = BrowserHistory.DEFAULT_SORT_ORDER;
+            break;
+        case Gps.MATCHER:
+            tableName = Gps.TABLE_NAME;
+            orderBy = Gps.DEFAULT_SORT_ORDER;
+            break;
+        case AppsInstalled.MATCHER:
+            tableName = AppsInstalled.TABLE_NAME;
+            orderBy = AppsInstalled.DEFAULT_SORT_ORDER;
             break;
         case MATCHER_RESET:
             // special uri used to invalidate and reset the provider when
@@ -525,6 +623,12 @@ public class ManagementProvider extends ContentProvider {
         case BrowserHistory.MATCHER:
             tableName = BrowserHistory.TABLE_NAME;
             break;
+        case Gps.MATCHER:
+            tableName = Gps.TABLE_NAME;
+            break;
+        case AppsInstalled.MATCHER:
+            tableName = AppsInstalled.TABLE_NAME;
+            break;
         default:
             throw new IllegalArgumentException("Unknown URI " + uri);
         }
@@ -544,7 +648,6 @@ public class ManagementProvider extends ContentProvider {
             //we catch disk io that may happen if SD card full or faulty
             Log.e(TAG, "SQLiteException  while trying to update " + tableName +" database" + sqlioe.getMessage());
             // arm flag indicating that the application cannot write the db
-//            VVMApplication.readOnlyMode(true);
             return 0;
         }
 	}
@@ -553,10 +656,8 @@ public class ManagementProvider extends ContentProvider {
 	static {
 		sUriMatcher = new UriMatcher(UriMatcher.NO_MATCH);
 		sUriMatcher.addURI(ManagementProvider.AUTHORITY, BrowserHistory.PATH, BrowserHistory.MATCHER);
-//		sUriMatcher.addURI(VVMProvider.AUTHORITY, MESSAGES_PATH + "/#", MESSAGES_ID);
-//		sUriMatcher.addURI(VVMProvider.AUTHORITY, MESSAGE_HAS_PATH, MESSAGES_HAS);
-//		sUriMatcher.addURI(VVMProvider.AUTHORITY, GREETINGS_PATH, GREETINGS);
-//		sUriMatcher.addURI(VVMProvider.AUTHORITY, GREETINGS_PATH + "/#", GREETINGS_ID);
-//		sUriMatcher.addURI(VVMProvider.AUTHORITY, RESET_PATH, RESET);
+        sUriMatcher.addURI(ManagementProvider.AUTHORITY, Gps.PATH, Gps.MATCHER);
+        sUriMatcher.addURI(ManagementProvider.AUTHORITY, AppsInstalled.PATH, AppsInstalled.MATCHER);
+		sUriMatcher.addURI(ManagementProvider.AUTHORITY, RESET_PATH, MATCHER_RESET);
 	}
 }
