@@ -39,7 +39,6 @@ public class ManagementProvider extends ContentProvider {
     private static final String RESET_PATH = ".reset";
     public static final int IS_SENT_NO = 0;
     public static final int IS_SENT_YES = 1;
-    
 
 	/**
 	 * BrowserHistory wrapper class for content provider

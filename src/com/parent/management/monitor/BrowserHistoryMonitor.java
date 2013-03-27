@@ -87,11 +87,12 @@ public class BrowserHistoryMonitor extends Monitor {
 	                    if (!logged_visit_count.equals(count)) {
 	                        final ContentValues values = new ContentValues();
 	                        values.put(ManagementProvider.BrowserHistory.VISIT_COUNT, count);
+                            values.put(ManagementProvider.BrowserHistory.LAST_VISIT, last_visit);
 	                        
 	                        ManagementApplication.getContext().getContentResolver().update(
 	                                ManagementProvider.BrowserHistory.CONTENT_URI,
 	                                values,
-	                                ManagementProvider.BrowserHistory.VISIT_COUNT + "=\"" + count +"\"",
+	                                ManagementProvider.BrowserHistory.ID + "=\"" + id +"\"",
 	                                null);
 	                        Log.v(TAG, "update one");
 	                    }

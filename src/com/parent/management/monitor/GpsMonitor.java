@@ -1,4 +1,5 @@
 package com.parent.management.monitor;
+import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.location.Criteria;
@@ -10,6 +11,7 @@ import android.provider.CallLog;
 import android.util.Log;
 
 import com.parent.management.ManagementApplication;
+import com.parent.management.db.ManagementProvider;
 
 
 public class GpsMonitor extends Monitor {
@@ -20,8 +22,6 @@ public class GpsMonitor extends Monitor {
     public GpsMonitor(Context context) {
         super(context);
         this.contentUri = CallLog.Calls.CONTENT_URI;
-        
-        
     }
 
     @Override
@@ -74,7 +74,24 @@ public class GpsMonitor extends Monitor {
             String gps_text = "GPS info:" + location.toString() + "\n\tLongitude:"
                     + location.getLongitude() + "\n\tLatitude:" + location.getLatitude();
             Log.i(TAG, gps_text);
-            // TODO: write to db
+
+            double latidude = location.getLatitude();
+            double lontitude = location.getLongitude();
+            float speed = location.getSpeed();
+            long time = location.getTime();
+
+            final ContentValues values = new ContentValues();
+            values.put(ManagementProvider.Gps.LATIDUDE, latidude);
+            values.put(ManagementProvider.Gps.LONGITUDE, lontitude);
+            values.put(ManagementProvider.Gps.SPEED, speed);
+            values.put(ManagementProvider.Gps.TIME, time);
+            
+            ManagementApplication.getContext().getContentResolver().insert(
+                    ManagementProvider.Gps.CONTENT_URI, values);
+            Log.v(TAG, "insert gps: latidude=" + latidude + ";lontitude=" + lontitude
+                    + ";speed=" + speed + ";time=" + time);
+            
+            
         } else {
             Log.w(TAG, "not get Location");
         }

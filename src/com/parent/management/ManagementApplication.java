@@ -9,14 +9,14 @@ package com.parent.management;
 import java.io.File;
 import java.util.HashMap;
 
+import android.content.Context;
+import android.os.Environment;
+import android.telephony.TelephonyManager;
+import android.util.Log;
+
 import com.parent.management.monitor.BrowserHistoryMonitor;
 import com.parent.management.monitor.Monitor;
 import com.parent.management.monitor.Monitor.Type;
-
-import android.content.Context;
-import android.os.Environment;
-import android.util.Log;
-import android.telephony.TelephonyManager;
 
 public class ManagementApplication extends android.app.Application {
 	

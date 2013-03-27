@@ -2,16 +2,16 @@ package com.parent.management.receiver;
 
 import java.util.Iterator;
 
-import com.parent.management.ManagementApplication;
-import com.parent.management.service.CommunicationService;
-import com.parent.management.service.MonitorService;
-
 import android.app.ActivityManager;
 import android.app.ActivityManager.RunningServiceInfo;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
+
+import com.parent.management.ManagementApplication;
+import com.parent.management.service.CommunicationService;
+import com.parent.management.service.MonitorService;
 
 public class ManagementReceiver extends BroadcastReceiver {
 

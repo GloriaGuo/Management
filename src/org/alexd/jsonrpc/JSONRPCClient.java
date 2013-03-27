@@ -2,13 +2,11 @@ package org.alexd.jsonrpc;
 
 import java.util.UUID;
 
+import org.alexd.jsonrpc.JSONRPCParams.Versions;
+import org.apache.http.protocol.HTTP;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-
-import org.alexd.jsonrpc.JSONRPCException;
-import org.alexd.jsonrpc.JSONRPCParams.Versions;
-import org.apache.http.protocol.HTTP;
 
 public abstract class JSONRPCClient {
 	

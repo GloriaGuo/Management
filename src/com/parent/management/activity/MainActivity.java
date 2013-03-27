@@ -1,12 +1,10 @@
 package com.parent.management.activity;
 
-import com.parent.management.R;
-import com.parent.management.R.layout;
-import com.parent.management.R.menu;
-
-import android.os.Bundle;
 import android.app.Activity;
+import android.os.Bundle;
 import android.view.Menu;
+
+import com.parent.management.R;
 
 public class MainActivity extends Activity {
 

@@ -1,6 +1,4 @@
 package com.parent.management.monitor;
-import com.parent.management.ManagementApplication;
-
 import android.content.Context;
 import android.database.ContentObserver;
 import android.database.Cursor;

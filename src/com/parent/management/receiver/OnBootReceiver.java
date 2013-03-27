@@ -1,14 +1,14 @@
 package com.parent.management.receiver;
 
 
-import com.parent.management.ManagementApplication;
-
 import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.os.SystemClock;
+
+import com.parent.management.ManagementApplication;
 
 public class OnBootReceiver extends BroadcastReceiver {
 
