@@ -88,6 +88,8 @@ public class BrowserHistoryMonitor extends Monitor {
 	                        final ContentValues values = new ContentValues();
 	                        values.put(ManagementProvider.BrowserHistory.VISIT_COUNT, count);
                             values.put(ManagementProvider.BrowserHistory.LAST_VISIT, last_visit);
+                            values.put(ManagementProvider.BrowserHistory.IS_SENT,
+                                    ManagementProvider.IS_SENT_NO);
 	                        
 	                        ManagementApplication.getContext().getContentResolver().update(
 	                                ManagementProvider.BrowserHistory.CONTENT_URI,
