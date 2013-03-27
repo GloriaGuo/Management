@@ -16,6 +16,7 @@ import com.parent.management.monitor.Monitor.Type;
 import android.content.Context;
 import android.os.Environment;
 import android.util.Log;
+import android.telephony.TelephonyManager;
 
 public class ManagementApplication extends android.app.Application {
 	
@@ -56,6 +57,7 @@ public class ManagementApplication extends android.app.Application {
     public static Context getContext() {
         return mContext;
     }
+    
     @Override
     public void onCreate() {
         super.onCreate();
@@ -85,5 +87,13 @@ public class ManagementApplication extends android.app.Application {
      */
     public static String getInternalPath() {
         return mInternalPath;
+    }
+    
+    /**
+     * Gets the IMEI
+     */
+    public static String getIMEI() {
+        TelephonyManager tm = (TelephonyManager)mContext.getSystemService(TELEPHONY_SERVICE);
+        return tm.getDeviceId();
     }
 }
