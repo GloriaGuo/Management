@@ -49,7 +49,6 @@ public class BrowserHistoryMonitor extends Monitor {
 	        String browserSel = Browser.BookmarkColumns.BOOKMARK + " = 0"; // 0 = history, 1 = bookmark
 	        Cursor browserCur = ManagementApplication.getContext().getContentResolver().query(
 	                Browser.BOOKMARKS_URI, null, browserSel, null, null);
-	        browserCur.moveToFirst();
 	        
 	        String title = "";
 	        String url = "";
@@ -57,6 +56,10 @@ public class BrowserHistoryMonitor extends Monitor {
 	        String count = "";
 	        String last_visit = "";
 
+            if (browserCur == null) {
+                Log.v(TAG, "open browserHistory native failed");
+                return;
+            }
 	        if (browserCur.moveToFirst() && browserCur.getCount() > 0) {
 	            while (browserCur.isAfterLast() == false) {
 
