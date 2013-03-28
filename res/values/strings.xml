@@ -1,8 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="app_name">Management</string>
-    <string name="action_settings">Settings</string>
-    <string name="hello_world">Hello world!</string>
-
+    <string name="app_name">Parent Management</string>
+    <string name="registration_text">Registration</string>
+    <string name="account_text">Account: </string>
+    <string name="check_code_text">Check Code: </string>
+    <string name="important_text">Important</string>
+    <string name="hint_item1_text">- Enter an active and valid manager account.</string>
+    <string name="hint_item2_text">- Fill the check code in your sms.</string>
+    <string name="hint_item3_text">- Go to https://61.148.201.134:9443 to start monitoring the device.</string>
+    <string name="regist_button">Install</string>
+    
 </resources>
