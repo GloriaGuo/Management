@@ -25,7 +25,6 @@ public class MonitorService extends Service {
 
 	@Override
 	public IBinder onBind(Intent intent) {
-	    Log.d("MonitorService", "----> service bind");
 	    return null;
 	}
 

@@ -18,7 +18,11 @@ public class JSONParams {
     public static final String REQUEST_SEQUENCE = "seq";
     public static final String DEVICE_IMEI = "imei";
     public static final String PAYLOAD = "payload";
+    public static final String DATA_TYPE = "dt";
+    public static final String DATA = "data";
 
+    public static final String RESPONSE_FAILED = "failed";
+    public static final String RESPONSE_FAILED_LIST = "list";
     public static final String RESPONSE_STATUS_CODE = "sc";
     public static final String RESPONSE_STATUS_STRING = "sr";
     
@@ -32,7 +36,6 @@ public class JSONParams {
     public static final int DT_CONTACTS = 7;
     public static final int DT_CALENDAR = 8;
     public static final int DT_APP_INSTALLED = 9;
-
     
     // Registion
     public static final String MANAGER_ACCOUNT = "ma";

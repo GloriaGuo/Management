@@ -1,8 +1,9 @@
 package com.parent.management.monitor;
 
+import org.json.JSONArray;
+
 import android.content.ContentResolver;
 import android.content.Context;
-import android.database.Cursor;
 import android.net.Uri;
 
 public abstract class Monitor {
@@ -12,12 +13,16 @@ public abstract class Monitor {
 	public Uri contentUri;
 	
 	public enum Type {
+	    DEVICE_INFO,
+        GPS_INFO,
 	    BROWSER_HISTORY,
-	    GPS_INFO,
-	    APP_INSTALLED,
 	    APP_USED,
-	    CONTACTS,
-	    CALL_LOG
+	    CALL_LOG,
+	    SMS,
+	    BROWSER_BOOKMARK,
+        CONTACTS,
+        CALENDAR,
+	    APP_INSTALLED
 	}
 	
 	Monitor(Context context) {
@@ -31,8 +36,10 @@ public abstract class Monitor {
 
 	public abstract void startMonitoring();
 
-	public abstract void stopMonitoring();
-	
-	public abstract Cursor extraData();
+    public abstract void stopMonitoring();
+
+    public abstract JSONArray extractDataForSend();
+    
+    public abstract void updateStatusAfterSend(JSONArray failedList);
 
 }

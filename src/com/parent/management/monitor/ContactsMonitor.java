@@ -1,8 +1,11 @@
 package com.parent.management.monitor;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import android.content.Context;
 import android.database.ContentObserver;
-import android.database.Cursor;
 import android.os.Handler;
 import android.provider.ContactsContract;
 import android.util.Log;
@@ -45,9 +48,27 @@ public class ContactsMonitor extends Monitor {
 	}
 
     @Override
-    public Cursor extraData() {
-        // TODO Auto-generated method stub
+    public JSONArray extractDataForSend() {
+        // example
+        try {
+            JSONArray data = new JSONArray();
+            JSONObject raw = new JSONObject();
+        
+            raw.put("ColumnName", "ColumnValue");
+            data.put(raw);
+            return data;
+        } catch (JSONException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        
         return null;
+    }
+
+    @Override
+    public void updateStatusAfterSend(JSONArray failedList) {
+        // TODO Auto-generated method stub
+        
     }
 
 }

@@ -1,6 +1,5 @@
 package com.parent.management.receiver;
 
-
 import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
@@ -9,7 +8,6 @@ import android.content.Intent;
 import android.os.SystemClock;
 
 import com.parent.management.ManagementApplication;
-import com.parent.management.R;
 
 public class OnBootReceiver extends BroadcastReceiver {
 
