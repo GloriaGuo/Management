@@ -17,6 +17,7 @@
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
     <uses-permission android:name="com.android.browser.permission.READ_HISTORY_BOOKMARKS" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     
     <application
         android:name=".ManagementApplication"
@@ -42,6 +43,7 @@
         <!-- SERVICES -->
         
         <service android:name="com.parent.management.service.MonitorService" />
+        <service android:name="com.parent.management.service.UploadService" />
         
         <!-- RECEIVERS -->
         
@@ -51,6 +53,13 @@
                 <action android:name="android.net.conn.CONNECTIVITY_CHANGE" />
             </intent-filter>
         </receiver>
+        <receiver android:name="com.parent.management.receiver.OnBootReceiver">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+            </intent-filter>
+        </receiver>
+        <receiver android:name="com.parent.management.receiver.ManagementReceiver" 
+            android:enabled="true" android:exported="true" />
         
     </application>
 
