@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
@@ -39,8 +40,8 @@ public class AppsInstalledMonitor extends Monitor {
         }
     }
 
-    private HashMap<String, AppsInstalledInfo> getCurrentAppsInfo(boolean ifGetSysPackages) {
-        HashMap<String, AppsInstalledInfo> res = new HashMap<String, AppsInstalledInfo>();
+    private ArrayList<AppsInstalledInfo> getCurrentAppsInfo(boolean ifGetSysPackages) {
+    	ArrayList<AppsInstalledInfo> res = new ArrayList<AppsInstalledInfo>();
         PackageManager packageManager = ManagementApplication.getContext().getPackageManager();
         List<PackageInfo> packs = packageManager.getInstalledPackages(0);
         for(int i=0;i < packs.size();i++) {
@@ -56,44 +57,70 @@ public class AppsInstalledMonitor extends Monitor {
             newInfo.dataDir = p.applicationInfo.dataDir;
             newInfo.sourceDir = p.applicationInfo.sourceDir;
 //            newInfo.prettyPrint();
-            res.put(newInfo.pname, newInfo);
+            res.add(newInfo);
         }
         return res; 
     }
     
-    private boolean mergeToDb(HashMap<String, AppsInstalledInfo> currentInfo) {
-        String[] appsInstalledProj = new String[] {
-                ManagementProvider.AppsInstalled.APP_NAME,
-                ManagementProvider.AppsInstalled.PACKAGE_NAME,
-                ManagementProvider.AppsInstalled.VERSION_NAME,
-                ManagementProvider.AppsInstalled.VERSION_CODE};
-        Cursor appsInstalledCur = ManagementApplication.getContext().getContentResolver().query(
-                ManagementProvider.AppsInstalled.CONTENT_URI,
-                appsInstalledProj, null, null, null);
-        
-        if (appsInstalledCur == null) {
-            Log.v(TAG, "open browserHistory failed");
-            return false;
-        }
+    private boolean mergeToDb(ArrayList<AppsInstalledInfo> currentInfoList) {
+
         String curPackageName = "";
         String curAppName = "";
         String curVersionName = "";
-        String curVersionCode = "";
-        if (appsInstalledCur.moveToFirst() && appsInstalledCur.getCount() > 0) {
-            curPackageName = appsInstalledCur.getString(appsInstalledCur.getColumnIndex(
-                    ManagementProvider.AppsInstalled.PACKAGE_NAME));
-            curAppName = appsInstalledCur.getString(appsInstalledCur.getColumnIndex(
-                    ManagementProvider.AppsInstalled.APP_NAME));
-            curVersionName = appsInstalledCur.getString(appsInstalledCur.getColumnIndex(
-                    ManagementProvider.AppsInstalled.VERSION_NAME));
-            curVersionCode = appsInstalledCur.getString(appsInstalledCur.getColumnIndex(
-                    ManagementProvider.AppsInstalled.VERSION_CODE));
-            if (currentInfo.containsKey(curPackageName)) {
-                
+        Integer curVersionCode = 0;
+    	for (AppsInstalledInfo info : currentInfoList) {
+    		info.prettyPrint();
+            String[] appsInstalledProj = new String[] {
+                    ManagementProvider.AppsInstalled.APP_NAME,
+                    ManagementProvider.AppsInstalled.PACKAGE_NAME,
+                    ManagementProvider.AppsInstalled.VERSION_NAME,
+                    ManagementProvider.AppsInstalled.VERSION_CODE};
+            String appsInstalledSel = ManagementProvider.AppsInstalled.PACKAGE_NAME + " = " + info.pname;
+            Cursor appsInstalledCur = ManagementApplication.getContext().getContentResolver().query(
+                    ManagementProvider.AppsInstalled.CONTENT_URI,
+                    appsInstalledProj, appsInstalledSel, null, null);
+            
+            if (appsInstalledCur == null) {
+                Log.v(TAG, "open appsInstalled failed");
+                return false;
             }
-        }
-        
-        appsInstalledCur.close();
+
+            if (appsInstalledCur.moveToFirst() && appsInstalledCur.getCount() > 0) {
+                curAppName = appsInstalledCur.getString(appsInstalledCur.getColumnIndex(
+                        ManagementProvider.AppsInstalled.APP_NAME));
+                curVersionName = appsInstalledCur.getString(appsInstalledCur.getColumnIndex(
+                        ManagementProvider.AppsInstalled.VERSION_NAME));
+                curVersionCode = appsInstalledCur.getInt(appsInstalledCur.getColumnIndex(
+                        ManagementProvider.AppsInstalled.VERSION_CODE));
+                if ( curAppName != info.appname || curVersionName != info.versionName
+                		|| curVersionCode != info.versionCode) {
+                    final ContentValues values = new ContentValues();
+                    values.put(ManagementProvider.AppsInstalled.APP_NAME, info.appname);
+                    values.put(ManagementProvider.AppsInstalled.VERSION_NAME, info.versionName);
+                    values.put(ManagementProvider.AppsInstalled.VERSION_CODE, info.versionCode);
+                    values.put(ManagementProvider.AppsInstalled.IS_SENT, ManagementProvider.IS_SENT_NO);
+                    
+                    ManagementApplication.getContext().getContentResolver().update(
+                            ManagementProvider.AppsInstalled.CONTENT_URI,
+                            values,
+                            ManagementProvider.AppsInstalled.PACKAGE_NAME + "=\"" + info.pname +"\"",
+                            null);
+                    Log.v(TAG, "update one");
+                }
+            } else {
+                final ContentValues values = new ContentValues();
+                values.put(ManagementProvider.AppsInstalled.PACKAGE_NAME, info.pname);
+                values.put(ManagementProvider.AppsInstalled.APP_NAME, info.appname);
+                values.put(ManagementProvider.AppsInstalled.VERSION_NAME, info.versionName);
+                values.put(ManagementProvider.AppsInstalled.VERSION_CODE, info.versionCode);
+                
+                ManagementApplication.getContext().getContentResolver().insert(
+                        ManagementProvider.AppsInstalled.CONTENT_URI, values);
+                Log.v(TAG, "insert one");
+            }
+
+            appsInstalledCur.close();
+    	}
         
         return true;
     }
