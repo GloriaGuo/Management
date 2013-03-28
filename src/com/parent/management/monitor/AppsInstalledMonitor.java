@@ -1,8 +1,11 @@
 package com.parent.management.monitor;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import android.content.ContentValues;
 import android.content.Context;
@@ -137,8 +140,27 @@ public class AppsInstalledMonitor extends Monitor {
     }
 
     @Override
-    public Cursor extraData() {
+    public JSONArray extractDataForSend() {
+        // example
+        try {
+            JSONArray data = new JSONArray();
+            JSONObject raw = new JSONObject();
+        
+            raw.put("ColumnName", "ColumnValue");
+            data.put(raw);
+            return data;
+        } catch (JSONException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        
         return null;
+    }
+
+    @Override
+    public void updateStatusAfterSend(JSONArray failedList) {
+        // TODO Auto-generated method stub
+        
     }
 
 }

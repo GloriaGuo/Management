@@ -2,7 +2,11 @@ package com.parent.management.jsonclient;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.UUID;
+import java.util.Map.Entry;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -22,6 +26,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import com.parent.management.ManagementApplication;
+import com.parent.management.monitor.Monitor;
+import com.parent.management.monitor.Monitor.Type;
 
 import android.util.Log;
 
@@ -146,31 +152,31 @@ public class JSONHttpClient {
         return arr;
     }
     
-    public JSONObject doUpload(Object[] params) throws JSONClientException
+    public JSONObject doUpload(JSONArray payload) throws JSONClientException
     {
-        //Copy method arguments in a json array
-        JSONArray jsonParams = new JSONArray();
-        for (int i=0; i<params.length; i++)
-        {
-            if (params[i].getClass().isArray()) {
-                jsonParams.put(getJSONArray((Object[])params[i]));
-            }
-            jsonParams.put(params[i]);
-        }
-        
         //Create the json request object
         JSONObject jsonRequest = new JSONObject();
         try {
             jsonRequest.put(JSONParams.PROTOCOL_VERSION, "1.0");
             jsonRequest.put(JSONParams.MESSAGE_CLASS, JSONParams.MC_BASIC);
             jsonRequest.put(JSONParams.MESSAGE_TYPE, JSONParams.MT_BASIC_DATA_UPLOAD_REQ);
-            jsonRequest.put(JSONParams.REQUEST_SEQUENCE, UUID.randomUUID().hashCode());
+            int id = UUID.randomUUID().hashCode();
+            jsonRequest.put(JSONParams.REQUEST_SEQUENCE, id);
             jsonRequest.put(JSONParams.DEVICE_IMEI, ManagementApplication.getIMEI());
-            jsonRequest.put(JSONParams.PAYLOAD, jsonParams);
+            jsonRequest.put(JSONParams.PAYLOAD, payload);
+            
+            JSONObject result = doJSONRequest(jsonRequest);
+            
+            if (result.getInt(JSONParams.MESSAGE_TYPE) == JSONParams.MT_BASIC_DATA_UPLOAD_RESP && 
+                result.getInt(JSONParams.REQUEST_SEQUENCE) == id) {
+                return result;
+            }
         } catch (JSONException e1) {
             throw new JSONClientException("Invalid JSON request", e1);
         }
-        return doJSONRequest(jsonRequest);
+        
+        return null;
+        
     }
     
     public boolean doRegistion(String account, String code) throws JSONClientException

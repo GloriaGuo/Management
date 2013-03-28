@@ -10,7 +10,7 @@ import android.content.Intent;
 import android.util.Log;
 
 import com.parent.management.ManagementApplication;
-import com.parent.management.service.CommunicationService;
+import com.parent.management.service.UploadService;
 import com.parent.management.service.MonitorService;
 
 public class ManagementReceiver extends BroadcastReceiver {
@@ -35,17 +35,17 @@ public class ManagementReceiver extends BroadcastReceiver {
 	    
 	    if (isServiceRunning("com.parent.management.service.CommunicationService", context)) {
 	        Log.d("ManagementReceiver", "----> stop communication service");
-	        context.stopService(new Intent(context, CommunicationService.class));
+	        context.stopService(new Intent(context, UploadService.class));
 	    }
         Log.d("ManagementReceiver", "----> starting communication service");
-        context.startService(new Intent(context, CommunicationService.class));
+        context.startService(new Intent(context, UploadService.class));
         
-        if (isServiceRunning("com.parent.management.service.MonitorService", context)) {
-            Log.d("ManagementReceiver", "----> stop monitor service");
-            context.stopService(new Intent(context, MonitorService.class));
+        // Check monitor service
+        if (!isServiceRunning("com.parent.management.service.MonitorService", context)) {
+            Log.d("ManagementReceiver", "----> start monitor service");
+            context.startService(new Intent(context, MonitorService.class));
         }
-        Log.d("ManagementReceiver", "----> starting monitor service");
-	    context.startService(new Intent(context, MonitorService.class));
+        
 	}
 
 }
