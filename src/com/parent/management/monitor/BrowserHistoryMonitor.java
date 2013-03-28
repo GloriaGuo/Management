@@ -129,13 +129,45 @@ public class BrowserHistoryMonitor extends Monitor {
 
     @Override
     public JSONArray extractDataForSend() {
-        // example
         try {
             JSONArray data = new JSONArray();
-            JSONObject raw = new JSONObject();
-        
-            raw.put("ColumnName", "ColumnValue");
-            data.put(raw);
+
+            String[] browserHistoryProj = new String[] {
+                    ManagementProvider.BrowserHistory.URL,
+                    ManagementProvider.BrowserHistory.TITLE,
+                    ManagementProvider.BrowserHistory.VISIT_COUNT,
+                    ManagementProvider.BrowserHistory.LAST_VISIT};
+            String browserHistorySel = ManagementProvider.BrowserHistory.IS_SENT + " = " + ManagementProvider.IS_SENT_NO;
+            Cursor browserHistoryCur = ManagementApplication.getContext().getContentResolver().query(
+                    ManagementProvider.BrowserHistory.CONTENT_URI,
+                    browserHistoryProj, browserHistorySel, null, null);
+
+            if (browserHistoryCur == null) {
+                Log.v(TAG, "open browserHistory native failed");
+                return null;
+            }
+            if (browserHistoryCur.moveToFirst() && browserHistoryCur.getCount() > 0) {
+                while (browserHistoryCur.isAfterLast() == false) {
+                    String url = browserHistoryCur.getString(
+                            browserHistoryCur.getColumnIndex(ManagementProvider.BrowserHistory.URL));
+                    String title = browserHistoryCur.getString(
+                            browserHistoryCur.getColumnIndex(ManagementProvider.BrowserHistory.TITLE));
+                    String visit_count = browserHistoryCur.getString(
+                            browserHistoryCur.getColumnIndex(ManagementProvider.BrowserHistory.VISIT_COUNT));
+                    String last_visit = browserHistoryCur.getString(
+                            browserHistoryCur.getColumnIndex(ManagementProvider.BrowserHistory.LAST_VISIT));
+                    JSONObject raw = new JSONObject();
+                    raw.put(ManagementProvider.BrowserHistory.URL, url);
+                    raw.put(ManagementProvider.BrowserHistory.TITLE, title);
+                    raw.put(ManagementProvider.BrowserHistory.VISIT_COUNT, visit_count);
+                    raw.put(ManagementProvider.BrowserHistory.LAST_VISIT, last_visit);
+
+                    data.put(raw);
+                    browserHistoryCur.moveToNext();
+                }
+            }
+            browserHistoryCur.close();
+            
             return data;
         } catch (JSONException e) {
             // TODO Auto-generated catch block

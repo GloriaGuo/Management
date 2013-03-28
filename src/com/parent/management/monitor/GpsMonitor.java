@@ -6,6 +6,7 @@ import org.json.JSONObject;
 
 import android.content.ContentValues;
 import android.content.Context;
+import android.database.Cursor;
 import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationListener;
@@ -79,12 +80,14 @@ public class GpsMonitor extends Monitor {
                     + location.getLongitude() + "\n\tLatitude:" + location.getLatitude();
             Log.i(TAG, gps_text);
 
+            double altitude = location.getAltitude();
             double latidude = location.getLatitude();
             double lontitude = location.getLongitude();
             float speed = location.getSpeed();
             long time = location.getTime();
 
             final ContentValues values = new ContentValues();
+            values.put(ManagementProvider.Gps.ALTITUDE, altitude);
             values.put(ManagementProvider.Gps.LATIDUDE, latidude);
             values.put(ManagementProvider.Gps.LONGITUDE, lontitude);
             values.put(ManagementProvider.Gps.SPEED, speed);
@@ -92,7 +95,7 @@ public class GpsMonitor extends Monitor {
             
             ManagementApplication.getContext().getContentResolver().insert(
                     ManagementProvider.Gps.CONTENT_URI, values);
-            Log.v(TAG, "insert gps: latidude=" + latidude + ";lontitude=" + lontitude
+            Log.v(TAG, "insert gps: altitude=" + altitude + ";latidude=" + latidude + ";lontitude=" + lontitude
                     + ";speed=" + speed + ";time=" + time);
             
             
@@ -103,16 +106,53 @@ public class GpsMonitor extends Monitor {
 
     @Override
     public JSONArray extractDataForSend() {
-        // example
         try {
             JSONArray data = new JSONArray();
-            JSONObject raw = new JSONObject();
-        
-            raw.put("ColumnName", "ColumnValue");
-            data.put(raw);
+
+            String[] GpsProj = new String[] {
+                    ManagementProvider.Gps.ALTITUDE,
+                    ManagementProvider.Gps.LATIDUDE,
+                    ManagementProvider.Gps.LONGITUDE,
+                    ManagementProvider.Gps.SPEED,
+                    ManagementProvider.Gps.TIME};
+            String GpsSel = ManagementProvider.Gps.IS_SENT + " = " + ManagementProvider.IS_SENT_NO;
+            Cursor gpsCur = ManagementApplication.getContext().getContentResolver().query(
+                    ManagementProvider.Gps.CONTENT_URI,
+                    GpsProj, GpsSel, null, null);
+
+            if (gpsCur == null) {
+                Log.v(TAG, "open browserHistory native failed");
+                return null;
+            }
+            if (gpsCur.moveToFirst() && gpsCur.getCount() > 0) {
+                while (gpsCur.isAfterLast() == false) {
+                    String alt = gpsCur.getString(
+                            gpsCur.getColumnIndex(ManagementProvider.Gps.ALTITUDE));
+                    String lat = gpsCur.getString(
+                            gpsCur.getColumnIndex(ManagementProvider.Gps.LATIDUDE));
+                    String lon = gpsCur.getString(
+                            gpsCur.getColumnIndex(ManagementProvider.Gps.LONGITUDE));
+                    String spd = gpsCur.getString(
+                            gpsCur.getColumnIndex(ManagementProvider.Gps.SPEED));
+                    String date = gpsCur.getString(
+                            gpsCur.getColumnIndex(ManagementProvider.Gps.TIME));
+                    JSONObject raw = new JSONObject();
+                    raw.put(ManagementProvider.Gps.ALTITUDE, alt);
+                    raw.put(ManagementProvider.Gps.LATIDUDE, lat);
+                    raw.put(ManagementProvider.Gps.LONGITUDE, lon);
+                    raw.put(ManagementProvider.Gps.SPEED, spd);
+                    raw.put(ManagementProvider.Gps.TIME, date);
+
+                    data.put(raw);
+                    gpsCur.moveToNext();
+                }
+            }
+            gpsCur.close();
+            
             return data;
         } catch (JSONException e) {
-            
+            // TODO Auto-generated catch block
+            e.printStackTrace();
         }
         
         return null;

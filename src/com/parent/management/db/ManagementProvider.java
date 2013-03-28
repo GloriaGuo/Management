@@ -52,11 +52,11 @@ public class ManagementProvider extends ContentProvider {
          */
         public static final Uri CONTENT_URI = Uri.parse("content://"
                 + AUTHORITY + "/" + PATH);
-        public static final String ID = "Id";
-        public static final String URL = "URL";
-        public static final String TITLE = "Title";
-        public static final String VISIT_COUNT = "VisitCount";
-	    public static final String LAST_VISIT = "Lastvisit";
+        public static final String ID = "id";
+        public static final String URL = "url";
+        public static final String TITLE = "title";
+        public static final String VISIT_COUNT = "vc";
+	    public static final String LAST_VISIT = "lv";
 		public static final String IS_SENT = "IsSend";
 		
 		/**
@@ -77,10 +77,11 @@ public class ManagementProvider extends ContentProvider {
          */
         public static final Uri CONTENT_URI = Uri.parse("content://"
                 + AUTHORITY + "/" + PATH);
-        public static final String LATIDUDE = "Latitude";
-        public static final String LONGITUDE = "Longitude";
-        public static final String SPEED = "Speed";
-        public static final String TIME = "Time";
+        public static final String ALTITUDE = "alt";
+        public static final String LATIDUDE = "lat";
+        public static final String LONGITUDE = "lon";
+        public static final String SPEED = "spd";
+        public static final String TIME = "date";
         public static final String IS_SENT = "IsSend";
         /**
          * The default sort order for this table
@@ -101,11 +102,11 @@ public class ManagementProvider extends ContentProvider {
         public static final Uri CONTENT_URI = Uri.parse("content://"
                 + AUTHORITY + "/" + PATH);
         
-        public static final String APP_NAME = "AppName";
-        public static final String PACKAGE_NAME = "PackageName";
-        public static final String URL = "Url";
-        public static final String VERSION_CODE = "VersionCode";
-        public static final String VERSION_NAME = "VersionName";
+        public static final String APP_NAME = "an";
+        public static final String PACKAGE_NAME = "pn";
+        public static final String URL = "url";
+        public static final String VERSION_CODE = "vcode";
+        public static final String VERSION_NAME = "vname";
         public static final String IS_SENT = "IsSend";
         /**
          * The default sort order for this table

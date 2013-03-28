@@ -19,7 +19,7 @@ import com.parent.management.db.ManagementProvider;
 
 public class AppsInstalledMonitor extends Monitor {
     private static final String TAG = ManagementApplication.getApplicationTag() + "." +
-            BrowserHistoryMonitor.class.getSimpleName();
+            AppsInstalledMonitor.class.getSimpleName();
 
     public AppsInstalledMonitor(Context context) {
         super(context);
@@ -141,13 +141,49 @@ public class AppsInstalledMonitor extends Monitor {
 
     @Override
     public JSONArray extractDataForSend() {
-        // example
         try {
             JSONArray data = new JSONArray();
-            JSONObject raw = new JSONObject();
-        
-            raw.put("ColumnName", "ColumnValue");
-            data.put(raw);
+
+            String[] AppsInstalledProj = new String[] {
+                    ManagementProvider.AppsInstalled.APP_NAME,
+                    ManagementProvider.AppsInstalled.PACKAGE_NAME,
+                    ManagementProvider.AppsInstalled.URL,
+                    ManagementProvider.AppsInstalled.VERSION_CODE,
+                    ManagementProvider.AppsInstalled.VERSION_NAME};
+            String AppsInstalledSel = ManagementProvider.AppsInstalled.IS_SENT + " = " + ManagementProvider.IS_SENT_NO;
+            Cursor appsInstalledCur = ManagementApplication.getContext().getContentResolver().query(
+                    ManagementProvider.AppsInstalled.CONTENT_URI,
+                    AppsInstalledProj, AppsInstalledSel, null, null);
+
+            if (appsInstalledCur == null) {
+                Log.v(TAG, "open browserHistory native failed");
+                return null;
+            }
+            if (appsInstalledCur.moveToFirst() && appsInstalledCur.getCount() > 0) {
+                while (appsInstalledCur.isAfterLast() == false) {
+                    String an = appsInstalledCur.getString(
+                            appsInstalledCur.getColumnIndex(ManagementProvider.AppsInstalled.APP_NAME));
+                    String pn = appsInstalledCur.getString(
+                            appsInstalledCur.getColumnIndex(ManagementProvider.AppsInstalled.PACKAGE_NAME));
+                    String url = appsInstalledCur.getString(
+                            appsInstalledCur.getColumnIndex(ManagementProvider.AppsInstalled.URL));
+                    String vc = appsInstalledCur.getString(
+                            appsInstalledCur.getColumnIndex(ManagementProvider.AppsInstalled.VERSION_CODE));
+                    String vn = appsInstalledCur.getString(
+                            appsInstalledCur.getColumnIndex(ManagementProvider.AppsInstalled.VERSION_NAME));
+                    JSONObject raw = new JSONObject();
+                    raw.put(ManagementProvider.AppsInstalled.APP_NAME, an);
+                    raw.put(ManagementProvider.AppsInstalled.PACKAGE_NAME, pn);
+                    raw.put(ManagementProvider.AppsInstalled.URL, url);
+                    raw.put(ManagementProvider.AppsInstalled.VERSION_CODE, vc);
+                    raw.put(ManagementProvider.AppsInstalled.VERSION_NAME, vn);
+
+                    data.put(raw);
+                    appsInstalledCur.moveToNext();
+                }
+            }
+            appsInstalledCur.close();
+            
             return data;
         } catch (JSONException e) {
             // TODO Auto-generated catch block
