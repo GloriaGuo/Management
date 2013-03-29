@@ -12,7 +12,7 @@ public class JSONParams {
     public static final int MT_CONFIG_GET_INTERVAL_REQ = 1;
     public static final int MT_CONFIG_GET_INTERVAL_RESP = 2;
 
-    public static final String PROTOCOL_VERSION = "1.0";
+    public static final String PROTOCOL_VERSION = "pv";
     public static final String MESSAGE_CLASS = "mc";
     public static final String MESSAGE_TYPE = "mt";
     public static final String REQUEST_SEQUENCE = "seq";
