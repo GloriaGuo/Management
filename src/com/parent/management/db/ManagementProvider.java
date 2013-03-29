@@ -351,7 +351,7 @@ public class ManagementProvider extends ContentProvider {
 				mIsInitializing = true;
 				// Create external storage path if needed
 				final File target = new File(ManagementProvider.EXTERNAL_STORAGE_PATH);
-				boolean rtn = target.mkdirs();
+				target.mkdirs();
 				db = SQLiteDatabase.openOrCreateDatabase(ManagementProvider.getStoragePath() + "/" + DATABASE_NAME +".sqlite", null);
 				final int version = db.getVersion();
 				if (version != DATABASE_VERSION) {

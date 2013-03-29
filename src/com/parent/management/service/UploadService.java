@@ -1,6 +1,5 @@
 package com.parent.management.service;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map.Entry;
@@ -18,11 +17,9 @@ import com.parent.management.monitor.Monitor;
 import com.parent.management.monitor.Monitor.Type;
 
 import android.app.Service;
-import android.content.Context;
 import android.content.Intent;
 import android.net.wifi.WifiManager;
 import android.os.IBinder;
-import android.os.PowerManager;
 import android.util.Log;
 
 public class UploadService extends Service {
@@ -30,7 +27,6 @@ public class UploadService extends Service {
             UploadService.class.getSimpleName();
     
     private static WifiManager.WifiLock mWifilock = null;
-    private static PowerManager.WakeLock mLockStatic = null;
 
 	@Override
 	public IBinder onBind(Intent intent) {
@@ -65,16 +61,6 @@ public class UploadService extends Service {
 	        mWifilock.release();
 	        mWifilock = null;
         }
-	}
-	
-	private static PowerManager.WakeLock getLock(Context context)
-	{
-	    if (mLockStatic == null)
-	    {
-	        mLockStatic = ((PowerManager)context.getSystemService("power")).newWakeLock(1, "PM");
-	        mLockStatic.setReferenceCounted(true);
-	    }
-	    return mLockStatic;
 	}
 	
 	private void uploadJob() {

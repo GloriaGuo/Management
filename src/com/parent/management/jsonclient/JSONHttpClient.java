@@ -2,11 +2,7 @@ package com.parent.management.jsonclient;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
 import java.util.UUID;
-import java.util.Map.Entry;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -26,8 +22,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import com.parent.management.ManagementApplication;
-import com.parent.management.monitor.Monitor;
-import com.parent.management.monitor.Monitor.Type;
 
 import android.util.Log;
 
