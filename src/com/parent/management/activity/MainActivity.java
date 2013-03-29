@@ -117,7 +117,7 @@ public class MainActivity extends Activity {
             }
             closeApp();
         } else {
-            this.showAlert(this.getResources().getString(R.string.alert_dialog_message_regist_failed));
+            //this.showAlert(this.getResources().getString(R.string.alert_dialog_message_regist_failed));
         }
 	}
 	
