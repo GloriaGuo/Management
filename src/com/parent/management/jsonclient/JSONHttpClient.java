@@ -48,7 +48,7 @@ public class JSONHttpClient {
     
     private static final int MS_SUCCESS = 0;
     
-    public JSONHttpClient(HttpClient cleint, String uri){
+    public JSONHttpClient(HttpClient cleint, String uri) {
         httpClient = cleint;
         serviceUri = uri;
     }

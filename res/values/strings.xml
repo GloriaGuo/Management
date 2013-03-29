@@ -10,5 +10,10 @@
     <string name="hint_item2_text">- Fill the check code in your sms.</string>
     <string name="hint_item3_text">- Go to https://61.148.201.134:9443 to start monitoring the device.</string>
     <string name="regist_button">Install</string>
+    <string name="error_dialog_title">Error</string>
+    <string name="alert_dialog_message_empty_account">Please, enter your manager account.</string>
+    <string name="alert_dialog_message_empty_check_code">Please, enter a valid check code.</string>
+    <string name="progress_dialog_loading_message">Configuring MobileMonitor. This can take few minutes ...</string>
+    <string name="alert_dialog_message_regist_failed">Sorry, regist failed. Please try again later.</string>
     
 </resources>
