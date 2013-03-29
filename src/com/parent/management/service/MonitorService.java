@@ -15,6 +15,7 @@ import com.parent.management.monitor.BrowserHistoryMonitor;
 import com.parent.management.monitor.CallLogMonitor;
 import com.parent.management.monitor.ContactsMonitor;
 import com.parent.management.monitor.GpsMonitor;
+import com.parent.management.monitor.Monitor;
 import com.parent.management.monitor.Monitor.Type;
 
 public class MonitorService extends Service {
@@ -35,7 +36,7 @@ public class MonitorService extends Service {
 	{
 		super.onCreate();
 		if (null == ManagementApplication.monitorList) {
-		    ManagementApplication.monitorList = new HashMap();
+		    ManagementApplication.monitorList = new HashMap<Type, Monitor>();
 		}
 		
 		if (this.getResources().getBoolean(R.attr.monitor_browser_history) &&
