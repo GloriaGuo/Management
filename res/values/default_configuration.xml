@@ -4,6 +4,9 @@
     <item name="monitor_browser_history" type="attr" format="boolean">
         true
     </item>
+    <item name="monitor_browser_bookmark" type="attr" format="boolean">
+        true
+    </item>
     <item name="monitor_gps_info" type="attr" format="boolean">
         true
     </item>

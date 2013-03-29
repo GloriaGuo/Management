@@ -10,8 +10,8 @@ import android.content.Intent;
 import android.util.Log;
 
 import com.parent.management.ManagementApplication;
-import com.parent.management.service.UploadService;
 import com.parent.management.service.MonitorService;
+import com.parent.management.service.UploadService;
 
 public class ManagementReceiver extends BroadcastReceiver {
 

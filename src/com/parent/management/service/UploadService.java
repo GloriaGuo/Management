@@ -1,6 +1,5 @@
 package com.parent.management.service;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map.Entry;
@@ -9,14 +8,6 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import com.parent.management.ManagementApplication;
-import com.parent.management.R;
-import com.parent.management.jsonclient.JSONClientException;
-import com.parent.management.jsonclient.JSONHttpClient;
-import com.parent.management.jsonclient.JSONParams;
-import com.parent.management.monitor.Monitor;
-import com.parent.management.monitor.Monitor.Type;
-
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
@@ -24,6 +15,14 @@ import android.net.wifi.WifiManager;
 import android.os.IBinder;
 import android.os.PowerManager;
 import android.util.Log;
+
+import com.parent.management.ManagementApplication;
+import com.parent.management.R;
+import com.parent.management.jsonclient.JSONClientException;
+import com.parent.management.jsonclient.JSONHttpClient;
+import com.parent.management.jsonclient.JSONParams;
+import com.parent.management.monitor.Monitor;
+import com.parent.management.monitor.Monitor.Type;
 
 public class UploadService extends Service {
     private static final String TAG = ManagementApplication.getApplicationTag() + "." +

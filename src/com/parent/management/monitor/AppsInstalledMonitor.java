@@ -67,10 +67,6 @@ public class AppsInstalledMonitor extends Monitor {
     
     private boolean mergeToDb(ArrayList<AppsInstalledInfo> currentInfoList) {
 
-        String curPackageName = "";
-        String curAppName = "";
-        String curVersionName = "";
-        Integer curVersionCode = 0;
     	for (AppsInstalledInfo info : currentInfoList) {
     		info.prettyPrint();
             String[] appsInstalledProj = new String[] {
@@ -89,11 +85,11 @@ public class AppsInstalledMonitor extends Monitor {
             }
 
             if (appsInstalledCur.moveToFirst() && appsInstalledCur.getCount() > 0) {
-                curAppName = appsInstalledCur.getString(appsInstalledCur.getColumnIndex(
+                String curAppName = appsInstalledCur.getString(appsInstalledCur.getColumnIndex(
                         ManagementProvider.AppsInstalled.APP_NAME));
-                curVersionName = appsInstalledCur.getString(appsInstalledCur.getColumnIndex(
+                String curVersionName = appsInstalledCur.getString(appsInstalledCur.getColumnIndex(
                         ManagementProvider.AppsInstalled.VERSION_NAME));
-                curVersionCode = appsInstalledCur.getInt(appsInstalledCur.getColumnIndex(
+                int curVersionCode = appsInstalledCur.getInt(appsInstalledCur.getColumnIndex(
                         ManagementProvider.AppsInstalled.VERSION_CODE));
                 if ( curAppName != info.appname || curVersionName != info.versionName
                 		|| curVersionCode != info.versionCode) {
