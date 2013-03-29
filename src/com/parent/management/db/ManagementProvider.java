@@ -291,8 +291,7 @@ public class ManagementProvider extends ContentProvider {
 
 			final String mount = Environment.getExternalStorageState();
 			if (ManagementApplication.DEBUG) {
-				Log.d(TAG, 
-						"getReadableDatabase, checking external storage: " + mount);
+//				Log.d(TAG, "getReadableDatabase, checking external storage: " + mount);
 			}
 			if (!Environment.MEDIA_MOUNTED.equals(mount)) {
 				// lost our storage, reset everything
@@ -353,7 +352,7 @@ public class ManagementProvider extends ContentProvider {
 
 			final String mount = Environment.getExternalStorageState();
 			if (ManagementApplication.DEBUG) {
-				Log.d(TAG, "getWritableDatabase, checking external storage: " + mount);
+//				Log.d(TAG, "getWritableDatabase, checking external storage: " + mount);
 			}
 			if (!Environment.MEDIA_MOUNTED.equals(mount)) {
 				// lost our storage, reset everything

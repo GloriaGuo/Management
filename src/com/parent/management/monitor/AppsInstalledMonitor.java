@@ -59,14 +59,13 @@ public class AppsInstalledMonitor extends Monitor {
             newInfo.versionCode = p.versionCode;
             newInfo.dataDir = p.applicationInfo.dataDir;
             newInfo.sourceDir = p.applicationInfo.sourceDir;
-//            newInfo.prettyPrint();
+            newInfo.prettyPrint();
             res.add(newInfo);
         }
         return res; 
     }
     
     private boolean checkForChange(ArrayList<AppsInstalledInfo> currentInfoList) {
-
     	for (AppsInstalledInfo info : currentInfoList) {
     		info.prettyPrint();
             String[] appsInstalledProj = new String[] {

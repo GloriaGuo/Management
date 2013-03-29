@@ -76,10 +76,6 @@ public class GpsMonitor extends Monitor {
 
     private void updateLocation(Location location) {
         if (location != null) {
-            String gps_text = "GPS info:" + location.toString() + "\n\tLongitude:"
-                    + location.getLongitude() + "\n\tLatitude:" + location.getLatitude();
-            Log.i(TAG, gps_text);
-
             double altitude = location.getAltitude();
             double latidude = location.getLatitude();
             double lontitude = location.getLongitude();
@@ -97,8 +93,6 @@ public class GpsMonitor extends Monitor {
                     ManagementProvider.Gps.CONTENT_URI, values);
             Log.v(TAG, "insert gps: altitude=" + altitude + ";latidude=" + latidude + ";lontitude=" + lontitude
                     + ";speed=" + speed + ";time=" + time);
-            
-            
         } else {
             Log.w(TAG, "not get Location");
         }

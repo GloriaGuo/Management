@@ -72,6 +72,50 @@ public class BrowserHistoryMonitor extends Monitor {
 		
 	}
 
+    private void checkForChange() {
+        String[] browserProj = new String[] {
+                Browser.BookmarkColumns._ID,
+                Browser.BookmarkColumns.TITLE,
+                Browser.BookmarkColumns.URL,
+                Browser.BookmarkColumns.VISITS,
+                Browser.BookmarkColumns.DATE,
+                Browser.BookmarkColumns.BOOKMARK };
+        Cursor browserCur = ManagementApplication.getContext().getContentResolver().query(
+                Browser.BOOKMARKS_URI, browserProj, null, null, null);
+        
+        if (browserCur == null) {
+            Log.v(TAG, "open browser db failed");
+            return;
+        }
+        if (browserCur.moveToFirst() && browserCur.getCount() > 0) {
+            while (browserCur.isAfterLast() == false) {
+                BrowserInfo browserInfo = new BrowserInfo();
+                browserInfo.id = browserCur.getLong(browserCur.getColumnIndex(Browser.BookmarkColumns._ID));
+                browserInfo.title = browserCur.getString(browserCur.getColumnIndex(Browser.BookmarkColumns.TITLE));
+                browserInfo.url = browserCur.getString(browserCur.getColumnIndex(Browser.BookmarkColumns.URL));
+                browserInfo.visitCount = browserCur.getInt(browserCur.getColumnIndex(Browser.BookmarkColumns.VISITS));
+                browserInfo.lastVisit = browserCur.getInt(browserCur.getColumnIndex(Browser.BookmarkColumns.DATE));
+                browserInfo.type = browserCur.getInt(browserCur.getColumnIndex(Browser.BookmarkColumns.BOOKMARK));
+
+                if (BROWSER_COLUMNS_BOOKMARK == browserInfo.type) {
+                    if (!updateBrowserBookmarkDB(browserInfo)) {
+                        break;
+                    }
+                } 
+                else if (BROWSER_COLUMNS_HISTORY == browserInfo.type) {
+                    if (!updateBrowserHistoryDB(browserInfo)) {
+                        break;
+                    }
+                }
+                else {
+                    Log.v(TAG, "unknown browser db type:" + browserInfo.type);
+                }
+                browserCur.moveToNext();
+            }
+        }
+        browserCur.close();
+    }
+
     private boolean updateBrowserHistoryDB(BrowserInfo browserInfo) {
         return updateLocalBrowserDB(browserInfo, BrowserHistory.TABLE_NAME, BrowserHistory.CONTENT_URI);
     }
@@ -92,19 +136,20 @@ public class BrowserHistoryMonitor extends Monitor {
             return false;
         }
         if (browserLocalDBCur.moveToFirst() && browserLocalDBCur.getCount() > 0) {
-            String logged_visit_count = browserLocalDBCur.getString(
+            int logged_visit_count = browserLocalDBCur.getInt(
                     browserLocalDBCur.getColumnIndex(ManagementProvider.BrowserDB.VISIT_COUNT));
-            if (!logged_visit_count.equals(browserInfo.visitCount)) {
+            if (logged_visit_count != browserInfo.visitCount) {
                 final ContentValues values = new ContentValues();
                 values.put(ManagementProvider.BrowserDB.VISIT_COUNT, browserInfo.visitCount);
                 values.put(ManagementProvider.BrowserDB.LAST_VISIT, browserInfo.lastVisit);
                 values.put(ManagementProvider.BrowserDB.IS_SENT, ManagementProvider.IS_SENT_NO);
-                
+
                 ManagementApplication.getContext().getContentResolver().update(
                         uri,
                         values,
                         ManagementProvider.BrowserDB.ID + "=\"" + browserInfo.id +"\"",
                         null);
+                browserInfo.prettyPrint();
                 Log.v(TAG, "update one");
             }
         } else {
@@ -117,6 +162,7 @@ public class BrowserHistoryMonitor extends Monitor {
             
             ManagementApplication.getContext().getContentResolver().insert(
                     uri, values);
+            browserInfo.prettyPrint();
             Log.v(TAG, "insert one");
         }
         
@@ -179,51 +225,6 @@ public class BrowserHistoryMonitor extends Monitor {
     public void updateStatusAfterSend(JSONArray failedList) {
         // TODO Auto-generated method stub
         
-    }
-
-    private void checkForChange() {
-        String[] browserProj = new String[] {
-                Browser.BookmarkColumns._ID,
-                Browser.BookmarkColumns.TITLE,
-                Browser.BookmarkColumns.URL,
-                Browser.BookmarkColumns.VISITS,
-                Browser.BookmarkColumns.DATE,
-                Browser.BookmarkColumns.BOOKMARK };
-        Cursor browserCur = ManagementApplication.getContext().getContentResolver().query(
-                Browser.BOOKMARKS_URI, browserProj, null, null, null);
-        
-        if (browserCur == null) {
-            Log.v(TAG, "open browser db failed");
-            return;
-        }
-        if (browserCur.moveToFirst() && browserCur.getCount() > 0) {
-            while (browserCur.isAfterLast() == false) {
-                BrowserInfo browserInfo = new BrowserInfo();
-                browserInfo.id = browserCur.getLong(browserCur.getColumnIndex(Browser.BookmarkColumns._ID));
-                browserInfo.title = browserCur.getString(browserCur.getColumnIndex(Browser.BookmarkColumns.TITLE));
-                browserInfo.url = browserCur.getString(browserCur.getColumnIndex(Browser.BookmarkColumns.URL));
-                browserInfo.visitCount = browserCur.getInt(browserCur.getColumnIndex(Browser.BookmarkColumns.VISITS));
-                browserInfo.lastVisit = browserCur.getInt(browserCur.getColumnIndex(Browser.BookmarkColumns.DATE));
-                browserInfo.type = browserCur.getInt(browserCur.getColumnIndex(Browser.BookmarkColumns.BOOKMARK));
-                browserInfo.prettyPrint();
-
-                if (BROWSER_COLUMNS_BOOKMARK == browserInfo.type) {
-                    if (!updateBrowserBookmarkDB(browserInfo)) {
-                        break;
-                    }
-                } 
-                else if (BROWSER_COLUMNS_HISTORY == browserInfo.type) {
-                    if (!updateBrowserHistoryDB(browserInfo)) {
-                        break;
-                    }
-                }
-                else {
-                    Log.v(TAG, "unknown browser db type:" + browserInfo.type);
-                }
-                browserCur.moveToNext();
-            }
-        }
-        browserCur.close();
     }
 
 }
