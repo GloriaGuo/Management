@@ -9,13 +9,14 @@ package com.parent.management;
 
 public final class R {
     public static final class attr {
-        public static final int default_interval_time=0x7f010006;
-        public static final int monitor_apps_installed=0x7f010002;
-        public static final int monitor_apps_used=0x7f010003;
+        public static final int default_interval_time=0x7f010007;
+        public static final int monitor_apps_installed=0x7f010003;
+        public static final int monitor_apps_used=0x7f010004;
+        public static final int monitor_browser_bookmark=0x7f010001;
         public static final int monitor_browser_history=0x7f010000;
-        public static final int monitor_call_log=0x7f010005;
-        public static final int monitor_contacts=0x7f010004;
-        public static final int monitor_gps_info=0x7f010001;
+        public static final int monitor_call_log=0x7f010006;
+        public static final int monitor_contacts=0x7f010005;
+        public static final int monitor_gps_info=0x7f010002;
     }
     public static final class dimen {
         /**  Default screen margins, per the Android Design guidelines. 
@@ -47,12 +48,17 @@ public final class R {
     }
     public static final class string {
         public static final int account_text=0x7f040003;
+        public static final int alert_dialog_message_empty_account=0x7f04000b;
+        public static final int alert_dialog_message_empty_check_code=0x7f04000c;
+        public static final int alert_dialog_message_regist_failed=0x7f04000e;
         public static final int app_name=0x7f040001;
         public static final int check_code_text=0x7f040004;
+        public static final int error_dialog_title=0x7f04000a;
         public static final int hint_item1_text=0x7f040006;
         public static final int hint_item2_text=0x7f040007;
         public static final int hint_item3_text=0x7f040008;
         public static final int important_text=0x7f040005;
+        public static final int progress_dialog_loading_message=0x7f04000d;
         public static final int regist_button=0x7f040009;
         public static final int registration_text=0x7f040002;
         public static final int server_address=0x7f040000;
