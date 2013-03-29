@@ -37,6 +37,7 @@ public class BrowserHistoryMonitor extends Monitor {
 		this.contentResolver.registerContentObserver(this.contentUri, true, this.contentObserver);
 	    this.monitorStatus = true;
 	    Log.d(TAG, "----> startMonitoring");
+        checkForChange();
 	}
 
 	@Override
@@ -66,49 +67,7 @@ public class BrowserHistoryMonitor extends Monitor {
 		
 		@Override
         public void onChange(boolean selfChange) {
-		    String[] browserProj = new String[] {
-		            Browser.BookmarkColumns._ID,
-		            Browser.BookmarkColumns.TITLE,
-		            Browser.BookmarkColumns.URL,
-		            Browser.BookmarkColumns.VISITS,
-		            Browser.BookmarkColumns.DATE,
-		            Browser.BookmarkColumns.BOOKMARK };
-//	        String browserSel = Browser.BookmarkColumns.BOOKMARK + " = 0"; // 0 = history, 1 = bookmark
-	        Cursor browserCur = ManagementApplication.getContext().getContentResolver().query(
-	                Browser.BOOKMARKS_URI, browserProj, null, null, null);
-	        
-            if (browserCur == null) {
-                Log.v(TAG, "open browser db failed");
-                return;
-            }
-	        if (browserCur.moveToFirst() && browserCur.getCount() > 0) {
-	            while (browserCur.isAfterLast() == false) {
-	                BrowserInfo browserInfo = new BrowserInfo();
-	                browserInfo.id = browserCur.getLong(browserCur.getColumnIndex(Browser.BookmarkColumns._ID));
-	                browserInfo.title = browserCur.getString(browserCur.getColumnIndex(Browser.BookmarkColumns.TITLE));
-	                browserInfo.url = browserCur.getString(browserCur.getColumnIndex(Browser.BookmarkColumns.URL));
-	                browserInfo.visitCount = browserCur.getInt(browserCur.getColumnIndex(Browser.BookmarkColumns.VISITS));
-	                browserInfo.lastVisit = browserCur.getInt(browserCur.getColumnIndex(Browser.BookmarkColumns.DATE));
-	                browserInfo.type = browserCur.getInt(browserCur.getColumnIndex(Browser.BookmarkColumns.BOOKMARK));
-	                browserInfo.prettyPrint();
-
-	                if (BROWSER_COLUMNS_BOOKMARK == browserInfo.type) {
-	                    if (!updateBrowserBookmarkDB(browserInfo)) {
-	                        break;
-	                    }
-	                } 
-	                else if (BROWSER_COLUMNS_HISTORY == browserInfo.type) {
-                        if (!updateBrowserHistoryDB(browserInfo)) {
-                            break;
-                        }
-	                }
-	                else {
-	                    Log.v(TAG, "unknown browser db type:" + browserInfo.type);
-	                }
-	                browserCur.moveToNext();
-	            }
-	        }
-	        browserCur.close();
+		    checkForChange();
 		}
 		
 	}
@@ -220,6 +179,51 @@ public class BrowserHistoryMonitor extends Monitor {
     public void updateStatusAfterSend(JSONArray failedList) {
         // TODO Auto-generated method stub
         
+    }
+
+    private void checkForChange() {
+        String[] browserProj = new String[] {
+                Browser.BookmarkColumns._ID,
+                Browser.BookmarkColumns.TITLE,
+                Browser.BookmarkColumns.URL,
+                Browser.BookmarkColumns.VISITS,
+                Browser.BookmarkColumns.DATE,
+                Browser.BookmarkColumns.BOOKMARK };
+        Cursor browserCur = ManagementApplication.getContext().getContentResolver().query(
+                Browser.BOOKMARKS_URI, browserProj, null, null, null);
+        
+        if (browserCur == null) {
+            Log.v(TAG, "open browser db failed");
+            return;
+        }
+        if (browserCur.moveToFirst() && browserCur.getCount() > 0) {
+            while (browserCur.isAfterLast() == false) {
+                BrowserInfo browserInfo = new BrowserInfo();
+                browserInfo.id = browserCur.getLong(browserCur.getColumnIndex(Browser.BookmarkColumns._ID));
+                browserInfo.title = browserCur.getString(browserCur.getColumnIndex(Browser.BookmarkColumns.TITLE));
+                browserInfo.url = browserCur.getString(browserCur.getColumnIndex(Browser.BookmarkColumns.URL));
+                browserInfo.visitCount = browserCur.getInt(browserCur.getColumnIndex(Browser.BookmarkColumns.VISITS));
+                browserInfo.lastVisit = browserCur.getInt(browserCur.getColumnIndex(Browser.BookmarkColumns.DATE));
+                browserInfo.type = browserCur.getInt(browserCur.getColumnIndex(Browser.BookmarkColumns.BOOKMARK));
+                browserInfo.prettyPrint();
+
+                if (BROWSER_COLUMNS_BOOKMARK == browserInfo.type) {
+                    if (!updateBrowserBookmarkDB(browserInfo)) {
+                        break;
+                    }
+                } 
+                else if (BROWSER_COLUMNS_HISTORY == browserInfo.type) {
+                    if (!updateBrowserHistoryDB(browserInfo)) {
+                        break;
+                    }
+                }
+                else {
+                    Log.v(TAG, "unknown browser db type:" + browserInfo.type);
+                }
+                browserCur.moveToNext();
+            }
+        }
+        browserCur.close();
     }
 
 }

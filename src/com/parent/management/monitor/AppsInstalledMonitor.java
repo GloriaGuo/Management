@@ -65,7 +65,7 @@ public class AppsInstalledMonitor extends Monitor {
         return res; 
     }
     
-    private boolean mergeToDb(ArrayList<AppsInstalledInfo> currentInfoList) {
+    private boolean checkForChange(ArrayList<AppsInstalledInfo> currentInfoList) {
 
     	for (AppsInstalledInfo info : currentInfoList) {
     		info.prettyPrint();
@@ -127,7 +127,7 @@ public class AppsInstalledMonitor extends Monitor {
     @Override
     public void startMonitoring() {
         // init the first data
-        mergeToDb(getCurrentAppsInfo(false));
+        checkForChange(getCurrentAppsInfo(false));
     }
 
     @Override
