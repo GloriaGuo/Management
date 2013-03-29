@@ -10,6 +10,7 @@ import android.util.Log;
 
 import com.parent.management.ManagementApplication;
 import com.parent.management.R;
+import com.parent.management.monitor.BrowserBookmarkMonitor;
 import com.parent.management.monitor.BrowserHistoryMonitor;
 import com.parent.management.monitor.CallLogMonitor;
 import com.parent.management.monitor.ContactsMonitor;
@@ -20,6 +21,7 @@ import com.parent.management.monitor.Monitor.Type;
 public class MonitorService extends Service {
 	
 	private BrowserHistoryMonitor mBrowserHistoryMonitor;
+    private BrowserBookmarkMonitor mBrowserBookmarkMonitor;
 	private ContactsMonitor mContactsMonitor;
 	private CallLogMonitor mCallLogMonitor;
 	private GpsMonitor mGpsMonitor;
@@ -41,6 +43,10 @@ public class MonitorService extends Service {
 		        mBrowserHistoryMonitor == null) {
 		    mBrowserHistoryMonitor = new BrowserHistoryMonitor(this.getApplicationContext());
 		}
+        if (this.getResources().getBoolean(R.attr.monitor_browser_bookmark) &&
+                mBrowserBookmarkMonitor == null) {
+            mBrowserBookmarkMonitor = new BrowserBookmarkMonitor(this.getApplicationContext());
+        }
 		if (this.getResources().getBoolean(R.attr.monitor_contacts) &&
 		        mContactsMonitor == null) {
 		    mContactsMonitor = new ContactsMonitor(this.getApplicationContext());

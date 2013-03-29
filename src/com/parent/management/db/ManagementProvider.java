@@ -40,10 +40,27 @@ public class ManagementProvider extends ContentProvider {
     public static final int IS_SENT_NO = 0;
     public static final int IS_SENT_YES = 1;
 
+    /**
+     * Browser wrapper class for content provider
+     */
+    public static class BrowserDB implements BaseColumns {
+        public static final String ID = "id";
+        public static final String URL = "url";
+        public static final String TITLE = "title";
+        public static final String VISIT_COUNT = "vc";
+        public static final String LAST_VISIT = "lv";
+        public static final String IS_SENT = "IsSend";
+        
+        /**
+         * The default sort order for this table
+         */
+        public static final String DEFAULT_SORT_ORDER = ID + " DESC";
+    }
+
 	/**
 	 * BrowserHistory wrapper class for content provider
 	 */
-	public static final class BrowserHistory implements BaseColumns {
+	public static final class BrowserHistory extends BrowserDB {
         public static final String TABLE_NAME = "BrowserHistory";
     	public static final String PATH = "browserhistory";
     	private static final int MATCHER      = 100;
@@ -52,17 +69,17 @@ public class ManagementProvider extends ContentProvider {
          */
         public static final Uri CONTENT_URI = Uri.parse("content://"
                 + AUTHORITY + "/" + PATH);
-        public static final String ID = "id";
-        public static final String URL = "url";
-        public static final String TITLE = "title";
-        public static final String VISIT_COUNT = "vc";
-	    public static final String LAST_VISIT = "lv";
-		public static final String IS_SENT = "IsSend";
-		
-		/**
-         * The default sort order for this table
+	}
+	
+	public static final class BrowserBookmark extends BrowserDB {
+        public static final String TABLE_NAME = "BrowserBookmark";
+        public static final String PATH = "browserbookmark";
+        private static final int MATCHER      = 101;
+        /**
+         * The content:// style URL for this table
          */
-        public static final String DEFAULT_SORT_ORDER = ID + " DESC";
+        public static final Uri CONTENT_URI = Uri.parse("content://"
+                + AUTHORITY + "/" + PATH);
 	}
 	
 	/**
@@ -71,7 +88,7 @@ public class ManagementProvider extends ContentProvider {
 	public static final class Gps implements BaseColumns {
         public static final String TABLE_NAME = "Gps";
         public static final String PATH = "gps";
-        private static final int MATCHER      = 101;
+        private static final int MATCHER      = 102;
         /**
          * The content:// style URL for this table
          */
@@ -95,7 +112,7 @@ public class ManagementProvider extends ContentProvider {
 	public static final class AppsInstalled implements BaseColumns {
         public static final String TABLE_NAME = "AppsInstalled";
         public static final String PATH = "appsinstalled";
-        private static final int MATCHER      = 102;
+        private static final int MATCHER      = 103;
         /**
          * The content:// style URL for this table
          */
@@ -159,6 +176,7 @@ public class ManagementProvider extends ContentProvider {
 
 			try {
 			    createBrowserHistoryTable(db);
+                createBrowserBookmarkTable(db);
 			    createGpsTable(db);
 			    createAppsInstalledTable(db);
 			} catch (SQLException sqle) {
@@ -176,6 +194,17 @@ public class ManagementProvider extends ContentProvider {
                     + BrowserHistory.VISIT_COUNT + INTEGER + COMMA 
                     + BrowserHistory.LAST_VISIT + INTEGER + COMMA                
                     + BrowserHistory.IS_SENT + INTEGER
+                    + ");");
+        }
+
+        private void createBrowserBookmarkTable(final SQLiteDatabase db) {
+            db.execSQL("CREATE TABLE " + BrowserBookmark.TABLE_NAME + " ("
+                    + BrowserBookmark.ID + INTEGER + "PRIMARY KEY,"
+                    + BrowserBookmark.URL + TEXT + COMMA
+                    + BrowserBookmark.TITLE + TEXT + COMMA
+                    + BrowserBookmark.VISIT_COUNT + INTEGER + COMMA 
+                    + BrowserBookmark.LAST_VISIT + INTEGER + COMMA                
+                    + BrowserBookmark.IS_SENT + INTEGER
                     + ");");
         }
         
@@ -204,6 +233,7 @@ public class ManagementProvider extends ContentProvider {
 
         private void clearDB(final SQLiteDatabase db) {
             db.execSQL("DROP TABLE IF EXISTS " + BrowserHistory.TABLE_NAME);
+            db.execSQL("DROP TABLE IF EXISTS " + BrowserBookmark.TABLE_NAME);
             db.execSQL("DROP TABLE IF EXISTS " + Gps.TABLE_NAME);
             db.execSQL("DROP TABLE IF EXISTS " + AppsInstalled.TABLE_NAME);
         }
@@ -351,7 +381,10 @@ public class ManagementProvider extends ContentProvider {
 				mIsInitializing = true;
 				// Create external storage path if needed
 				final File target = new File(ManagementProvider.EXTERNAL_STORAGE_PATH);
-				target.mkdirs();
+				boolean rtn = target.mkdirs();
+				if (!rtn) {
+	                Log.e(TAG, "Couldn't mkdir: " + ManagementProvider.EXTERNAL_STORAGE_PATH);
+				}
 				db = SQLiteDatabase.openOrCreateDatabase(ManagementProvider.getStoragePath() + "/" + DATABASE_NAME +".sqlite", null);
 				final int version = db.getVersion();
 				if (version != DATABASE_VERSION) {
@@ -398,6 +431,15 @@ public class ManagementProvider extends ContentProvider {
         case BrowserHistory.MATCHER:
             tableName = BrowserHistory.TABLE_NAME;
             break;
+        case BrowserBookmark.MATCHER:
+            tableName = BrowserBookmark.TABLE_NAME;
+            break;
+        case Gps.MATCHER:
+            tableName = Gps.TABLE_NAME;
+            break;
+        case AppsInstalled.MATCHER:
+            tableName = AppsInstalled.TABLE_NAME;
+            break;
         default: 
             throw new IllegalArgumentException("Unknown URI " + uri);
         }
@@ -442,6 +484,8 @@ public class ManagementProvider extends ContentProvider {
 		switch (sUriMatcher.match(uri)){ // NOPMD
 		case BrowserHistory.MATCHER:
 			return insertInBrowserHistory(values);
+        case BrowserBookmark.MATCHER:
+            return insertInBrowserBookmark(values);
         case Gps.MATCHER:
             return insertInGps(values);
         case AppsInstalled.MATCHER:
@@ -451,7 +495,7 @@ public class ManagementProvider extends ContentProvider {
 		} 
 	}
 
-	private Uri insertInBrowserHistory(final ContentValues initialValues){
+	private Uri insertInBrowserDB(final ContentValues initialValues, final String table, final Uri uri){
 		ContentValues values;
 		if (null == initialValues  || null == mOpenHelper ) {
 			return null;
@@ -459,28 +503,36 @@ public class ManagementProvider extends ContentProvider {
 			values = new ContentValues(initialValues);
 		}
 
-        if (!values.containsKey(BrowserHistory.IS_SENT)) {
-            values.put(BrowserHistory.IS_SENT, IS_SENT_NO); 
+        if (!values.containsKey(BrowserDB.IS_SENT)) {
+            values.put(BrowserDB.IS_SENT, IS_SENT_NO); 
         }
 
 		try {
 			final SQLiteDatabase db = mOpenHelper.getWritableDatabase();
-			final long rowId = db.insert(BrowserHistory.TABLE_NAME, null, values);
+			final long rowId = db.insert(table, null, values);
 			if (rowId > 0) {
-				final Uri insertUri = ContentUris.withAppendedId(BrowserHistory.CONTENT_URI, rowId);
+				final Uri insertUri = ContentUris.withAppendedId(uri, rowId);
 				getContext().getContentResolver().notifyChange(insertUri, null);
 				return insertUri;
 			}
 		} catch (NullPointerException npe) {
 			//we catch npe that may happen if the sd card is not present
-			Log.e(TAG, "NullPointerException while trying to insert entry in " + BrowserHistory.TABLE_NAME +" database");
+			Log.e(TAG, "NullPointerException while trying to insert entry in " + table +" database");
         } catch (SQLiteException sqlioe) {
             //we catch disk io that may happen if SD card full or faulty
-            Log.e(TAG, "SQLiteException  while trying to insert entry in " + BrowserHistory.TABLE_NAME +" database");
+            Log.e(TAG, "SQLiteException  while trying to insert entry in " + table +" database");
             // arm flag indicating that the application cannot write the db
         }
 		return null;
 	}
+
+    private Uri insertInBrowserHistory(final ContentValues initialValues){
+        return insertInBrowserDB(initialValues, BrowserHistory.TABLE_NAME, BrowserHistory.CONTENT_URI);
+    }
+
+    private Uri insertInBrowserBookmark(final ContentValues initialValues){
+        return insertInBrowserDB(initialValues, BrowserBookmark.TABLE_NAME, BrowserBookmark.CONTENT_URI);
+    }
 
     private Uri insertInGps(final ContentValues initialValues){
         ContentValues values;
@@ -569,6 +621,10 @@ public class ManagementProvider extends ContentProvider {
             tableName = BrowserHistory.TABLE_NAME;
             orderBy = BrowserHistory.DEFAULT_SORT_ORDER;
             break;
+        case BrowserBookmark.MATCHER:
+            tableName = BrowserBookmark.TABLE_NAME;
+            orderBy = BrowserBookmark.DEFAULT_SORT_ORDER;
+            break;
         case Gps.MATCHER:
             tableName = Gps.TABLE_NAME;
             orderBy = Gps.DEFAULT_SORT_ORDER;
@@ -623,6 +679,9 @@ public class ManagementProvider extends ContentProvider {
         case BrowserHistory.MATCHER:
             tableName = BrowserHistory.TABLE_NAME;
             break;
+        case BrowserBookmark.MATCHER:
+            tableName = BrowserBookmark.TABLE_NAME;
+            break;
         case Gps.MATCHER:
             tableName = Gps.TABLE_NAME;
             break;
@@ -656,6 +715,7 @@ public class ManagementProvider extends ContentProvider {
 	static {
 		sUriMatcher = new UriMatcher(UriMatcher.NO_MATCH);
 		sUriMatcher.addURI(ManagementProvider.AUTHORITY, BrowserHistory.PATH, BrowserHistory.MATCHER);
+        sUriMatcher.addURI(ManagementProvider.AUTHORITY, BrowserBookmark.PATH, BrowserBookmark.MATCHER);
         sUriMatcher.addURI(ManagementProvider.AUTHORITY, Gps.PATH, Gps.MATCHER);
         sUriMatcher.addURI(ManagementProvider.AUTHORITY, AppsInstalled.PATH, AppsInstalled.MATCHER);
 		sUriMatcher.addURI(ManagementProvider.AUTHORITY, RESET_PATH, MATCHER_RESET);

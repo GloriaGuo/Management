@@ -65,12 +65,8 @@ public class AppsInstalledMonitor extends Monitor {
         return res; 
     }
     
-    private boolean mergeToDb(ArrayList<AppsInstalledInfo> currentInfoList) {
+    private boolean checkForChange(ArrayList<AppsInstalledInfo> currentInfoList) {
 
-        String curPackageName = "";
-        String curAppName = "";
-        String curVersionName = "";
-        Integer curVersionCode = 0;
     	for (AppsInstalledInfo info : currentInfoList) {
     		info.prettyPrint();
             String[] appsInstalledProj = new String[] {
@@ -89,11 +85,11 @@ public class AppsInstalledMonitor extends Monitor {
             }
 
             if (appsInstalledCur.moveToFirst() && appsInstalledCur.getCount() > 0) {
-                curAppName = appsInstalledCur.getString(appsInstalledCur.getColumnIndex(
+                String curAppName = appsInstalledCur.getString(appsInstalledCur.getColumnIndex(
                         ManagementProvider.AppsInstalled.APP_NAME));
-                curVersionName = appsInstalledCur.getString(appsInstalledCur.getColumnIndex(
+                String curVersionName = appsInstalledCur.getString(appsInstalledCur.getColumnIndex(
                         ManagementProvider.AppsInstalled.VERSION_NAME));
-                curVersionCode = appsInstalledCur.getInt(appsInstalledCur.getColumnIndex(
+                int curVersionCode = appsInstalledCur.getInt(appsInstalledCur.getColumnIndex(
                         ManagementProvider.AppsInstalled.VERSION_CODE));
                 if ( curAppName != info.appname || curVersionName != info.versionName
                 		|| curVersionCode != info.versionCode) {
@@ -131,7 +127,7 @@ public class AppsInstalledMonitor extends Monitor {
     @Override
     public void startMonitoring() {
         // init the first data
-        mergeToDb(getCurrentAppsInfo(false));
+        checkForChange(getCurrentAppsInfo(false));
     }
 
     @Override
