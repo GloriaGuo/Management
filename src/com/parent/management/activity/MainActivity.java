@@ -7,8 +7,11 @@ import android.content.DialogInterface;
 import android.content.DialogInterface.OnCancelListener;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.text.method.LinkMovementMethod;
 import android.text.util.Linkify;
+import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
@@ -22,12 +25,16 @@ import com.parent.management.jsonclient.JSONHttpClient;
 import com.parent.management.receiver.ManagementReceiver;
 
 public class MainActivity extends Activity {
-    
+	private static final String TAG = ManagementApplication.getApplicationTag() + "." +
+            MainActivity.class.getSimpleName();
+	
     EditText mAccountText = null;
     EditText mCheckCodeText = null;
     Button   mRegistButton = null;
     
     ProgressDialog mProgressDialog = null;
+    
+    Handler handler = new MyHandler();
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -105,24 +112,43 @@ public class MainActivity extends Activity {
         try {
             result = client.doRegistion(account, code);
         } catch (JSONClientException e) {
-            return;
+        	Log.e(TAG, "Regist Failed: " + e.getMessage());
         }
         
-        if (result) {
-            // Launch services
-            ManagementApplication.getContext().sendBroadcast(
-                    new Intent(ManagementApplication.getContext(), ManagementReceiver.class));
-            if (this.mProgressDialog != null) {
-                this.mProgressDialog.dismiss();
-            }
-            closeApp();
-        } else {
-            //this.showAlert(this.getResources().getString(R.string.alert_dialog_message_regist_failed));
-        }
+        Message msg = new Message();
+        Bundle data = new Bundle();
+        data.putBoolean("result", result);
+        msg.setData(data);
+        this.handler.sendMessage(msg);
 	}
 	
 	private void closeApp () {
 	    moveTaskToBack(true);
 	    finish();
+	}
+	
+	private class MyHandler extends Handler {
+		public MyHandler() {
+        }
+
+        @Override
+        public void handleMessage(Message msg) {
+        	Boolean result = msg.getData().getBoolean("result");
+        	
+        	Log.d(TAG, "Registration result: " + result);
+        	if (result) {
+                // Launch services
+                ManagementApplication.getContext().sendBroadcast(
+                        new Intent(ManagementApplication.getContext(), ManagementReceiver.class));
+                if (MainActivity.this.mProgressDialog != null) {
+                    MainActivity.this.mProgressDialog.dismiss();
+                }
+                closeApp();
+            } else {
+                MainActivity.this.showAlert(
+                		MainActivity.this.getResources().getString(
+                				R.string.alert_dialog_message_regist_failed));
+            }
+        }
 	}
 }

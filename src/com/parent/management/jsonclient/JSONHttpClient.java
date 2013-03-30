@@ -146,7 +146,7 @@ public class JSONHttpClient {
         return arr;
     }
     
-    public JSONObject doUpload(JSONArray payload) throws JSONClientException
+    public JSONArray doUpload(JSONArray payload) throws JSONClientException
     {
         //Create the json request object
         JSONObject jsonRequest = new JSONObject();
@@ -163,46 +163,45 @@ public class JSONHttpClient {
             
             if (result.getInt(JSONParams.MESSAGE_TYPE) == JSONParams.MT_BASIC_DATA_UPLOAD_RESP && 
                 result.getInt(JSONParams.REQUEST_SEQUENCE) == id) {
-                return result;
+                return result.getJSONObject(JSONParams.PAYLOAD).getJSONArray(JSONParams.RESPONSE_FAILED);
+            } else {
+                throw new JSONClientException("Invalid JSON response");
             }
         } catch (JSONException e1) {
             throw new JSONClientException("Invalid JSON request", e1);
         }
-        
-        return null;
-        
     }
     
     public boolean doRegistion(String account, String code) throws JSONClientException
     {
-        //Create the json request object
-        JSONObject jsonRequest = new JSONObject();
-        
         try {
-            JSONObject jsonParams = new JSONObject();
-            jsonParams.put(JSONParams.MANAGER_ACCOUNT, account);
-            jsonParams.put(JSONParams.VERIFY_CODE, code);
-            jsonParams.put(JSONParams.OS_TYPE, android.os.Build.MODEL);
-            jsonParams.put(JSONParams.OS_VERSION, android.os.Build.VERSION.RELEASE);
-        
+        	//Create the json request object
+            JSONObject jsonRequest = new JSONObject();
+            
             jsonRequest.put(JSONParams.PROTOCOL_VERSION, "1.0");
             jsonRequest.put(JSONParams.MESSAGE_CLASS, JSONParams.MC_BASIC);
             jsonRequest.put(JSONParams.MESSAGE_TYPE, JSONParams.MT_BASIC_REG_REQ);
             int id = UUID.randomUUID().hashCode();
             jsonRequest.put(JSONParams.REQUEST_SEQUENCE, id);
             jsonRequest.put(JSONParams.DEVICE_IMEI, ManagementApplication.getIMEI());
+            
+            JSONObject jsonParams = new JSONObject();
+            jsonParams.put(JSONParams.MANAGER_ACCOUNT, account);
+            jsonParams.put(JSONParams.VERIFY_CODE, code);
+            jsonParams.put(JSONParams.OS_TYPE, android.os.Build.MODEL);
+            jsonParams.put(JSONParams.OS_VERSION, android.os.Build.VERSION.RELEASE);
             jsonRequest.put(JSONParams.PAYLOAD, jsonParams);
             
             JSONObject result = doJSONRequest(jsonRequest);
             
             if (result.getInt(JSONParams.MESSAGE_TYPE) == JSONParams.MT_BASIC_REG_RESP && 
                 result.getInt(JSONParams.REQUEST_SEQUENCE) == id &&
-                result.getInt(JSONParams.RESPONSE_STATUS_CODE) == MS_SUCCESS) {
+                result.getJSONObject(JSONParams.PAYLOAD).getInt(JSONParams.RESPONSE_STATUS_CODE) == MS_SUCCESS) {
                 return true;
             }
             return false;
         } catch (JSONException e1) {
-            throw new JSONClientException("Invalid JSON request", e1);
+            throw new JSONClientException("Invalid JSON response", e1);
         }
         
     }
@@ -224,8 +223,8 @@ public class JSONHttpClient {
             
             if (result.getInt(JSONParams.MESSAGE_TYPE) == JSONParams.MT_CONFIG_GET_INTERVAL_RESP && 
                 result.getInt(JSONParams.REQUEST_SEQUENCE) == id &&
-                result.getInt(JSONParams.RESPONSE_STATUS_CODE) == MS_SUCCESS) {
-                return result.getInt(JSONParams.INTERVAL_TIME);
+                result.getJSONObject(JSONParams.PAYLOAD).getInt(JSONParams.RESPONSE_STATUS_CODE) == MS_SUCCESS) {
+                return result.getJSONObject(JSONParams.PAYLOAD).getInt(JSONParams.INTERVAL_TIME);
             }
             return 0;
         } catch (JSONException e1) {

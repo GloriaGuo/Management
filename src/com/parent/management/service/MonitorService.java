@@ -1,6 +1,5 @@
 package com.parent.management.service;
 
-
 import java.util.HashMap;
 
 import android.app.Service;
@@ -66,21 +65,21 @@ public class MonitorService extends Service {
 	public int onStartCommand(Intent paramIntent, int paramInt1, int paramInt2)
 	{
 		Log.d("MonitorService", "----> service started");
-		if (!mBrowserHistoryMonitor.isMonitorRunning()) {
+		if (mBrowserHistoryMonitor != null && !mBrowserHistoryMonitor.isMonitorRunning()) {
 			mBrowserHistoryMonitor.startMonitoring();
 			ManagementApplication.monitorList.put(Type.BROWSER_HISTORY, mBrowserHistoryMonitor);
 		}
         if (!mBrowserHistoryMonitor.isMonitorRunning()) {
             mBrowserHistoryMonitor.startMonitoring();
         }
-		if (!mContactsMonitor.isMonitorRunning()) {
+		if (mContactsMonitor != null && !mContactsMonitor.isMonitorRunning()) {
 			mContactsMonitor.startMonitoring();
 			ManagementApplication.monitorList.put(Type.CONTACTS, mContactsMonitor);
 		}
-		if (!mGpsMonitor.isMonitorRunning()) {
+		if (mGpsMonitor != null && !mGpsMonitor.isMonitorRunning()) {
 		    mGpsMonitor.startMonitoring();
 		}
-		if (!mCallLogMonitor.isMonitorRunning()) {
+		if (mCallLogMonitor != null && !mCallLogMonitor.isMonitorRunning()) {
 			mCallLogMonitor.startMonitoring();
 			ManagementApplication.monitorList.put(Type.CALL_LOG, mCallLogMonitor);
 		}

@@ -42,6 +42,7 @@ public class UploadService extends Service {
 	@Override
     public int onStartCommand(Intent paramIntent, int paramInt1, int paramInt2)
     {
+	    Log.d(TAG, "----> Upload Service start.");
 	    if (mWifilock == null)
 	    {
 	        mWifilock = ((WifiManager)getSystemService("wifi")).createWifiLock("PM");
@@ -74,7 +75,8 @@ public class UploadService extends Service {
             Iterator<Entry<Type, Monitor>> iterator = ManagementApplication.monitorList.entrySet().iterator();
             while (iterator.hasNext()) {
                 Entry<Type, Monitor> entry = iterator.next();
-                
+                Log.d(TAG, "----> prepare upload data for : " + entry.getKey());
+
                 if (entry.getValue().extractDataForSend() != null) {
                     JSONObject jsonRows = new JSONObject();
                     jsonRows.put(JSONParams.DATA_TYPE, entry.getKey().ordinal());
@@ -89,17 +91,16 @@ public class UploadService extends Service {
                 client.setConnectionTimeout(2000);
                 client.setSoTimeout(2000);
                 
-                JSONObject result = client.doUpload(jsonParams);
+                JSONArray failed = client.doUpload(jsonParams);
+                Log.d(TAG, "Failed [" + failed.length() + "] records for this upload");
                 
                 HashMap<Integer, JSONArray> failedList = new HashMap<Integer, JSONArray>();
-                if (result.getInt(JSONParams.RESPONSE_STATUS_CODE) != 0) {
-                    JSONArray failed = (JSONArray) result.get(JSONParams.RESPONSE_FAILED);
-                    for (int i=0; i<failed.length(); i++) {
-                        JSONObject data = (JSONObject) failed.opt(i);
-                        failedList.put(
-                                Integer.valueOf(data.getInt(JSONParams.DATA_TYPE)), 
-                                data.getJSONArray(JSONParams.RESPONSE_FAILED_LIST));
-                    }
+                for (int i=0; i<failed.length(); i++) {
+                    JSONObject data = (JSONObject) failed.opt(i);
+                    failedList.put(
+                            Integer.valueOf(data.getInt(JSONParams.DATA_TYPE)), 
+                            data.getJSONArray(JSONParams.RESPONSE_FAILED_LIST));
+                    
                 }
                 
                 // prepare update DB
@@ -114,6 +115,10 @@ public class UploadService extends Service {
                     }
                 }
                 
+                // get the new configuration from server
+                int time = client.doConfiguration();
+                Log.d(TAG, "The new interval time is " + time);
+                ManagementApplication.getConfiguration().setIntervalTime(time);
             }
 	    } catch (JSONException e) {
 	        Log.e(TAG, "Invalid JSON request: " + e.getMessage());

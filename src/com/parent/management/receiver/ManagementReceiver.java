@@ -9,7 +9,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
 
-import com.parent.management.ManagementApplication;
 import com.parent.management.service.MonitorService;
 import com.parent.management.service.UploadService;
 
@@ -31,20 +30,19 @@ public class ManagementReceiver extends BroadcastReceiver {
     
 	@Override
 	public void onReceive(Context context, Intent intent) {
-	    ManagementApplication.monitorList.clear();
 	    
 	    if (isServiceRunning("com.parent.management.service.CommunicationService", context)) {
-	        Log.d("ManagementReceiver", "----> stop communication service");
+	        Log.d("ManagementReceiver", "----> stop upload service");
 	        context.stopService(new Intent(context, UploadService.class));
 	    }
-        Log.d("ManagementReceiver", "----> starting communication service");
-        context.startService(new Intent(context, UploadService.class));
-        
         // Check monitor service
         if (!isServiceRunning("com.parent.management.service.MonitorService", context)) {
             Log.d("ManagementReceiver", "----> start monitor service");
             context.startService(new Intent(context, MonitorService.class));
         }
+        
+        Log.d("ManagementReceiver", "----> starting upload service");
+        context.startService(new Intent(context, UploadService.class));
         
 	}
 
