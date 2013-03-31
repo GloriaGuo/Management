@@ -4,7 +4,9 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
+import android.content.SharedPreferences;
 import android.content.DialogInterface.OnCancelListener;
+import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
@@ -47,6 +49,8 @@ public class MainActivity extends Activity {
         
         // check if already installed
         
+        ManagementApplication.getConfiguration().registerPreferenceChangeListener(this.mSettingsListener);
+        
         this.mRegistButton.setOnClickListener(new OnClickListener() {
             
             @Override
@@ -80,6 +84,7 @@ public class MainActivity extends Activity {
                 }
             }
         });
+        
 	}
 	
 	private void showAlert(String message) {
@@ -91,8 +96,16 @@ public class MainActivity extends Activity {
                 .setOnCancelListener(new OnCancelListener() {
                     @Override
                     public void onCancel(final DialogInterface dialog) {
-                        finish();
                     }
+                })
+                .setPositiveButton(R.string.alert_dialog_positive_button, 
+                        new DialogInterface.OnClickListener() {
+
+                            @Override
+                            public void onClick(DialogInterface dialog,
+                                    int which) {
+                            }
+                    
                 }).show();
         // linkify dialog message
         final TextView msgView = 
@@ -151,4 +164,18 @@ public class MainActivity extends Activity {
             }
         }
 	}
+	
+	private final OnSharedPreferenceChangeListener mSettingsListener = 
+	        new OnSharedPreferenceChangeListener() {
+	            /* (non-Javadoc)
+	             * @see android.content.SharedPreferences.OnSharedPreferenceChangeListener#onSharedPreferenceChanged(android.content.SharedPreferences, java.lang.String)
+	             */
+	            @Override
+	            public void onSharedPreferenceChanged(
+	                final SharedPreferences sharedPreferences, final String key) {
+	                if (key.equals(ManagementApplication.getConfiguration().PREFERENCE_KEY_INTERVAL_TIME)) {
+	                    
+	                } 
+	            }
+	        };
 }
