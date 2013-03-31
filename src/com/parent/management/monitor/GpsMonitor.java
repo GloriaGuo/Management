@@ -120,15 +120,15 @@ public class GpsMonitor extends Monitor {
             }
             if (gpsCur.moveToFirst() && gpsCur.getCount() > 0) {
                 while (gpsCur.isAfterLast() == false) {
-                    String alt = gpsCur.getString(
+                    double alt = gpsCur.getDouble(
                             gpsCur.getColumnIndex(ManagementProvider.Gps.ALTITUDE));
-                    String lat = gpsCur.getString(
+                    double lat = gpsCur.getDouble(
                             gpsCur.getColumnIndex(ManagementProvider.Gps.LATIDUDE));
-                    String lon = gpsCur.getString(
+                    double lon = gpsCur.getDouble(
                             gpsCur.getColumnIndex(ManagementProvider.Gps.LONGITUDE));
-                    String spd = gpsCur.getString(
+                    float spd = gpsCur.getFloat(
                             gpsCur.getColumnIndex(ManagementProvider.Gps.SPEED));
-                    String date = gpsCur.getString(
+                    long date = gpsCur.getLong(
                             gpsCur.getColumnIndex(ManagementProvider.Gps.TIME));
                     JSONObject raw = new JSONObject();
                     raw.put(ManagementProvider.Gps.ALTITUDE, alt);
@@ -150,7 +150,14 @@ public class GpsMonitor extends Monitor {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
-        
+
+        final ContentValues values = new ContentValues();
+        values.put(ManagementProvider.Gps.IS_SENT, ManagementProvider.IS_SENT_YES);
+        ManagementApplication.getContext().getContentResolver().update(
+        		ManagementProvider.Gps.CONTENT_URI,
+                values,
+                ManagementProvider.Gps.IS_SENT + "=\"" + ManagementProvider.IS_SENT_NO +"\"",
+                null);
         return null;
     }
 

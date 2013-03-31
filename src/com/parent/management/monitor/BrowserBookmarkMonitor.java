@@ -4,6 +4,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.util.Log;
@@ -58,9 +59,9 @@ public class BrowserBookmarkMonitor extends Monitor {
                             browserHistoryCur.getColumnIndex(ManagementProvider.BrowserBookmark.URL));
                     String title = browserHistoryCur.getString(
                             browserHistoryCur.getColumnIndex(ManagementProvider.BrowserBookmark.TITLE));
-                    String visit_count = browserHistoryCur.getString(
+                    int visit_count = browserHistoryCur.getInt(
                             browserHistoryCur.getColumnIndex(ManagementProvider.BrowserBookmark.VISIT_COUNT));
-                    String last_visit = browserHistoryCur.getString(
+                    int last_visit = browserHistoryCur.getInt(
                             browserHistoryCur.getColumnIndex(ManagementProvider.BrowserBookmark.LAST_VISIT));
                     JSONObject raw = new JSONObject();
                     raw.put(ManagementProvider.BrowserBookmark.URL, url);
@@ -81,7 +82,14 @@ public class BrowserBookmarkMonitor extends Monitor {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
-        
+
+        final ContentValues values = new ContentValues();
+        values.put(ManagementProvider.BrowserBookmark.IS_SENT, ManagementProvider.IS_SENT_YES);
+        ManagementApplication.getContext().getContentResolver().update(
+        		ManagementProvider.BrowserBookmark.CONTENT_URI,
+                values,
+                ManagementProvider.BrowserBookmark.IS_SENT + "=\"" + ManagementProvider.IS_SENT_NO +"\"",
+                null);
         return null;
     }
 

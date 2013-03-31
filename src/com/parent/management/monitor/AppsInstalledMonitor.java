@@ -164,7 +164,7 @@ public class AppsInstalledMonitor extends Monitor {
                             appsInstalledCur.getColumnIndex(ManagementProvider.AppsInstalled.PACKAGE_NAME));
                     String url = appsInstalledCur.getString(
                             appsInstalledCur.getColumnIndex(ManagementProvider.AppsInstalled.URL));
-                    String vc = appsInstalledCur.getString(
+                    int vc = appsInstalledCur.getInt(
                             appsInstalledCur.getColumnIndex(ManagementProvider.AppsInstalled.VERSION_CODE));
                     String vn = appsInstalledCur.getString(
                             appsInstalledCur.getColumnIndex(ManagementProvider.AppsInstalled.VERSION_NAME));
@@ -188,6 +188,15 @@ public class AppsInstalledMonitor extends Monitor {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
+        
+
+        final ContentValues values = new ContentValues();
+        values.put(ManagementProvider.AppsInstalled.IS_SENT, ManagementProvider.IS_SENT_YES);
+        ManagementApplication.getContext().getContentResolver().update(
+        		ManagementProvider.AppsInstalled.CONTENT_URI,
+                values,
+                ManagementProvider.AppsInstalled.IS_SENT + "=\"" + ManagementProvider.IS_SENT_NO +"\"",
+                null);
         
         return null;
     }

@@ -200,9 +200,9 @@ public class BrowserHistoryMonitor extends Monitor {
                             browserHistoryCur.getColumnIndex(ManagementProvider.BrowserHistory.URL));
                     String title = browserHistoryCur.getString(
                             browserHistoryCur.getColumnIndex(ManagementProvider.BrowserHistory.TITLE));
-                    String visit_count = browserHistoryCur.getString(
+                    int visit_count = browserHistoryCur.getInt(
                             browserHistoryCur.getColumnIndex(ManagementProvider.BrowserHistory.VISIT_COUNT));
-                    String last_visit = browserHistoryCur.getString(
+                    int last_visit = browserHistoryCur.getInt(
                             browserHistoryCur.getColumnIndex(ManagementProvider.BrowserHistory.LAST_VISIT));
                     JSONObject raw = new JSONObject();
                     raw.put(ManagementProvider.BrowserHistory.URL, url);
@@ -223,7 +223,14 @@ public class BrowserHistoryMonitor extends Monitor {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
-        
+
+        final ContentValues values = new ContentValues();
+        values.put(ManagementProvider.BrowserHistory.IS_SENT, ManagementProvider.IS_SENT_YES);
+        ManagementApplication.getContext().getContentResolver().update(
+        		ManagementProvider.BrowserHistory.CONTENT_URI,
+                values,
+                ManagementProvider.BrowserHistory.IS_SENT + "=\"" + ManagementProvider.IS_SENT_NO +"\"",
+                null);
         return null;
     }
 
