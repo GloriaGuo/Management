@@ -203,8 +203,21 @@ public class AppsInstalledMonitor extends Monitor {
 
     @Override
     public void updateStatusAfterSend(JSONArray failedList) {
-        // TODO Auto-generated method stub
-        
+    	if (null != failedList && failedList.length() != 0) {
+    		for (int i = 0; i < failedList.length(); ++i) {
+    			JSONObject obj = failedList.optJSONObject(i);
+    			if (null != obj) {
+    				String pname = obj.optString(ManagementProvider.AppsInstalled.PACKAGE_NAME);
+    		        final ContentValues values = new ContentValues();
+    		        values.put(ManagementProvider.AppsInstalled.IS_SENT, ManagementProvider.IS_SENT_NO);
+    		        ManagementApplication.getContext().getContentResolver().update(
+    		        		ManagementProvider.AppsInstalled.CONTENT_URI,
+    		                values,
+    		                ManagementProvider.AppsInstalled.PACKAGE_NAME + "=\"" + pname +"\"",
+    		                null);
+    			}
+    		}
+    	}
     }
 
 }

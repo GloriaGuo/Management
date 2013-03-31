@@ -163,8 +163,21 @@ public class GpsMonitor extends Monitor {
 
     @Override
     public void updateStatusAfterSend(JSONArray failedList) {
-        // TODO Auto-generated method stub
-        
+    	if (null != failedList && failedList.length() != 0) {
+    		for (int i = 0; i < failedList.length(); ++i) {
+    			JSONObject obj = failedList.optJSONObject(i);
+    			if (null != obj) {
+    				long id = obj.optLong(ManagementProvider.Gps._ID);
+    		        final ContentValues values = new ContentValues();
+    		        values.put(ManagementProvider.Gps.IS_SENT, ManagementProvider.IS_SENT_NO);
+    		        ManagementApplication.getContext().getContentResolver().update(
+    		        		ManagementProvider.Gps.CONTENT_URI,
+    		                values,
+    		                ManagementProvider.Gps._ID + "=\"" + id +"\"",
+    		                null);
+    			}
+    		}
+    	}
     }
     
 }

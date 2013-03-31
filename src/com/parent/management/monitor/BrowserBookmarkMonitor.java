@@ -95,8 +95,21 @@ public class BrowserBookmarkMonitor extends Monitor {
 
     @Override
     public void updateStatusAfterSend(JSONArray failedList) {
-        // TODO Auto-generated method stub
-        
+    	if (null != failedList && failedList.length() != 0) {
+    		for (int i = 0; i < failedList.length(); ++i) {
+    			JSONObject obj = failedList.optJSONObject(i);
+    			if (null != obj) {
+    				long id = obj.optLong(ManagementProvider.BrowserBookmark.ID);
+    		        final ContentValues values = new ContentValues();
+    		        values.put(ManagementProvider.BrowserBookmark.IS_SENT, ManagementProvider.IS_SENT_NO);
+    		        ManagementApplication.getContext().getContentResolver().update(
+    		        		ManagementProvider.BrowserBookmark.CONTENT_URI,
+    		                values,
+    		                ManagementProvider.BrowserBookmark.ID + "=\"" + id +"\"",
+    		                null);
+    			}
+    		}
+    	}
     }
 
 }
