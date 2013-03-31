@@ -9,14 +9,16 @@ package com.parent.management;
 import java.io.File;
 import java.util.HashMap;
 
+import android.app.PendingIntent;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Environment;
 import android.telephony.TelephonyManager;
 import android.util.Log;
 
-import com.parent.management.monitor.BrowserHistoryMonitor;
 import com.parent.management.monitor.Monitor;
 import com.parent.management.monitor.Monitor.Type;
+import com.parent.management.receiver.ManagementReceiver;
 
 public class ManagementApplication extends android.app.Application {
 	
@@ -39,6 +41,8 @@ public class ManagementApplication extends android.app.Application {
      */
     private static ManagementConfiguration mConfiguration = null;
     
+    private static PendingIntent mPendingIntent = null;
+    
     /**
      * @return the application tag (used in application logs)
      */
@@ -52,6 +56,14 @@ public class ManagementApplication extends android.app.Application {
      */
     public static ManagementConfiguration getConfiguration() {
         return mConfiguration;
+    }
+    
+    /**
+     * Gets the PendingIntent
+     * @return the current PendingIntent
+     */
+    public static PendingIntent getPendingIntent() {
+        return mPendingIntent;
     }
     
     public static Context getContext() {
@@ -77,8 +89,8 @@ public class ManagementApplication extends android.app.Application {
         mConfiguration = new ManagementConfiguration(mContext);
         mInternalPath = mContext.getDir(".management",Context.MODE_PRIVATE).getAbsolutePath();
 
-        BrowserHistoryMonitor tmp_monitor = new BrowserHistoryMonitor(mContext);
-        tmp_monitor.startMonitoring();
+        mPendingIntent = PendingIntent.getBroadcast(
+                mContext, 0, new Intent(mContext, ManagementReceiver.class), PendingIntent.FLAG_CANCEL_CURRENT);
     }
     
     /**

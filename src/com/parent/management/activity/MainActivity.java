@@ -1,14 +1,18 @@
 package com.parent.management.activity;
 
 import android.app.Activity;
+import android.app.AlarmManager;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
+import android.content.SharedPreferences;
 import android.content.DialogInterface.OnCancelListener;
+import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.os.SystemClock;
 import android.text.method.LinkMovementMethod;
 import android.text.util.Linkify;
 import android.util.Log;
@@ -19,6 +23,7 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import com.parent.management.ManagementApplication;
+import com.parent.management.ManagementConfiguration;
 import com.parent.management.R;
 import com.parent.management.jsonclient.JSONClientException;
 import com.parent.management.jsonclient.JSONHttpClient;
@@ -46,6 +51,8 @@ public class MainActivity extends Activity {
         this.mRegistButton = (Button) findViewById(R.id.registButton);
         
         // check if already installed
+        
+        ManagementApplication.getConfiguration().registerPreferenceChangeListener(this.mSettingsListener);
         
         this.mRegistButton.setOnClickListener(new OnClickListener() {
             
@@ -80,6 +87,7 @@ public class MainActivity extends Activity {
                 }
             }
         });
+        
 	}
 	
 	private void showAlert(String message) {
@@ -91,8 +99,16 @@ public class MainActivity extends Activity {
                 .setOnCancelListener(new OnCancelListener() {
                     @Override
                     public void onCancel(final DialogInterface dialog) {
-                        finish();
                     }
+                })
+                .setPositiveButton(R.string.alert_dialog_positive_button, 
+                        new DialogInterface.OnClickListener() {
+
+                            @Override
+                            public void onClick(DialogInterface dialog,
+                                    int which) {
+                            }
+                    
                 }).show();
         // linkify dialog message
         final TextView msgView = 
@@ -151,4 +167,26 @@ public class MainActivity extends Activity {
             }
         }
 	}
+	
+	private final OnSharedPreferenceChangeListener mSettingsListener = 
+	        new OnSharedPreferenceChangeListener() {
+	            /* (non-Javadoc)
+	             * @see android.content.SharedPreferences.OnSharedPreferenceChangeListener#onSharedPreferenceChanged(android.content.SharedPreferences, java.lang.String)
+	             */
+	            @Override
+	            public void onSharedPreferenceChanged(
+	                final SharedPreferences sharedPreferences, final String key) {
+	                ManagementApplication.getConfiguration();
+                    if (key.equals(ManagementConfiguration.PREFERENCE_KEY_INTERVAL_TIME)) {
+	                    AlarmManager mAlarmManager = (AlarmManager)ManagementApplication.getContext().
+	                            getSystemService("alarm");
+	                    mAlarmManager.cancel(ManagementApplication.getPendingIntent());
+	                    mAlarmManager.setRepeating(
+	                            2, 
+	                            5000L + SystemClock.elapsedRealtime(), 
+	                            ManagementApplication.getConfiguration().getIntervalTime(),
+	                            ManagementApplication.getPendingIntent());
+	                } 
+	            }
+	        };
 }

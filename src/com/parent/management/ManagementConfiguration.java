@@ -2,6 +2,7 @@ package com.parent.management;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 
 public class ManagementConfiguration {
 	
@@ -11,7 +12,7 @@ public class ManagementConfiguration {
     
     private static final String SHARED_PREFS_NAME = "management.preferences";
     
-    private static final String PREFERENCE_KEY_INTERVAL_TIME = "interval_time";
+    public static final String PREFERENCE_KEY_INTERVAL_TIME = "interval_time";
     
     /**
      * Creates a new Configuration instance 
@@ -30,7 +31,17 @@ public class ManagementConfiguration {
     
     public void setIntervalTime(int time) {
         mSharedPreferences.edit().putInt(
-                PREFERENCE_KEY_INTERVAL_TIME, time).commit();
+                PREFERENCE_KEY_INTERVAL_TIME, time*1000).commit();
+    }
+    
+    /**
+     * Registers a new listener, whose callback will be triggered each time the
+     * internal shared preferences are modified
+     * @param listener to be registered
+     */
+    public void registerPreferenceChangeListener(
+        final OnSharedPreferenceChangeListener listener) {
+        this.mSharedPreferences.registerOnSharedPreferenceChangeListener(listener);
     }
 
 }
