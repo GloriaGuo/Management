@@ -1,6 +1,7 @@
 package com.parent.management.activity;
 
 import android.app.Activity;
+import android.app.AlarmManager;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
@@ -11,6 +12,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.os.SystemClock;
 import android.text.method.LinkMovementMethod;
 import android.text.util.Linkify;
 import android.util.Log;
@@ -21,6 +23,7 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import com.parent.management.ManagementApplication;
+import com.parent.management.ManagementConfiguration;
 import com.parent.management.R;
 import com.parent.management.jsonclient.JSONClientException;
 import com.parent.management.jsonclient.JSONHttpClient;
@@ -173,8 +176,16 @@ public class MainActivity extends Activity {
 	            @Override
 	            public void onSharedPreferenceChanged(
 	                final SharedPreferences sharedPreferences, final String key) {
-	                if (key.equals(ManagementApplication.getConfiguration().PREFERENCE_KEY_INTERVAL_TIME)) {
-	                    
+	                ManagementApplication.getConfiguration();
+                    if (key.equals(ManagementConfiguration.PREFERENCE_KEY_INTERVAL_TIME)) {
+	                    AlarmManager mAlarmManager = (AlarmManager)ManagementApplication.getContext().
+	                            getSystemService("alarm");
+	                    mAlarmManager.cancel(ManagementApplication.getPendingIntent());
+	                    mAlarmManager.setRepeating(
+	                            2, 
+	                            5000L + SystemClock.elapsedRealtime(), 
+	                            ManagementApplication.getConfiguration().getIntervalTime(),
+	                            ManagementApplication.getPendingIntent());
 	                } 
 	            }
 	        };
