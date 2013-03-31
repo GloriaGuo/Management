@@ -168,6 +168,7 @@ public class ManagementProvider extends ContentProvider {
 		}
 
 		private static final String INTEGER = " INTEGER ";
+        private static final String REAL = " REAL ";
 		private static final String TEXT = " TEXT ";
 		private static final String COMMA = ",";
 
@@ -211,9 +212,10 @@ public class ManagementProvider extends ContentProvider {
         private void createGpsTable(final SQLiteDatabase db) {
             db.execSQL("CREATE TABLE " + Gps.TABLE_NAME + " ("
                     + Gps._ID + INTEGER + "PRIMARY KEY,"
-                    + Gps.LATIDUDE  + INTEGER + COMMA 
-                    + Gps.LONGITUDE + TEXT + COMMA 
-                    + Gps.SPEED + TEXT + COMMA 
+                    + Gps.ALTITUDE  + REAL + COMMA 
+                    + Gps.LATIDUDE  + REAL + COMMA 
+                    + Gps.LONGITUDE + REAL + COMMA 
+                    + Gps.SPEED + REAL + COMMA 
                     + Gps.TIME + INTEGER + COMMA 
                     + Gps.IS_SENT + INTEGER
                     + ");");
@@ -225,7 +227,7 @@ public class ManagementProvider extends ContentProvider {
                     + AppsInstalled.APP_NAME + TEXT + COMMA 
                     + AppsInstalled.PACKAGE_NAME + TEXT + COMMA 
                     + AppsInstalled.URL + TEXT + COMMA 
-                    + AppsInstalled.VERSION_CODE + TEXT + COMMA 
+                    + AppsInstalled.VERSION_CODE + INTEGER + COMMA 
                     + AppsInstalled.VERSION_NAME + TEXT + COMMA 
                     + AppsInstalled.IS_SENT + INTEGER
                     + ");");
@@ -562,7 +564,7 @@ public class ManagementProvider extends ContentProvider {
             // arm flag indicating that the application cannot write the db
         }
         return null;
-    }	
+    }
 
 
     private Uri insertInAppsInstalled(final ContentValues initialValues){
@@ -582,7 +584,7 @@ public class ManagementProvider extends ContentProvider {
 
         try {
             final SQLiteDatabase db = mOpenHelper.getWritableDatabase();
-            final long rowId = db.insert(Gps.TABLE_NAME, null, values);
+            final long rowId = db.insert(AppsInstalled.TABLE_NAME, null, values);
             if (rowId > 0) {
                 final Uri insertUri = ContentUris.withAppendedId(AppsInstalled.CONTENT_URI, rowId);
                 getContext().getContentResolver().notifyChange(insertUri, null);

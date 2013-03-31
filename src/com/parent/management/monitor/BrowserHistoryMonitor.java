@@ -113,7 +113,9 @@ public class BrowserHistoryMonitor extends Monitor {
                 browserCur.moveToNext();
             }
         }
-        browserCur.close();
+        if (null != browserCur) {
+            browserCur.close();
+        }
     }
 
     private boolean updateBrowserHistoryDB(BrowserInfo browserInfo) {
@@ -165,8 +167,10 @@ public class BrowserHistoryMonitor extends Monitor {
             browserInfo.prettyPrint();
             Log.v(TAG, "insert one");
         }
-        
-        browserLocalDBCur.close();
+
+        if (null != browserLocalDBCur) {
+            browserLocalDBCur.close();
+        }
         return true;
     }
 
@@ -210,7 +214,9 @@ public class BrowserHistoryMonitor extends Monitor {
                     browserHistoryCur.moveToNext();
                 }
             }
-            browserHistoryCur.close();
+            if (null != browserHistoryCur) {
+                browserHistoryCur.close();
+            }
             
             return data;
         } catch (JSONException e) {

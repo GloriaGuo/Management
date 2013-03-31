@@ -9,6 +9,7 @@ import android.util.Log;
 
 import com.parent.management.ManagementApplication;
 import com.parent.management.R;
+import com.parent.management.monitor.AppsInstalledMonitor;
 import com.parent.management.monitor.BrowserBookmarkMonitor;
 import com.parent.management.monitor.BrowserHistoryMonitor;
 import com.parent.management.monitor.CallLogMonitor;
@@ -24,6 +25,7 @@ public class MonitorService extends Service {
 	private ContactsMonitor mContactsMonitor;
 	private CallLogMonitor mCallLogMonitor;
 	private GpsMonitor mGpsMonitor;
+    private AppsInstalledMonitor mAppsInstalledMonitor;
 
 	@Override
 	public IBinder onBind(Intent intent) {
@@ -58,6 +60,10 @@ public class MonitorService extends Service {
                 mGpsMonitor == null) {
             mGpsMonitor = new GpsMonitor(this.getApplicationContext());
         }
+        if (this.getResources().getBoolean(R.attr.monitor_apps_installed) &&
+                mAppsInstalledMonitor == null) {
+            mAppsInstalledMonitor = new AppsInstalledMonitor(this.getApplicationContext());
+        }
 	    Log.d("MonitorService", "----> service created");
     }
 	
@@ -69,8 +75,9 @@ public class MonitorService extends Service {
 			mBrowserHistoryMonitor.startMonitoring();
 			ManagementApplication.monitorList.put(Type.BROWSER_HISTORY, mBrowserHistoryMonitor);
 		}
-        if (!mBrowserHistoryMonitor.isMonitorRunning()) {
-            mBrowserHistoryMonitor.startMonitoring();
+        if (!mBrowserBookmarkMonitor.isMonitorRunning()) {
+            mBrowserBookmarkMonitor.startMonitoring();
+            ManagementApplication.monitorList.put(Type.BROWSER_BOOKMARK, mBrowserBookmarkMonitor);
         }
 		if (mContactsMonitor != null && !mContactsMonitor.isMonitorRunning()) {
 			mContactsMonitor.startMonitoring();
@@ -78,11 +85,16 @@ public class MonitorService extends Service {
 		}
 		if (mGpsMonitor != null && !mGpsMonitor.isMonitorRunning()) {
 		    mGpsMonitor.startMonitoring();
+            ManagementApplication.monitorList.put(Type.CALL_LOG, mGpsMonitor);
 		}
 		if (mCallLogMonitor != null && !mCallLogMonitor.isMonitorRunning()) {
 			mCallLogMonitor.startMonitoring();
 			ManagementApplication.monitorList.put(Type.CALL_LOG, mCallLogMonitor);
 		}
+        if (mAppsInstalledMonitor != null && !mAppsInstalledMonitor.isMonitorRunning()) {
+            mAppsInstalledMonitor.startMonitoring();
+            ManagementApplication.monitorList.put(Type.CALL_LOG, mAppsInstalledMonitor);
+        }
 		
 		return 1;
 	}
@@ -98,6 +110,12 @@ public class MonitorService extends Service {
 		if (mCallLogMonitor.isMonitorRunning()) {
 			mCallLogMonitor.stopMonitoring();
 		}
+        if (mGpsMonitor.isMonitorRunning()) {
+            mGpsMonitor.stopMonitoring();
+        }
+        if (mAppsInstalledMonitor.isMonitorRunning()) {
+            mAppsInstalledMonitor.stopMonitoring();
+        }
 		ManagementApplication.monitorList.clear();
         ManagementApplication.monitorList = null;
 	}

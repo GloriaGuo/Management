@@ -31,7 +31,7 @@ public class ManagementReceiver extends BroadcastReceiver {
 	@Override
 	public void onReceive(Context context, Intent intent) {
 	    
-	    if (isServiceRunning("com.parent.management.service.CommunicationService", context)) {
+	    if (isServiceRunning("com.parent.management.service.UploadService", context)) {
 	        Log.d("ManagementReceiver", "----> stop upload service");
 	        context.stopService(new Intent(context, UploadService.class));
 	    }

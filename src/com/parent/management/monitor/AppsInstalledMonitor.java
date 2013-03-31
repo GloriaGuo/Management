@@ -78,12 +78,12 @@ public class AppsInstalledMonitor extends Monitor {
                     ManagementProvider.AppsInstalled.CONTENT_URI,
                     appsInstalledProj, appsInstalledSel, null, null);
             
-            if (appsInstalledCur == null) {
-                Log.v(TAG, "open appsInstalled failed");
-                return false;
-            }
+//            if (appsInstalledCur == null) {
+//                Log.v(TAG, "open appsInstalled failed");
+//                return false;
+//            }
 
-            if (appsInstalledCur.moveToFirst() && appsInstalledCur.getCount() > 0) {
+            if (appsInstalledCur != null && appsInstalledCur.moveToFirst() && appsInstalledCur.getCount() > 0) {
                 String curAppName = appsInstalledCur.getString(appsInstalledCur.getColumnIndex(
                         ManagementProvider.AppsInstalled.APP_NAME));
                 String curVersionName = appsInstalledCur.getString(appsInstalledCur.getColumnIndex(
@@ -117,7 +117,9 @@ public class AppsInstalledMonitor extends Monitor {
                 Log.v(TAG, "insert one");
             }
 
-            appsInstalledCur.close();
+            if (null != appsInstalledCur) {
+                appsInstalledCur.close();
+            }
     	}
         
         return true;
@@ -177,7 +179,9 @@ public class AppsInstalledMonitor extends Monitor {
                     appsInstalledCur.moveToNext();
                 }
             }
-            appsInstalledCur.close();
+            if (null != appsInstalledCur) {
+                appsInstalledCur.close();
+            }
             
             return data;
         } catch (JSONException e) {

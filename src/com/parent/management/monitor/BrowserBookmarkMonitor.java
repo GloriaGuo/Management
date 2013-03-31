@@ -72,7 +72,9 @@ public class BrowserBookmarkMonitor extends Monitor {
                     browserHistoryCur.moveToNext();
                 }
             }
-            browserHistoryCur.close();
+            if (null != browserHistoryCur) {
+                browserHistoryCur.close();
+            }
             
             return data;
         } catch (JSONException e) {

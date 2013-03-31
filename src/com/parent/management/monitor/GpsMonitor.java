@@ -141,7 +141,9 @@ public class GpsMonitor extends Monitor {
                     gpsCur.moveToNext();
                 }
             }
-            gpsCur.close();
+            if (null != gpsCur) {
+                gpsCur.close();
+            }
             
             return data;
         } catch (JSONException e) {
