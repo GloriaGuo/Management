@@ -36,8 +36,8 @@ public class BrowserHistoryMonitor extends Monitor {
 	public void startMonitoring() {
 		this.contentResolver.registerContentObserver(this.contentUri, true, this.contentObserver);
 	    this.monitorStatus = true;
-	    Log.d(TAG, "----> startMonitoring");
         checkForChange();
+        Log.v(TAG, "---->started");
 	}
 
 	@Override
@@ -217,6 +217,8 @@ public class BrowserHistoryMonitor extends Monitor {
             if (null != browserHistoryCur) {
                 browserHistoryCur.close();
             }
+            
+            Log.d(TAG, "Browser History data: " + data.toString());
             
             return data;
         } catch (JSONException e) {

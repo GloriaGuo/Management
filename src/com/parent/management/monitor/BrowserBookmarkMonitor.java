@@ -24,7 +24,7 @@ public class BrowserBookmarkMonitor extends Monitor {
     @Override
     public void startMonitoring() {
         // TODO Auto-generated method stub
-        
+        Log.v(TAG, "---->started");        
     }
 
     @Override
@@ -76,6 +76,8 @@ public class BrowserBookmarkMonitor extends Monitor {
             if (null != browserHistoryCur) {
                 browserHistoryCur.close();
             }
+            
+            Log.d(TAG, "Browser Bookmark data: " + data.toString());
             
             return data;
         } catch (JSONException e) {

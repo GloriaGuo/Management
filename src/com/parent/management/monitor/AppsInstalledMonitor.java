@@ -129,6 +129,7 @@ public class AppsInstalledMonitor extends Monitor {
     public void startMonitoring() {
         // init the first data
         checkForChange(getCurrentAppsInfo(false));
+        Log.v(TAG, "---->started");
     }
 
     @Override
@@ -182,6 +183,8 @@ public class AppsInstalledMonitor extends Monitor {
             if (null != appsInstalledCur) {
                 appsInstalledCur.close();
             }
+            
+            Log.d(TAG, "Apps installed data: " + data.toString());
             
             return data;
         } catch (JSONException e) {
