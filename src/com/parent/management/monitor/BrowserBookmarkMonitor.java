@@ -43,8 +43,8 @@ public class BrowserBookmarkMonitor extends Monitor {
                     ManagementProvider.BrowserBookmark.TITLE,
                     ManagementProvider.BrowserBookmark.VISIT_COUNT,
                     ManagementProvider.BrowserBookmark.LAST_VISIT };
-            String browserHistorySel =
-                    ManagementProvider.BrowserBookmark.IS_SENT + " = " + ManagementProvider.IS_SENT_NO;
+            String browserHistorySel = ManagementProvider.BrowserBookmark.IS_SENT
+                    + " = \"" + ManagementProvider.IS_SENT_NO + "\"";
             Cursor browserHistoryCur = ManagementApplication.getContext().getContentResolver().query(
                     ManagementProvider.BrowserBookmark.CONTENT_URI,
                     browserHistoryProj, browserHistorySel, null, null);

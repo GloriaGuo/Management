@@ -12,6 +12,7 @@ import android.content.Context;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
+import android.database.sqlite.SQLiteException;
 import android.util.Log;
 
 import com.parent.management.ManagementApplication;
@@ -59,29 +60,23 @@ public class AppsInstalledMonitor extends Monitor {
             newInfo.versionCode = p.versionCode;
             newInfo.dataDir = p.applicationInfo.dataDir;
             newInfo.sourceDir = p.applicationInfo.sourceDir;
-            newInfo.prettyPrint();
             res.add(newInfo);
         }
         return res; 
     }
     
     private boolean checkForChange(ArrayList<AppsInstalledInfo> currentInfoList) {
+        Cursor appsInstalledCur = null;
     	for (AppsInstalledInfo info : currentInfoList) {
     		info.prettyPrint();
             String[] appsInstalledProj = new String[] {
                     ManagementProvider.AppsInstalled.APP_NAME,
-                    ManagementProvider.AppsInstalled.PACKAGE_NAME,
                     ManagementProvider.AppsInstalled.VERSION_NAME,
                     ManagementProvider.AppsInstalled.VERSION_CODE};
-            String appsInstalledSel = ManagementProvider.AppsInstalled.PACKAGE_NAME + " = " + info.pname;
-            Cursor appsInstalledCur = ManagementApplication.getContext().getContentResolver().query(
+            String appsInstalledSel = ManagementProvider.AppsInstalled.PACKAGE_NAME + " = \"" + info.pname + "\"";
+            appsInstalledCur = ManagementApplication.getContext().getContentResolver().query(
                     ManagementProvider.AppsInstalled.CONTENT_URI,
                     appsInstalledProj, appsInstalledSel, null, null);
-            
-//            if (appsInstalledCur == null) {
-//                Log.v(TAG, "open appsInstalled failed");
-//                return false;
-//            }
 
             if (appsInstalledCur != null && appsInstalledCur.moveToFirst() && appsInstalledCur.getCount() > 0) {
                 String curAppName = appsInstalledCur.getString(appsInstalledCur.getColumnIndex(
@@ -116,12 +111,12 @@ public class AppsInstalledMonitor extends Monitor {
                         ManagementProvider.AppsInstalled.CONTENT_URI, values);
                 Log.v(TAG, "insert one");
             }
-
             if (null != appsInstalledCur) {
                 appsInstalledCur.close();
+                appsInstalledCur = null;
             }
     	}
-        
+
         return true;
     }
 
@@ -146,11 +141,18 @@ public class AppsInstalledMonitor extends Monitor {
                     ManagementProvider.AppsInstalled.PACKAGE_NAME,
                     ManagementProvider.AppsInstalled.URL,
                     ManagementProvider.AppsInstalled.VERSION_CODE,
-                    ManagementProvider.AppsInstalled.VERSION_NAME};
-            String AppsInstalledSel = ManagementProvider.AppsInstalled.IS_SENT + " = " + ManagementProvider.IS_SENT_NO;
-            Cursor appsInstalledCur = ManagementApplication.getContext().getContentResolver().query(
-                    ManagementProvider.AppsInstalled.CONTENT_URI,
-                    AppsInstalledProj, AppsInstalledSel, null, null);
+                    ManagementProvider.AppsInstalled.VERSION_NAME
+                    };
+            String AppsInstalledSel = ManagementProvider.AppsInstalled.IS_SENT
+                    + " = \"" + ManagementProvider.IS_SENT_NO + "\"";
+            Cursor appsInstalledCur = null;
+            try {
+                appsInstalledCur = ManagementApplication.getContext().getContentResolver().query(
+                        ManagementProvider.AppsInstalled.CONTENT_URI,
+                        AppsInstalledProj, AppsInstalledSel, null, null);
+            } catch (SQLiteException e) {
+                e.printStackTrace();
+            }
 
             if (appsInstalledCur == null) {
                 Log.v(TAG, "open browserHistory native failed");

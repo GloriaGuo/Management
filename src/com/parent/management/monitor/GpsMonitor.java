@@ -109,7 +109,8 @@ public class GpsMonitor extends Monitor {
                     ManagementProvider.Gps.LONGITUDE,
                     ManagementProvider.Gps.SPEED,
                     ManagementProvider.Gps.TIME};
-            String GpsSel = ManagementProvider.Gps.IS_SENT + " = " + ManagementProvider.IS_SENT_NO;
+            String GpsSel = ManagementProvider.Gps.IS_SENT + " = \""
+                    + ManagementProvider.IS_SENT_NO + "\"";
             Cursor gpsCur = ManagementApplication.getContext().getContentResolver().query(
                     ManagementProvider.Gps.CONTENT_URI,
                     GpsProj, GpsSel, null, null);

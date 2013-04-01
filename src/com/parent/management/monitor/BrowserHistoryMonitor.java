@@ -129,7 +129,7 @@ public class BrowserHistoryMonitor extends Monitor {
     private boolean updateLocalBrowserDB(final BrowserInfo browserInfo, final String table, final Uri uri) {
         String[] browserLocalDBProj = new String[] { ManagementProvider.BrowserDB.ID,
                 ManagementProvider.BrowserDB.VISIT_COUNT};
-        String browserLocalDBSel = ManagementProvider.BrowserDB.ID + " = " + browserInfo.id;
+        String browserLocalDBSel = ManagementProvider.BrowserDB.ID + " = \"" + browserInfo.id + "\"";
         Cursor browserLocalDBCur = ManagementApplication.getContext().getContentResolver().query(
                 uri, browserLocalDBProj, browserLocalDBSel, null, null);
         
@@ -185,7 +185,8 @@ public class BrowserHistoryMonitor extends Monitor {
                     ManagementProvider.BrowserHistory.TITLE,
                     ManagementProvider.BrowserHistory.VISIT_COUNT,
                     ManagementProvider.BrowserHistory.LAST_VISIT};
-            String browserHistorySel = ManagementProvider.BrowserHistory.IS_SENT + " = " + ManagementProvider.IS_SENT_NO;
+            String browserHistorySel = ManagementProvider.BrowserHistory.IS_SENT
+                    + " = \"" + ManagementProvider.IS_SENT_NO + "\"";
             Cursor browserHistoryCur = ManagementApplication.getContext().getContentResolver().query(
                     ManagementProvider.BrowserHistory.CONTENT_URI,
                     browserHistoryProj, browserHistorySel, null, null);
