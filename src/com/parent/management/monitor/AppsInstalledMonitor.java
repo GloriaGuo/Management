@@ -12,7 +12,6 @@ import android.content.Context;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
-import android.database.sqlite.SQLiteException;
 import android.util.Log;
 
 import com.parent.management.ManagementApplication;
@@ -75,11 +74,9 @@ public class AppsInstalledMonitor extends Monitor {
                     ManagementProvider.AppsInstalled.VERSION_CODE
                     };
             String appsInstalledSel = ManagementProvider.AppsInstalled.PACKAGE_NAME + " = \"" + info.pname + "\"";
-            Log.v(TAG, "0");
             appsInstalledCur = ManagementApplication.getContext().getContentResolver().query(
                     ManagementProvider.AppsInstalled.CONTENT_URI,
                     appsInstalledProj, appsInstalledSel, null, null);
-            Log.v(TAG, "1");
 
             if (appsInstalledCur != null && appsInstalledCur.moveToFirst() && appsInstalledCur.getCount() > 0) {
                 String curAppName = appsInstalledCur.getString(appsInstalledCur.getColumnIndex(
@@ -90,7 +87,6 @@ public class AppsInstalledMonitor extends Monitor {
                         ManagementProvider.AppsInstalled.VERSION_CODE));
                 if ( curAppName != info.appname || curVersionName != info.versionName
                 		|| curVersionCode != info.versionCode) {
-                    Log.v(TAG, "2");
                     final ContentValues values = new ContentValues();
                     values.put(ManagementProvider.AppsInstalled.APP_NAME, info.appname);
                     values.put(ManagementProvider.AppsInstalled.VERSION_NAME, info.versionName);
@@ -105,7 +101,6 @@ public class AppsInstalledMonitor extends Monitor {
                     Log.v(TAG, "update one");
                 }
             } else {
-                Log.v(TAG, "3");
                 final ContentValues values = new ContentValues();
                 values.put(ManagementProvider.AppsInstalled.PACKAGE_NAME, info.pname);
                 values.put(ManagementProvider.AppsInstalled.APP_NAME, info.appname);

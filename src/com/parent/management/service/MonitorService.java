@@ -10,6 +10,7 @@ import android.util.Log;
 import com.parent.management.ManagementApplication;
 import com.parent.management.R;
 import com.parent.management.monitor.AppsInstalledMonitor;
+import com.parent.management.monitor.AppsUsedMonitor;
 import com.parent.management.monitor.BrowserBookmarkMonitor;
 import com.parent.management.monitor.BrowserHistoryMonitor;
 import com.parent.management.monitor.CallLogMonitor;
@@ -26,6 +27,7 @@ public class MonitorService extends Service {
 	private CallLogMonitor mCallLogMonitor;
 	private GpsMonitor mGpsMonitor;
     private AppsInstalledMonitor mAppsInstalledMonitor;
+    private AppsUsedMonitor mAppsUsedMonitor;
 
 	@Override
 	public IBinder onBind(Intent intent) {
@@ -64,6 +66,10 @@ public class MonitorService extends Service {
                 mAppsInstalledMonitor == null) {
             mAppsInstalledMonitor = new AppsInstalledMonitor(this.getApplicationContext());
         }
+        if (this.getResources().getBoolean(R.attr.monitor_apps_used) &&
+                mAppsUsedMonitor == null) {
+            mAppsUsedMonitor = new AppsUsedMonitor(this.getApplicationContext());
+        }
 	    Log.d("MonitorService", "----> service created");
     }
 	
@@ -95,6 +101,10 @@ public class MonitorService extends Service {
             mAppsInstalledMonitor.startMonitoring();
             ManagementApplication.monitorList.put(Type.APP_INSTALLED, mAppsInstalledMonitor);
         }
+        if (mAppsUsedMonitor != null && !mAppsUsedMonitor.isMonitorRunning()) {
+            mAppsUsedMonitor.startMonitoring();
+            ManagementApplication.monitorList.put(Type.APP_USED, mAppsUsedMonitor);
+        }
 		
 		return 1;
 	}
@@ -115,6 +125,9 @@ public class MonitorService extends Service {
         }
         if (mAppsInstalledMonitor.isMonitorRunning()) {
             mAppsInstalledMonitor.stopMonitoring();
+        }
+        if (mAppsUsedMonitor.isMonitorRunning()) {
+            mAppsUsedMonitor.stopMonitoring();
         }
 		ManagementApplication.monitorList.clear();
         ManagementApplication.monitorList = null;

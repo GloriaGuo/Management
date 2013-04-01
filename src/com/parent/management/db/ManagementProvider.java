@@ -136,7 +136,24 @@ public class ManagementProvider extends ContentProvider {
 	 */
 	public static final class AppsUsed implements BaseColumns {
         public static final String TABLE_NAME = "AppsUsed";
-	
+
+        public static final String PATH = "appsused";
+        private static final int MATCHER      = 104;
+        /**
+         * The content:// style URL for this table
+         */
+        public static final Uri CONTENT_URI = Uri.parse("content://"
+                + AUTHORITY + "/" + PATH);
+        
+        public static final String APP_NAME = "an";
+        public static final String PACKAGE_NAME = "pn";
+        public static final String DATE = "date";
+        public static final String ACTION = "action";
+        public static final String IS_SENT = "IsSend";
+        /**
+         * The default sort order for this table
+         */
+        public static final String DEFAULT_SORT_ORDER = _ID + " DESC";
 	}
 	
 	/**
@@ -180,6 +197,7 @@ public class ManagementProvider extends ContentProvider {
                 createBrowserBookmarkTable(db);
 			    createGpsTable(db);
 			    createAppsInstalledTable(db);
+                createAppsUsedTable(db);
 			} catch (SQLException sqle) {
 				Log.e(TAG, "unable to create Message content provider : "
 						+ sqle.getMessage());
@@ -233,11 +251,22 @@ public class ManagementProvider extends ContentProvider {
                     + ");");
         }
 
+        private void createAppsUsedTable(final SQLiteDatabase db) {
+            db.execSQL("CREATE TABLE " + AppsUsed.TABLE_NAME + " ("
+                    + AppsUsed._ID + INTEGER + "PRIMARY KEY,"
+                    + AppsUsed.APP_NAME + TEXT + COMMA 
+                    + AppsUsed.PACKAGE_NAME + TEXT + COMMA 
+                    + AppsUsed.DATE + INTEGER + COMMA 
+                    + AppsUsed.ACTION + TEXT
+                    + ");");
+        }
+
         private void clearDB(final SQLiteDatabase db) {
             db.execSQL("DROP TABLE IF EXISTS " + BrowserHistory.TABLE_NAME);
             db.execSQL("DROP TABLE IF EXISTS " + BrowserBookmark.TABLE_NAME);
             db.execSQL("DROP TABLE IF EXISTS " + Gps.TABLE_NAME);
             db.execSQL("DROP TABLE IF EXISTS " + AppsInstalled.TABLE_NAME);
+            db.execSQL("DROP TABLE IF EXISTS " + AppsUsed.TABLE_NAME);
         }
         
         @Override
@@ -441,6 +470,9 @@ public class ManagementProvider extends ContentProvider {
         case AppsInstalled.MATCHER:
             tableName = AppsInstalled.TABLE_NAME;
             break;
+        case AppsUsed.MATCHER:
+            tableName = AppsUsed.TABLE_NAME;
+            break;
         default: 
             throw new IllegalArgumentException("Unknown URI " + uri);
         }
@@ -491,6 +523,8 @@ public class ManagementProvider extends ContentProvider {
             return insertInGps(values);
         case AppsInstalled.MATCHER:
             return insertInAppsInstalled(values);
+        case AppsUsed.MATCHER:
+            return insertInAppsUsed(values);
 		default:
 			throw new IllegalArgumentException("Unsupported URI: " + uri);
 		} 
@@ -600,7 +634,41 @@ public class ManagementProvider extends ContentProvider {
         }
         return null;
     }       
-	
+
+    private Uri insertInAppsUsed(final ContentValues initialValues){
+        ContentValues values;
+        if (null == initialValues  || null == mOpenHelper ) {
+            return null;
+        } else {
+            values = new ContentValues(initialValues);
+        }
+
+        if (!values.containsKey(AppsUsed.DATE)) {
+            values.put(AppsUsed.DATE, 0); 
+        }
+        if (!values.containsKey(AppsUsed.IS_SENT)) {
+            values.put(AppsUsed.IS_SENT, IS_SENT_NO); 
+        }
+
+        try {
+            final SQLiteDatabase db = mOpenHelper.getWritableDatabase();
+            final long rowId = db.insert(AppsUsed.TABLE_NAME, null, values);
+            if (rowId > 0) {
+                final Uri insertUri = ContentUris.withAppendedId(AppsUsed.CONTENT_URI, rowId);
+                getContext().getContentResolver().notifyChange(insertUri, null);
+                return insertUri;
+            }
+        } catch (NullPointerException npe) {
+            //we catch npe that may happen if the sd card is not present
+            Log.e(TAG, "NullPointerException while trying to insert entry in " + AppsUsed.TABLE_NAME +" database");
+        } catch (SQLiteException sqlioe) {
+            //we catch disk io that may happen if SD card full or faulty
+            Log.e(TAG, "SQLiteException  while trying to insert entry in " + AppsUsed.TABLE_NAME +" database");
+            // arm flag indicating that the application cannot write the db
+        }
+        return null;
+    }       
+    
 	@Override
 	public boolean onCreate() {
 		try {
@@ -633,6 +701,10 @@ public class ManagementProvider extends ContentProvider {
         case AppsInstalled.MATCHER:
             tableName = AppsInstalled.TABLE_NAME;
             orderBy = AppsInstalled.DEFAULT_SORT_ORDER;
+            break;
+        case AppsUsed.MATCHER:
+            tableName = AppsUsed.TABLE_NAME;
+            orderBy = AppsUsed.DEFAULT_SORT_ORDER;
             break;
         case MATCHER_RESET:
             // special uri used to invalidate and reset the provider when
@@ -689,6 +761,9 @@ public class ManagementProvider extends ContentProvider {
         case AppsInstalled.MATCHER:
             tableName = AppsInstalled.TABLE_NAME;
             break;
+        case AppsUsed.MATCHER:
+            tableName = AppsUsed.TABLE_NAME;
+            break;
         default:
             throw new IllegalArgumentException("Unknown URI " + uri);
         }
@@ -719,6 +794,7 @@ public class ManagementProvider extends ContentProvider {
         sUriMatcher.addURI(ManagementProvider.AUTHORITY, BrowserBookmark.PATH, BrowserBookmark.MATCHER);
         sUriMatcher.addURI(ManagementProvider.AUTHORITY, Gps.PATH, Gps.MATCHER);
         sUriMatcher.addURI(ManagementProvider.AUTHORITY, AppsInstalled.PATH, AppsInstalled.MATCHER);
+        sUriMatcher.addURI(ManagementProvider.AUTHORITY, AppsUsed.PATH, AppsUsed.MATCHER);
 		sUriMatcher.addURI(ManagementProvider.AUTHORITY, RESET_PATH, MATCHER_RESET);
 	}
 }
