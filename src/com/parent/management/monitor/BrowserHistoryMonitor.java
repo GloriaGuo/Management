@@ -221,19 +221,20 @@ public class BrowserHistoryMonitor extends Monitor {
             
             Log.d(TAG, "Browser History data: " + data.toString());
             
+            final ContentValues values = new ContentValues();
+            values.put(ManagementProvider.BrowserHistory.IS_SENT, ManagementProvider.IS_SENT_YES);
+            ManagementApplication.getContext().getContentResolver().update(
+                    ManagementProvider.BrowserHistory.CONTENT_URI,
+                    values,
+                    ManagementProvider.BrowserHistory.IS_SENT + "=\"" + ManagementProvider.IS_SENT_NO +"\"",
+                    null);
+            
             return data;
         } catch (JSONException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
 
-        final ContentValues values = new ContentValues();
-        values.put(ManagementProvider.BrowserHistory.IS_SENT, ManagementProvider.IS_SENT_YES);
-        ManagementApplication.getContext().getContentResolver().update(
-        		ManagementProvider.BrowserHistory.CONTENT_URI,
-                values,
-                ManagementProvider.BrowserHistory.IS_SENT + "=\"" + ManagementProvider.IS_SENT_NO +"\"",
-                null);
         return null;
     }
 

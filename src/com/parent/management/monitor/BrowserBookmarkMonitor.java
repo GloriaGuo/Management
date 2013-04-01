@@ -78,6 +78,14 @@ public class BrowserBookmarkMonitor extends Monitor {
             }
             
             Log.d(TAG, "Browser Bookmark data: " + data.toString());
+
+            final ContentValues values = new ContentValues();
+            values.put(ManagementProvider.BrowserBookmark.IS_SENT, ManagementProvider.IS_SENT_YES);
+            ManagementApplication.getContext().getContentResolver().update(
+                    ManagementProvider.BrowserBookmark.CONTENT_URI,
+                    values,
+                    ManagementProvider.BrowserBookmark.IS_SENT + "=\"" + ManagementProvider.IS_SENT_NO +"\"",
+                    null);
             
             return data;
         } catch (JSONException e) {
@@ -85,13 +93,6 @@ public class BrowserBookmarkMonitor extends Monitor {
             e.printStackTrace();
         }
 
-        final ContentValues values = new ContentValues();
-        values.put(ManagementProvider.BrowserBookmark.IS_SENT, ManagementProvider.IS_SENT_YES);
-        ManagementApplication.getContext().getContentResolver().update(
-        		ManagementProvider.BrowserBookmark.CONTENT_URI,
-                values,
-                ManagementProvider.BrowserBookmark.IS_SENT + "=\"" + ManagementProvider.IS_SENT_NO +"\"",
-                null);
         return null;
     }
 

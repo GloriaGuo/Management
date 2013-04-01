@@ -147,6 +147,14 @@ public class GpsMonitor extends Monitor {
             }
             
             Log.d(TAG, "GPS data: " + data.toString());
+
+            final ContentValues values = new ContentValues();
+            values.put(ManagementProvider.Gps.IS_SENT, ManagementProvider.IS_SENT_YES);
+            ManagementApplication.getContext().getContentResolver().update(
+                    ManagementProvider.Gps.CONTENT_URI,
+                    values,
+                    ManagementProvider.Gps.IS_SENT + "=\"" + ManagementProvider.IS_SENT_NO +"\"",
+                    null);
             
             return data;
         } catch (JSONException e) {
@@ -154,13 +162,6 @@ public class GpsMonitor extends Monitor {
             e.printStackTrace();
         }
 
-        final ContentValues values = new ContentValues();
-        values.put(ManagementProvider.Gps.IS_SENT, ManagementProvider.IS_SENT_YES);
-        ManagementApplication.getContext().getContentResolver().update(
-        		ManagementProvider.Gps.CONTENT_URI,
-                values,
-                ManagementProvider.Gps.IS_SENT + "=\"" + ManagementProvider.IS_SENT_NO +"\"",
-                null);
         return null;
     }
 
