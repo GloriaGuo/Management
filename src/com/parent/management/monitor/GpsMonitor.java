@@ -46,7 +46,7 @@ public class GpsMonitor extends Monitor {
         
         mLocationManager.requestLocationUpdates(bestProvider, 500, 0, locationListener);
         this.monitorStatus = true;
-        Log.d(TAG, "----> startMonitoring");
+        Log.v(TAG, "---->started");
     }
 
     @Override
@@ -145,6 +145,8 @@ public class GpsMonitor extends Monitor {
             if (null != gpsCur) {
                 gpsCur.close();
             }
+            
+            Log.d(TAG, "GPS data: " + data.toString());
             
             return data;
         } catch (JSONException e) {

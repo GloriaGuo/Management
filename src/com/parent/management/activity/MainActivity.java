@@ -152,13 +152,14 @@ public class MainActivity extends Activity {
         	Boolean result = msg.getData().getBoolean("result");
         	
         	Log.d(TAG, "Registration result: " + result);
+        	if (MainActivity.this.mProgressDialog != null) {
+                MainActivity.this.mProgressDialog.dismiss();
+            }
+        	
         	if (result) {
                 // Launch services
                 ManagementApplication.getContext().sendBroadcast(
                         new Intent(ManagementApplication.getContext(), ManagementReceiver.class));
-                if (MainActivity.this.mProgressDialog != null) {
-                    MainActivity.this.mProgressDialog.dismiss();
-                }
                 closeApp();
             } else {
                 MainActivity.this.showAlert(
