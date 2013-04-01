@@ -14,7 +14,7 @@ import com.parent.management.db.ManagementProvider;
 
 public class BrowserBookmarkMonitor extends Monitor {
     private static final String TAG = ManagementApplication.getApplicationTag() + "." +
-            BrowserHistoryMonitor.class.getSimpleName();
+            BrowserBookmarkMonitor.class.getSimpleName();
 
     public BrowserBookmarkMonitor(Context context) {
         super(context);

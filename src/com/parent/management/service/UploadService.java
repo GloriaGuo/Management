@@ -77,10 +77,11 @@ public class UploadService extends Service {
                 Entry<Type, Monitor> entry = iterator.next();
                 Log.d(TAG, "----> prepare upload data for : " + entry.getKey());
 
-                if (entry.getValue().extractDataForSend() != null) {
+                JSONArray data = entry.getValue().extractDataForSend();
+                if (data != null) {
                     JSONObject jsonRows = new JSONObject();
                     jsonRows.put(JSONParams.DATA_TYPE, entry.getKey().ordinal());
-                    jsonRows.put(JSONParams.DATA, entry.getValue().extractDataForSend());
+                    jsonRows.put(JSONParams.DATA, data);
                     jsonParams.put(jsonRows);
                 }
             }
