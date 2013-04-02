@@ -42,17 +42,24 @@ public class UploadService extends Service {
 	@Override
     public int onStartCommand(Intent paramIntent, int paramInt1, int paramInt2)
     {
-	    Log.d(TAG, "----> Upload Service start.");
-	    if (mWifilock == null)
-	    {
-	        mWifilock = ((WifiManager)getSystemService("wifi")).createWifiLock("PM");
-	        mWifilock.acquire();
-	    }
-	    //getLock(this).acquire();
-        uploadJob();
-	    mWifilock.release();
-	    mWifilock = null;
-	    stopSelf();
+	    new Thread(new Runnable() {
+
+            @Override
+            public void run() {
+                Log.d(TAG, "----> Upload Service start.");
+                if (mWifilock == null)
+                {
+                    mWifilock = ((WifiManager)getSystemService("wifi")).createWifiLock("PM");
+                    mWifilock.acquire();
+                }
+                //getLock(this).acquire();
+                uploadJob();
+                mWifilock.release();
+                mWifilock = null;
+                UploadService.this.stopSelf();
+            }
+	    
+	    });
         return 1;
     }
 	

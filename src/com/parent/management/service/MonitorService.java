@@ -81,7 +81,7 @@ public class MonitorService extends Service {
 			mBrowserHistoryMonitor.startMonitoring();
 			ManagementApplication.monitorList.put(Type.BROWSER_HISTORY, mBrowserHistoryMonitor);
 		}
-        if (!mBrowserBookmarkMonitor.isMonitorRunning()) {
+        if (mBrowserBookmarkMonitor != null && !mBrowserBookmarkMonitor.isMonitorRunning()) {
             mBrowserBookmarkMonitor.startMonitoring();
             ManagementApplication.monitorList.put(Type.BROWSER_BOOKMARK, mBrowserBookmarkMonitor);
         }
