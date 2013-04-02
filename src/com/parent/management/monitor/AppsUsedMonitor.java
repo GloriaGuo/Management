@@ -39,7 +39,7 @@ public class AppsUsedMonitor extends Monitor {
         }
     }
 
-    private ArrayList<AppsUsedInfo> getCurrentAppsUsedInfo(boolean ifGetSysPackages) {
+    private ArrayList<AppsUsedInfo> getCurrentAppsUsedInfo() {
     	ArrayList<AppsUsedInfo> res = new ArrayList<AppsUsedInfo>();
 
         ActivityManager activityManager = (ActivityManager)
@@ -127,7 +127,7 @@ public class AppsUsedMonitor extends Monitor {
     @Override
     public void startMonitoring() {
         // init the first data
-        checkForChange(getCurrentAppsUsedInfo(false));
+        checkForChange(getCurrentAppsUsedInfo());
         Log.v(TAG, "---->started");
     }
 
@@ -155,7 +155,7 @@ public class AppsUsedMonitor extends Monitor {
                     AppsUsedProj, AppsUsedSel, null, null);
 
             if (appsUsedCur == null) {
-                Log.v(TAG, "open browserHistory native failed");
+                Log.v(TAG, "open appUsed db failed");
                 return null;
             }
             if (appsUsedCur.moveToFirst() && appsUsedCur.getCount() > 0) {

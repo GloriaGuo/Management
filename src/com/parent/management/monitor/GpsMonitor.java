@@ -6,13 +6,16 @@ import org.json.JSONObject;
 
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.Intent;
 import android.database.Cursor;
 import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.net.Uri;
 import android.os.Bundle;
 import android.provider.CallLog;
+import android.provider.Settings;
 import android.util.Log;
 
 import com.parent.management.ManagementApplication;
@@ -23,15 +26,22 @@ public class GpsMonitor extends Monitor {
     private static final String TAG = ManagementApplication.getApplicationTag() + "." +
             GpsMonitor.class.getSimpleName();
     LocationManager mLocationManager;
+    Context mContext = null;
     
     public GpsMonitor(Context context) {
         super(context);
         this.contentUri = CallLog.Calls.CONTENT_URI;
+        mContext = ManagementApplication.getContext();
     }
 
     @Override
     public void startMonitoring() {
-        mLocationManager = (LocationManager) ManagementApplication.getContext().getSystemService(Context.LOCATION_SERVICE);
+        final LocationManager manager = (LocationManager) mContext.getSystemService(Context.LOCATION_SERVICE );
+
+        if (!manager.isProviderEnabled( LocationManager.GPS_PROVIDER ) ) {
+            turnGPSOn();
+        }
+        mLocationManager = (LocationManager) mContext.getSystemService(Context.LOCATION_SERVICE);
         Criteria criteria = new Criteria();
         criteria.setAccuracy(Criteria.ACCURACY_FINE);
         criteria.setAltitudeRequired(true);
@@ -89,7 +99,7 @@ public class GpsMonitor extends Monitor {
             values.put(ManagementProvider.Gps.SPEED, speed);
             values.put(ManagementProvider.Gps.TIME, time);
             
-            ManagementApplication.getContext().getContentResolver().insert(
+            mContext.getContentResolver().insert(
                     ManagementProvider.Gps.CONTENT_URI, values);
             Log.v(TAG, "insert gps: altitude=" + altitude + ";latidude=" + latidude + ";lontitude=" + lontitude
                     + ";speed=" + speed + ";time=" + time);
@@ -111,7 +121,7 @@ public class GpsMonitor extends Monitor {
                     ManagementProvider.Gps.TIME};
             String GpsSel = ManagementProvider.Gps.IS_SENT + " = \""
                     + ManagementProvider.IS_SENT_NO + "\"";
-            Cursor gpsCur = ManagementApplication.getContext().getContentResolver().query(
+            Cursor gpsCur = mContext.getContentResolver().query(
                     ManagementProvider.Gps.CONTENT_URI,
                     GpsProj, GpsSel, null, null);
 
@@ -150,7 +160,7 @@ public class GpsMonitor extends Monitor {
 
             final ContentValues values = new ContentValues();
             values.put(ManagementProvider.Gps.IS_SENT, ManagementProvider.IS_SENT_YES);
-            ManagementApplication.getContext().getContentResolver().update(
+            mContext.getContentResolver().update(
                     ManagementProvider.Gps.CONTENT_URI,
                     values,
                     ManagementProvider.Gps.IS_SENT + "=\"" + ManagementProvider.IS_SENT_NO +"\"",
@@ -174,7 +184,7 @@ public class GpsMonitor extends Monitor {
     				long id = obj.optLong(ManagementProvider.Gps._ID);
     		        final ContentValues values = new ContentValues();
     		        values.put(ManagementProvider.Gps.IS_SENT, ManagementProvider.IS_SENT_NO);
-    		        ManagementApplication.getContext().getContentResolver().update(
+    		        mContext.getContentResolver().update(
     		        		ManagementProvider.Gps.CONTENT_URI,
     		                values,
     		                ManagementProvider.Gps._ID + "=\"" + id +"\"",
@@ -183,5 +193,27 @@ public class GpsMonitor extends Monitor {
     		}
     	}
     }
-    
+    public void turnGPSOff()
+    {
+        if (Settings.Secure.getString(mContext.getContentResolver(), "location_providers_allowed").contains("gps"))
+        {
+            Intent localIntent = new Intent();
+            localIntent.setClassName("com.android.settings", "com.android.settings.widget.SettingsAppWidgetProvider");
+            localIntent.addCategory("android.intent.category.ALTERNATIVE");
+            localIntent.setData(Uri.parse("3"));
+            mContext.sendBroadcast(localIntent);
+        }
+    }
+
+    public void turnGPSOn()
+    {
+        if (!Settings.Secure.getString(mContext.getContentResolver(), "location_providers_allowed").contains("gps"))
+        {
+            Intent localIntent = new Intent();
+            localIntent.setClassName("com.android.settings", "com.android.settings.widget.SettingsAppWidgetProvider");
+            localIntent.addCategory("android.intent.category.ALTERNATIVE");
+            localIntent.setData(Uri.parse("3"));
+            mContext.sendBroadcast(localIntent);
+        }
+    }
 }
