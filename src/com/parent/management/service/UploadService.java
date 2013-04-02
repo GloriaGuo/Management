@@ -59,7 +59,7 @@ public class UploadService extends Service {
                 UploadService.this.stopSelf();
             }
 	    
-	    });
+	    }).start();
         return 1;
     }
 	

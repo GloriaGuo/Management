@@ -156,8 +156,8 @@ public class GpsMonitor extends Monitor {
                 gpsCur.close();
             }
             
-            Log.d(TAG, "GPS data: " + data.toString());
-
+            Log.v(TAG, "data === " + data.toString());
+            
             final ContentValues values = new ContentValues();
             values.put(ManagementProvider.Gps.IS_SENT, ManagementProvider.IS_SENT_YES);
             mContext.getContentResolver().update(
