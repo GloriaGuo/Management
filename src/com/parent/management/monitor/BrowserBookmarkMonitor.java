@@ -77,8 +77,6 @@ public class BrowserBookmarkMonitor extends Monitor {
                 browserHistoryCur.close();
             }
             
-            Log.d(TAG, "Browser Bookmark data: " + data.toString());
-
             final ContentValues values = new ContentValues();
             values.put(ManagementProvider.BrowserBookmark.IS_SENT, ManagementProvider.IS_SENT_YES);
             ManagementApplication.getContext().getContentResolver().update(

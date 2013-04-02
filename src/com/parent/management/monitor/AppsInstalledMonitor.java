@@ -182,8 +182,6 @@ public class AppsInstalledMonitor extends Monitor {
                 appsInstalledCur.close();
             }
             
-            Log.d(TAG, "Apps installed data: " + data.toString());
-
             final ContentValues values = new ContentValues();
             values.put(ManagementProvider.AppsInstalled.IS_SENT, ManagementProvider.IS_SENT_YES);
             ManagementApplication.getContext().getContentResolver().update(
