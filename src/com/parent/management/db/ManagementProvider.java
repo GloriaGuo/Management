@@ -257,7 +257,8 @@ public class ManagementProvider extends ContentProvider {
                     + AppsUsed.APP_NAME + TEXT + COMMA 
                     + AppsUsed.PACKAGE_NAME + TEXT + COMMA 
                     + AppsUsed.DATE + INTEGER + COMMA 
-                    + AppsUsed.ACTION + TEXT
+                    + AppsUsed.ACTION + TEXT + COMMA 
+                    + AppsUsed.IS_SENT + INTEGER
                     + ");");
         }
 
