@@ -77,7 +77,8 @@ public class AppsUsedMonitor extends Monitor {
         return res; 
     }
     
-    private boolean checkForChange(ArrayList<AppsUsedInfo> currentInfoList) {
+    private boolean checkForChange() {
+        ArrayList<AppsUsedInfo> currentInfoList = getCurrentAppsUsedInfo();
         Cursor appsUsedCur = null;
     	for (AppsUsedInfo info : currentInfoList) {
     		info.prettyPrint();
@@ -127,7 +128,7 @@ public class AppsUsedMonitor extends Monitor {
     @Override
     public void startMonitoring() {
         // init the first data
-        checkForChange(getCurrentAppsUsedInfo());
+        checkForChange();
         Log.v(TAG, "---->started");
     }
 
@@ -138,6 +139,7 @@ public class AppsUsedMonitor extends Monitor {
 
     @Override
     public JSONArray extractDataForSend() {
+        checkForChange();
         try {
             JSONArray data = new JSONArray();
 

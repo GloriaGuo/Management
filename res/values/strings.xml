@@ -16,5 +16,6 @@
     <string name="progress_dialog_loading_message">Configuring MobileMonitor. This can take few minutes ...</string>
     <string name="alert_dialog_message_regist_failed">Sorry, regist failed. Please try again later.</string>
     <string name="alert_dialog_positive_button">OK</string>
+    <string name="alert_dialog_message_enable_gps">GPS is disabled. Enable it?</string>
     
 </resources>

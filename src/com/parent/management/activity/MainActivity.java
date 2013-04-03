@@ -28,6 +28,7 @@ import com.parent.management.ManagementConfiguration;
 import com.parent.management.R;
 import com.parent.management.jsonclient.JSONClientException;
 import com.parent.management.jsonclient.JSONHttpClient;
+import com.parent.management.monitor.GpsMonitor;
 import com.parent.management.receiver.ManagementReceiver;
 
 public class MainActivity extends Activity {
@@ -46,6 +47,8 @@ public class MainActivity extends Activity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main);
+		
+		GpsMonitor.checkGPSSettings(this);
 		
 		this.mAccountText = (EditText) findViewById(R.id.accountEditText);
         this.mCheckCodeText = (EditText) findViewById(R.id.checkCodeEditText);
@@ -67,7 +70,7 @@ public class MainActivity extends Activity {
                             MainActivity.this.getResources().getString(R.string.alert_dialog_message_empty_account));
                 } else if (checkCode.equals("")) {
                     MainActivity.this.showAlert(
-                            MainActivity.this.getResources().getString(R.string.alert_dialog_message_empty_account));
+                            MainActivity.this.getResources().getString(R.string.alert_dialog_message_empty_check_code));
                 } else {
                 
                     // do registration

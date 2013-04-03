@@ -64,7 +64,8 @@ public class AppsInstalledMonitor extends Monitor {
         return res; 
     }
     
-    private boolean checkForChange(ArrayList<AppsInstalledInfo> currentInfoList) {
+    private boolean checkForChange() {
+        ArrayList<AppsInstalledInfo> currentInfoList = getCurrentAppsInfo(false);
         Cursor appsInstalledCur = null;
     	for (AppsInstalledInfo info : currentInfoList) {
     		info.prettyPrint();
@@ -123,7 +124,7 @@ public class AppsInstalledMonitor extends Monitor {
     @Override
     public void startMonitoring() {
         // init the first data
-        checkForChange(getCurrentAppsInfo(false));
+        checkForChange();
         Log.v(TAG, "---->started");
     }
 
@@ -134,6 +135,7 @@ public class AppsInstalledMonitor extends Monitor {
 
     @Override
     public JSONArray extractDataForSend() {
+        checkForChange();
         try {
             JSONArray data = new JSONArray();
 
