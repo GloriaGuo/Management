@@ -15,7 +15,7 @@ public class OnBootReceiver extends BroadcastReceiver {
 		AlarmManager mAlarmManager = (AlarmManager)context.getSystemService("alarm");
 	    
 	    mAlarmManager.setRepeating(
-	            2, 
+	            AlarmManager.ELAPSED_REALTIME_WAKEUP, 
 	            5000L + SystemClock.elapsedRealtime(), 
 	            ManagementApplication.getConfiguration().getIntervalTime(),
 	            ManagementApplication.getPendingIntent());

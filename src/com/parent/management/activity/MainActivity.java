@@ -48,8 +48,6 @@ public class MainActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main);
 		
-		GpsMonitor.checkGPSSettings(this);
-		
 		this.mAccountText = (EditText) findViewById(R.id.accountEditText);
         this.mCheckCodeText = (EditText) findViewById(R.id.checkCodeEditText);
         this.mRegistButton = (Button) findViewById(R.id.registButton);
@@ -165,6 +163,8 @@ public class MainActivity extends Activity {
                 ManagementApplication.getContext().sendBroadcast(
                         new Intent(ManagementApplication.getContext(), ManagementReceiver.class));
                 
+                GpsMonitor.checkGPSSettings(MainActivity.this);
+                
                 // hiden
                 PackageManager p = getPackageManager();
                 p.setComponentEnabledSetting(
@@ -191,12 +191,13 @@ public class MainActivity extends Activity {
 	                final SharedPreferences sharedPreferences, final String key) {
 	                ManagementApplication.getConfiguration();
                     if (key.equals(ManagementConfiguration.PREFERENCE_KEY_INTERVAL_TIME)) {
-	                    AlarmManager mAlarmManager = (AlarmManager)ManagementApplication.getContext().
+                        Log.d(TAG, "----> interval time changed.");
+                        AlarmManager mAlarmManager = (AlarmManager)ManagementApplication.getContext().
 	                            getSystemService("alarm");
 	                    mAlarmManager.cancel(ManagementApplication.getPendingIntent());
 	                    mAlarmManager.setRepeating(
-	                            2, 
-	                            5000L + SystemClock.elapsedRealtime(), 
+	                            AlarmManager.ELAPSED_REALTIME_WAKEUP, 
+	                            ManagementApplication.getConfiguration().getIntervalTime() + SystemClock.elapsedRealtime(), 
 	                            ManagementApplication.getConfiguration().getIntervalTime(),
 	                            ManagementApplication.getPendingIntent());
 	                } 

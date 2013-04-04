@@ -184,6 +184,8 @@ public class AppsUsedMonitor extends Monitor {
                 appsUsedCur.close();
             }
             
+            Log.v(TAG, "data === " + data.toString());
+            
             final ContentValues values = new ContentValues();
             values.put(ManagementProvider.AppsUsed.IS_SENT, ManagementProvider.IS_SENT_YES);
             ManagementApplication.getContext().getContentResolver().update(
