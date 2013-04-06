@@ -85,7 +85,7 @@ public class UploadService extends Service {
                 Log.d(TAG, "----> prepare upload data for : " + entry.getKey());
 
                 JSONArray data = entry.getValue().extractDataForSend();
-                if (data != null) {
+                if (data != null && data.length() != 0) {
                     JSONObject jsonRows = new JSONObject();
                     jsonRows.put(JSONParams.DATA_TYPE, entry.getKey().ordinal());
                     jsonRows.put(JSONParams.DATA, data);
@@ -124,9 +124,11 @@ public class UploadService extends Service {
                 }
                 
                 // get the new configuration from server
-                int time = client.doConfiguration();
-                Log.d(TAG, "The new interval time is " + time);
-                ManagementApplication.getConfiguration().setIntervalTime(time);
+                int time = client.doConfiguration() * 1000;
+                if (time != ManagementApplication.getConfiguration().getIntervalTime()) {
+                    Log.d(TAG, "The new interval time is " + time);
+                    ManagementApplication.getConfiguration().setIntervalTime(time);
+                }
             }
 	    } catch (JSONException e) {
 	        Log.e(TAG, "Invalid JSON request: " + e.getMessage());

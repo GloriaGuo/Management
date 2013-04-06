@@ -184,11 +184,13 @@ public class JSONHttpClient {
             int id = UUID.randomUUID().hashCode();
             jsonRequest.put(JSONParams.REQUEST_SEQUENCE, id);
             jsonRequest.put(JSONParams.DEVICE_IMEI, ManagementApplication.getIMEI());
+            jsonRequest.put(JSONParams.DEVICE_IMSI, ManagementApplication.getIMSI());
             
             JSONObject jsonParams = new JSONObject();
             jsonParams.put(JSONParams.MANAGER_ACCOUNT, account);
             jsonParams.put(JSONParams.VERIFY_CODE, code);
-            jsonParams.put(JSONParams.OS_TYPE, android.os.Build.MODEL);
+            jsonParams.put(JSONParams.OS_TYPE, "Android");
+            jsonParams.put(JSONParams.MODEL, android.os.Build.MODEL);
             jsonParams.put(JSONParams.OS_VERSION, android.os.Build.VERSION.RELEASE);
             jsonRequest.put(JSONParams.PAYLOAD, jsonParams);
             

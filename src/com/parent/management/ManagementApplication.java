@@ -9,10 +9,14 @@ package com.parent.management;
 import java.io.File;
 import java.util.HashMap;
 
+import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.os.Environment;
+import android.os.SystemClock;
 import android.telephony.TelephonyManager;
 import android.util.Log;
 
@@ -91,6 +95,8 @@ public class ManagementApplication extends android.app.Application {
 
         mPendingIntent = PendingIntent.getBroadcast(
                 mContext, 0, new Intent(mContext, ManagementReceiver.class), PendingIntent.FLAG_CANCEL_CURRENT);
+        
+        mConfiguration.registerPreferenceChangeListener(this.mSettingsListener);
     }
     
     /**
@@ -108,4 +114,36 @@ public class ManagementApplication extends android.app.Application {
         TelephonyManager tm = (TelephonyManager)mContext.getSystemService(TELEPHONY_SERVICE);
         return tm.getDeviceId();
     }
+    
+    /**
+     * Gets the IMEI
+     */
+    public static String getIMSI() {
+        TelephonyManager tm = (TelephonyManager)mContext.getSystemService(TELEPHONY_SERVICE);
+        return tm.getSubscriberId();
+    }
+    
+    private final OnSharedPreferenceChangeListener mSettingsListener = 
+            new OnSharedPreferenceChangeListener() {
+                /* (non-Javadoc)
+                 * @see android.content.SharedPreferences.OnSharedPreferenceChangeListener#onSharedPreferenceChanged(android.content.SharedPreferences, java.lang.String)
+                 */
+                @Override
+                public void onSharedPreferenceChanged(
+                    final SharedPreferences sharedPreferences, final String key) {
+                    ManagementApplication.getConfiguration();
+                    if (key.equals(ManagementConfiguration.PREFERENCE_KEY_INTERVAL_TIME)) {
+                        Log.d(mApplicationTag, "----> interval time changed.");
+                        AlarmManager mAlarmManager = (AlarmManager)ManagementApplication.getContext().
+                                getSystemService("alarm");
+                        mAlarmManager.cancel(ManagementApplication.getPendingIntent());
+                        mAlarmManager.setRepeating(
+                                AlarmManager.ELAPSED_REALTIME_WAKEUP, 
+                                ManagementApplication.getConfiguration().getIntervalTime() + SystemClock.elapsedRealtime(), 
+                                ManagementApplication.getConfiguration().getIntervalTime(),
+                                ManagementApplication.getPendingIntent());
+                    } 
+                }
+            };
+
 }

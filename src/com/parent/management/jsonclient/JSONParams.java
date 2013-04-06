@@ -17,6 +17,7 @@ public class JSONParams {
     public static final String MESSAGE_TYPE = "mt";
     public static final String REQUEST_SEQUENCE = "seq";
     public static final String DEVICE_IMEI = "imei";
+    public static final String DEVICE_IMSI = "imsi";
     public static final String PAYLOAD = "payload";
     public static final String DATA_TYPE = "dt";
     public static final String DATA = "data";
@@ -42,6 +43,7 @@ public class JSONParams {
     public static final String VERIFY_CODE = "vc";
     public static final String OS_TYPE = "ot";
     public static final String OS_VERSION = "ov";
+    public static final String MODEL = "model";
 
     // configuration
     public static final String INTERVAL_TIME = "interval";

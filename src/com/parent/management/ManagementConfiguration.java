@@ -31,7 +31,7 @@ public class ManagementConfiguration {
     
     public void setIntervalTime(int time) {
         mSharedPreferences.edit().putInt(
-                PREFERENCE_KEY_INTERVAL_TIME, time*1000).commit();
+                PREFERENCE_KEY_INTERVAL_TIME, time).commit();
     }
     
     /**

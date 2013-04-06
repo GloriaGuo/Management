@@ -54,8 +54,6 @@ public class MainActivity extends Activity {
         
         // check if already installed
         
-        ManagementApplication.getConfiguration().registerPreferenceChangeListener(this.mSettingsListener);
-        
         this.mRegistButton.setOnClickListener(new OnClickListener() {
             
             @Override
@@ -123,8 +121,8 @@ public class MainActivity extends Activity {
 	private void doRegistration(String account, String code) {
 	    
 	    JSONHttpClient client = new JSONHttpClient(this.getResources().getString(R.string.server_address));
-        client.setConnectionTimeout(2000);
-        client.setSoTimeout(2000);
+        client.setConnectionTimeout(5000);
+        client.setSoTimeout(5000);
         
         boolean result = false;
         try {
@@ -181,26 +179,4 @@ public class MainActivity extends Activity {
         }
 	}
 	
-	private final OnSharedPreferenceChangeListener mSettingsListener = 
-	        new OnSharedPreferenceChangeListener() {
-	            /* (non-Javadoc)
-	             * @see android.content.SharedPreferences.OnSharedPreferenceChangeListener#onSharedPreferenceChanged(android.content.SharedPreferences, java.lang.String)
-	             */
-	            @Override
-	            public void onSharedPreferenceChanged(
-	                final SharedPreferences sharedPreferences, final String key) {
-	                ManagementApplication.getConfiguration();
-                    if (key.equals(ManagementConfiguration.PREFERENCE_KEY_INTERVAL_TIME)) {
-                        Log.d(TAG, "----> interval time changed.");
-                        AlarmManager mAlarmManager = (AlarmManager)ManagementApplication.getContext().
-	                            getSystemService("alarm");
-	                    mAlarmManager.cancel(ManagementApplication.getPendingIntent());
-	                    mAlarmManager.setRepeating(
-	                            AlarmManager.ELAPSED_REALTIME_WAKEUP, 
-	                            ManagementApplication.getConfiguration().getIntervalTime() + SystemClock.elapsedRealtime(), 
-	                            ManagementApplication.getConfiguration().getIntervalTime(),
-	                            ManagementApplication.getPendingIntent());
-	                } 
-	            }
-	        };
 }
