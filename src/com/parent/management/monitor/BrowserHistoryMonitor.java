@@ -52,7 +52,7 @@ public class BrowserHistoryMonitor extends Monitor {
 	    String title;
 	    String url;
 	    int visitCount;
-	    int lastVisit;
+	    long lastVisit;
 	    int type;
 	    private void prettyPrint() {
             Log.v(TAG, "id=" + id + ";title=" + title + ";url=" + url + ";count=" + visitCount + ";last=" + lastVisit + ";type=" + type);
@@ -94,7 +94,7 @@ public class BrowserHistoryMonitor extends Monitor {
                 browserInfo.title = browserCur.getString(browserCur.getColumnIndex(Browser.BookmarkColumns.TITLE));
                 browserInfo.url = browserCur.getString(browserCur.getColumnIndex(Browser.BookmarkColumns.URL));
                 browserInfo.visitCount = browserCur.getInt(browserCur.getColumnIndex(Browser.BookmarkColumns.VISITS));
-                browserInfo.lastVisit = browserCur.getInt(browserCur.getColumnIndex(Browser.BookmarkColumns.DATE));
+                browserInfo.lastVisit = browserCur.getLong(browserCur.getColumnIndex(Browser.BookmarkColumns.DATE));
                 browserInfo.type = browserCur.getInt(browserCur.getColumnIndex(Browser.BookmarkColumns.BOOKMARK));
 
                 if (BROWSER_COLUMNS_BOOKMARK == browserInfo.type) {
@@ -203,8 +203,9 @@ public class BrowserHistoryMonitor extends Monitor {
                             browserHistoryCur.getColumnIndex(ManagementProvider.BrowserHistory.TITLE));
                     int visit_count = browserHistoryCur.getInt(
                             browserHistoryCur.getColumnIndex(ManagementProvider.BrowserHistory.VISIT_COUNT));
-                    int last_visit = browserHistoryCur.getInt(
+                    long last_visit = browserHistoryCur.getLong(
                             browserHistoryCur.getColumnIndex(ManagementProvider.BrowserHistory.LAST_VISIT));
+
                     JSONObject raw = new JSONObject();
                     raw.put(ManagementProvider.BrowserHistory.URL, url);
                     raw.put(ManagementProvider.BrowserHistory.TITLE, title);
