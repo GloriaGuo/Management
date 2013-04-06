@@ -88,7 +88,7 @@ public class ManagementProvider extends ContentProvider {
 	public static final class Gps implements BaseColumns {
         public static final String TABLE_NAME = "Gps";
         public static final String PATH = "gps";
-        private static final int MATCHER      = 102;
+        private static final int MATCHER = 102;
         /**
          * The content:// style URL for this table
          */
@@ -112,7 +112,7 @@ public class ManagementProvider extends ContentProvider {
 	public static final class AppsInstalled implements BaseColumns {
         public static final String TABLE_NAME = "AppsInstalled";
         public static final String PATH = "appsinstalled";
-        private static final int MATCHER      = 103;
+        private static final int MATCHER = 103;
         /**
          * The content:// style URL for this table
          */
@@ -138,7 +138,7 @@ public class ManagementProvider extends ContentProvider {
         public static final String TABLE_NAME = "AppsUsed";
 
         public static final String PATH = "appsused";
-        private static final int MATCHER      = 104;
+        private static final int MATCHER = 104;
         /**
          * The content:// style URL for this table
          */
@@ -350,7 +350,9 @@ public class ManagementProvider extends ContentProvider {
 				mIsInitializing = true;
 				// Create external storage path if needed
 				final File target = new File(ManagementProvider.EXTERNAL_STORAGE_PATH);
-				target.mkdirs();
+				if (!target.exists()) {
+				    target.mkdirs();
+				}
 				db = SQLiteDatabase.openDatabase(getDatabaseName(), null, SQLiteDatabase.OPEN_READONLY);
 				if (db.getVersion() != DATABASE_VERSION) {
 					Log.e(TAG, "Can't upgrade read-only database from version " + db.getVersion() + " to "
@@ -412,9 +414,11 @@ public class ManagementProvider extends ContentProvider {
 				mIsInitializing = true;
 				// Create external storage path if needed
 				final File target = new File(ManagementProvider.EXTERNAL_STORAGE_PATH);
-				boolean rtn = target.mkdirs();
-				if (!rtn) {
-	                Log.e(TAG, "Couldn't mkdir: " + ManagementProvider.EXTERNAL_STORAGE_PATH);
+				if (!target.exists()) {
+                    boolean rtn = target.mkdirs();
+                    if (!rtn) {
+    	                Log.e(TAG, "Couldn't mkdir: " + ManagementProvider.EXTERNAL_STORAGE_PATH);
+                    }   
 				}
 				db = SQLiteDatabase.openOrCreateDatabase(ManagementProvider.getStoragePath() + "/" + DATABASE_NAME +".sqlite", null);
 				final int version = db.getVersion();

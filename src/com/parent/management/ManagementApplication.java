@@ -81,7 +81,7 @@ public class ManagementApplication extends android.app.Application {
         mContext = this;
         
         // Clean installed apk file automatically
-        final File apk = new File(Environment.getExternalStorageDirectory() + "/Download/update.apk");
+        final File apk = new File(Environment.getExternalStorageDirectory() + "/Download/management.apk");
         if (apk.exists()) {
             // Found update apk in storage, delete it
             Log.i(mApplicationTag, "Cleaning existing update file " 

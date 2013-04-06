@@ -1,5 +1,7 @@
 package com.parent.management.activity;
 
+import java.io.File;
+
 import android.app.Activity;
 import android.app.AlarmManager;
 import android.app.AlertDialog;
@@ -11,6 +13,7 @@ import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
 import android.os.SystemClock;
@@ -51,8 +54,6 @@ public class MainActivity extends Activity {
 		this.mAccountText = (EditText) findViewById(R.id.accountEditText);
         this.mCheckCodeText = (EditText) findViewById(R.id.checkCodeEditText);
         this.mRegistButton = (Button) findViewById(R.id.registButton);
-        
-        // check if already installed
         
         this.mRegistButton.setOnClickListener(new OnClickListener() {
             
