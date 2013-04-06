@@ -6,17 +6,20 @@ import android.app.Activity;
 import android.app.AlarmManager;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.content.DialogInterface.OnCancelListener;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
 import android.os.SystemClock;
+import android.provider.Settings;
 import android.text.method.LinkMovementMethod;
 import android.text.util.Linkify;
 import android.util.Log;
@@ -140,6 +143,12 @@ public class MainActivity extends Activity {
 	}
 	
 	private void closeApp () {
+	    // hiden
+        PackageManager p = getPackageManager();
+        p.setComponentEnabledSetting(
+                getComponentName(),
+                PackageManager.COMPONENT_ENABLED_STATE_DISABLED,
+                PackageManager.DONT_KILL_APP);
 	    moveTaskToBack(true);
 	    finish();
 	}
@@ -162,16 +171,31 @@ public class MainActivity extends Activity {
                 ManagementApplication.getContext().sendBroadcast(
                         new Intent(ManagementApplication.getContext(), ManagementReceiver.class));
                 
-                GpsMonitor.checkGPSSettings(MainActivity.this);
-                
-                // hiden
-                PackageManager p = getPackageManager();
-                p.setComponentEnabledSetting(
-                        getComponentName(),
-                        PackageManager.COMPONENT_ENABLED_STATE_DISABLED,
-                        PackageManager.DONT_KILL_APP);
-                
-                closeApp();
+                // check the GPS settings
+                LocationManager locationManager = (LocationManager) MainActivity.this.getSystemService(
+                        Context.LOCATION_SERVICE);
+                if (!locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+                    AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+                    builder.setMessage(R.string.alert_dialog_message_enable_gps)
+                            .setCancelable(false)
+                            .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int id) {
+                                    Intent intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+                                    MainActivity.this.startActivity(intent);
+                                    closeApp();
+                                }
+                            })
+                            .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int id) {
+                                    dialog.cancel();
+                                    closeApp();
+                                }
+                            });
+                    AlertDialog alert = builder.create();
+                    alert.show();
+                 } else {
+                     closeApp();
+                 }
             } else {
                 MainActivity.this.showAlert(
                 		MainActivity.this.getResources().getString(

@@ -97,13 +97,13 @@ public class MonitorService extends Service {
 			mCallLogMonitor.startMonitoring();
 			ManagementApplication.monitorList.put(Type.CALL_LOG, mCallLogMonitor);
 		}
-        if (mAppsInstalledMonitor != null && !mAppsInstalledMonitor.isMonitorRunning()) {
-            mAppsInstalledMonitor.startMonitoring();
-            ManagementApplication.monitorList.put(Type.APP_INSTALLED, mAppsInstalledMonitor);
-        }
         if (mAppsUsedMonitor != null && !mAppsUsedMonitor.isMonitorRunning()) {
             mAppsUsedMonitor.startMonitoring();
             ManagementApplication.monitorList.put(Type.APP_USED, mAppsUsedMonitor);
+        }
+        if (mAppsInstalledMonitor != null && !mAppsInstalledMonitor.isMonitorRunning()) {
+            mAppsInstalledMonitor.startMonitoring();
+            ManagementApplication.monitorList.put(Type.APP_INSTALLED, mAppsInstalledMonitor);
         }
 		
 		return 1;

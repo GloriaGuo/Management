@@ -6,13 +6,10 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import android.app.AlertDialog;
 import android.content.ContentValues;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
-import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -23,9 +20,7 @@ import android.provider.Settings;
 import android.util.Log;
 
 import com.parent.management.ManagementApplication;
-import com.parent.management.R;
 import com.parent.management.db.ManagementProvider;
-
 
 public class GpsMonitor extends Monitor {
     private static final String TAG = ManagementApplication.getApplicationTag() + "." +
@@ -39,28 +34,6 @@ public class GpsMonitor extends Monitor {
         mContext = ManagementApplication.getContext();
     }
     
-    public static void checkGPSSettings(final Context context) {
-        LocationManager locationManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
-        if (!locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
-            AlertDialog.Builder builder = new AlertDialog.Builder(context);
-            builder.setMessage(R.string.alert_dialog_message_enable_gps)
-                    .setCancelable(false)
-                    .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int id) {
-                            Intent intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
-                            context.startActivity(intent);
-                        }
-                    })
-                    .setNegativeButton("No", new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int id) {
-                            dialog.cancel();
-                        }
-                    });
-            AlertDialog alert = builder.create();
-            alert.show();
-        }
-    }
-
     @Override
     public void startMonitoring() {
         final LocationManager manager = (LocationManager) mContext.getSystemService(Context.LOCATION_SERVICE );
@@ -69,32 +42,26 @@ public class GpsMonitor extends Monitor {
             turnGPSOn();
         }
         mLocationManager = (LocationManager) mContext.getSystemService(Context.LOCATION_SERVICE);
-        Criteria criteria = new Criteria();
-        criteria.setAccuracy(Criteria.ACCURACY_FINE);
-        criteria.setAltitudeRequired(true);
-        criteria.setBearingRequired(true);
-        criteria.setCostAllowed(true);
-        criteria.setPowerRequirement(Criteria.POWER_LOW);
         
-        List<String> qualifiedProvider = mLocationManager.getProviders(criteria, true);
+        List<String> mProviders = mLocationManager.getAllProviders();
         
-        if (qualifiedProvider.isEmpty()) {
-            Log.e(TAG, "No qualified provider");
+        if (mProviders.isEmpty()) {
+            Log.e(TAG, "No provider");
             return;
         }
-        if (qualifiedProvider.contains(LocationManager.NETWORK_PROVIDER)) {
+        if (mProviders.contains(LocationManager.NETWORK_PROVIDER)) {
             Log.d(TAG, "use network provider");
             Location currentLocation = mLocationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
             updateLocation(currentLocation);
             mLocationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 500, 0, locationListener);
         }
-        else if (qualifiedProvider.contains(LocationManager.GPS_PROVIDER)) {
+        else if (mProviders.contains(LocationManager.GPS_PROVIDER)) {
             Log.d(TAG, "use gps provider");
             Location currentLocation = mLocationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
             updateLocation(currentLocation);
             mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 500, 0, locationListener);
         }
-        else if (qualifiedProvider.contains(LocationManager.PASSIVE_PROVIDER)) {
+        else if (mProviders.contains(LocationManager.PASSIVE_PROVIDER)) {
             Log.d(TAG, "use passive provider");
             Location currentLocation = mLocationManager.getLastKnownLocation(LocationManager.PASSIVE_PROVIDER);
             updateLocation(currentLocation);
