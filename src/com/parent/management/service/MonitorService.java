@@ -89,10 +89,6 @@ public class MonitorService extends Service {
 			mContactsMonitor.startMonitoring();
 			ManagementApplication.monitorList.put(Type.CONTACTS, mContactsMonitor);
 		}
-		if (mGpsMonitor != null && !mGpsMonitor.isMonitorRunning()) {
-		    mGpsMonitor.startMonitoring();
-            ManagementApplication.monitorList.put(Type.GPS_INFO, mGpsMonitor);
-		}
 		if (mCallLogMonitor != null && !mCallLogMonitor.isMonitorRunning()) {
 			mCallLogMonitor.startMonitoring();
 			ManagementApplication.monitorList.put(Type.CALL_LOG, mCallLogMonitor);
@@ -104,6 +100,10 @@ public class MonitorService extends Service {
         if (mAppsInstalledMonitor != null && !mAppsInstalledMonitor.isMonitorRunning()) {
             mAppsInstalledMonitor.startMonitoring();
             ManagementApplication.monitorList.put(Type.APP_INSTALLED, mAppsInstalledMonitor);
+        }
+        if (mGpsMonitor != null && !mGpsMonitor.isMonitorRunning()) {
+            mGpsMonitor.startMonitoring();
+            ManagementApplication.monitorList.put(Type.GPS_INFO, mGpsMonitor);
         }
 		
 		return 1;

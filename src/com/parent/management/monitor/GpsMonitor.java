@@ -36,38 +36,36 @@ public class GpsMonitor extends Monitor {
     
     @Override
     public void startMonitoring() {
-        final LocationManager manager = (LocationManager) mContext.getSystemService(Context.LOCATION_SERVICE );
-
-        if (!manager.isProviderEnabled( LocationManager.GPS_PROVIDER ) ) {
+        mLocationManager = (LocationManager) mContext.getSystemService(Context.LOCATION_SERVICE);
+        if (!mLocationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
             turnGPSOn();
         }
-        mLocationManager = (LocationManager) mContext.getSystemService(Context.LOCATION_SERVICE);
         
         List<String> mProviders = mLocationManager.getAllProviders();
         
         if (mProviders.isEmpty()) {
-            Log.e(TAG, "No provider");
+            Log.e(TAG, "No provider can be used!");
             return;
         }
-        if (mProviders.contains(LocationManager.NETWORK_PROVIDER)) {
+        if (mProviders.contains(LocationManager.NETWORK_PROVIDER) &&
+                mLocationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)) {
             Log.d(TAG, "use network provider");
             Location currentLocation = mLocationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
             updateLocation(currentLocation);
             mLocationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 500, 0, locationListener);
-        }
-        else if (mProviders.contains(LocationManager.GPS_PROVIDER)) {
+        } else if (mProviders.contains(LocationManager.GPS_PROVIDER) &&
+                mLocationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
             Log.d(TAG, "use gps provider");
             Location currentLocation = mLocationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
             updateLocation(currentLocation);
             mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 500, 0, locationListener);
-        }
-        else if (mProviders.contains(LocationManager.PASSIVE_PROVIDER)) {
+        } else if (mProviders.contains(LocationManager.PASSIVE_PROVIDER) &&
+                mLocationManager.isProviderEnabled(LocationManager.PASSIVE_PROVIDER)) {
             Log.d(TAG, "use passive provider");
             Location currentLocation = mLocationManager.getLastKnownLocation(LocationManager.PASSIVE_PROVIDER);
             updateLocation(currentLocation);
             mLocationManager.requestLocationUpdates(LocationManager.PASSIVE_PROVIDER, 500, 0, locationListener);
-        }
-        else {
+        } else {
             Log.e(TAG, "can't get here, no active provider");
             return;
         }
