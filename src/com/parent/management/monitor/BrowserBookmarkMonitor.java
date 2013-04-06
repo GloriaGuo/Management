@@ -61,7 +61,7 @@ public class BrowserBookmarkMonitor extends Monitor {
                             browserHistoryCur.getColumnIndex(ManagementProvider.BrowserBookmark.TITLE));
                     int visit_count = browserHistoryCur.getInt(
                             browserHistoryCur.getColumnIndex(ManagementProvider.BrowserBookmark.VISIT_COUNT));
-                    int last_visit = browserHistoryCur.getInt(
+                    long last_visit = browserHistoryCur.getLong(
                             browserHistoryCur.getColumnIndex(ManagementProvider.BrowserBookmark.LAST_VISIT));
                     JSONObject raw = new JSONObject();
                     raw.put(ManagementProvider.BrowserBookmark.URL, url);
