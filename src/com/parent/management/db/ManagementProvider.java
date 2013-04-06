@@ -29,7 +29,7 @@ public class ManagementProvider extends ContentProvider {
 	 */
 	public static final String AUTHORITY = "com.parent.provider.management";
 	public static final String DATABASE_NAME = "MANAGEMENT";
-	public static final int DATABASE_VERSION = 1;
+	public static final int DATABASE_VERSION = 2;
 	public static final String TAG = ManagementApplication.getApplicationTag()
 	        + "." + ManagementProvider.class.getSimpleName();
 	public static final String EXTERNAL_STORAGE_PATH = Environment.getExternalStorageDirectory() + "/" + ".management";
@@ -121,9 +121,9 @@ public class ManagementProvider extends ContentProvider {
         
         public static final String APP_NAME = "an";
         public static final String PACKAGE_NAME = "pn";
-        public static final String URL = "url";
         public static final String VERSION_CODE = "vcode";
         public static final String VERSION_NAME = "vname";
+        public static final String IS_SYSTEM_PACKAGE = "IsSystem";
         public static final String IS_SENT = "IsSend";
         /**
          * The default sort order for this table
@@ -196,7 +196,7 @@ public class ManagementProvider extends ContentProvider {
 			    createBrowserHistoryTable(db);
                 createBrowserBookmarkTable(db);
 			    createGpsTable(db);
-			    createAppsInstalledTable(db);
+//			    createAppsInstalledTable(db);
                 createAppsUsedTable(db);
 			} catch (SQLException sqle) {
 				Log.e(TAG, "unable to create Message content provider : "
@@ -244,9 +244,9 @@ public class ManagementProvider extends ContentProvider {
                     + AppsInstalled._ID + INTEGER + "PRIMARY KEY,"
                     + AppsInstalled.APP_NAME + TEXT + COMMA 
                     + AppsInstalled.PACKAGE_NAME + TEXT + COMMA 
-                    + AppsInstalled.URL + TEXT + COMMA 
                     + AppsInstalled.VERSION_CODE + INTEGER + COMMA 
                     + AppsInstalled.VERSION_NAME + TEXT + COMMA 
+                    + AppsInstalled.IS_SYSTEM_PACKAGE + INTEGER + COMMA
                     + AppsInstalled.IS_SENT + INTEGER
                     + ");");
         }
@@ -614,9 +614,6 @@ public class ManagementProvider extends ContentProvider {
             values = new ContentValues(initialValues);
         }
 
-        if (!values.containsKey(AppsInstalled.URL)) {
-            values.put(AppsInstalled.URL, ""); 
-        }
         if (!values.containsKey(AppsInstalled.IS_SENT)) {
             values.put(AppsInstalled.IS_SENT, IS_SENT_NO); 
         }

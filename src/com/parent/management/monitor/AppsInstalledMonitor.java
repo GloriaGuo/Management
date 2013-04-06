@@ -7,11 +7,10 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import android.content.ContentValues;
 import android.content.Context;
+import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
-import android.database.Cursor;
 import android.util.Log;
 
 import com.parent.management.ManagementApplication;
@@ -20,6 +19,8 @@ import com.parent.management.db.ManagementProvider;
 public class AppsInstalledMonitor extends Monitor {
     private static final String TAG = ManagementApplication.getApplicationTag() + "." +
             AppsInstalledMonitor.class.getSimpleName();
+    
+    ArrayList<AppsInstalledInfo> mCurrentInfoList = null;
 
     public AppsInstalledMonitor(Context context) {
         super(context);
@@ -32,6 +33,7 @@ public class AppsInstalledMonitor extends Monitor {
         private int versionCode = 0;
         private String dataDir = "";
         private String sourceDir = "";
+        private Boolean isSystemPackage = true;
         private void prettyPrint() {
             Log.v(TAG, "appname:" + appname);
             Log.v(TAG, "pname:" + pname);
@@ -39,17 +41,18 @@ public class AppsInstalledMonitor extends Monitor {
             Log.v(TAG, "versionCode:" + versionCode);
             Log.v(TAG, "dataDir:" + dataDir);
             Log.v(TAG, "sourceDir:" + sourceDir);
+            Log.v(TAG, "isSystemPackage:" + isSystemPackage);
             Log.v(TAG, "----------------------");
         }
     }
 
-    private ArrayList<AppsInstalledInfo> getCurrentAppsInfo(boolean ifGetSysPackages) {
+    private ArrayList<AppsInstalledInfo> getCurrentAppsInfo() {
     	ArrayList<AppsInstalledInfo> res = new ArrayList<AppsInstalledInfo>();
         PackageManager packageManager = ManagementApplication.getContext().getPackageManager();
         List<PackageInfo> packs = packageManager.getInstalledPackages(0);
         for(int i=0;i < packs.size();i++) {
             PackageInfo p = packs.get(i);
-            if ((!ifGetSysPackages) && (p.versionName == null)) {
+            if (p.versionName == null) {
                 continue ;
             }
             AppsInstalledInfo newInfo = new AppsInstalledInfo();
@@ -59,72 +62,20 @@ public class AppsInstalledMonitor extends Monitor {
             newInfo.versionCode = p.versionCode;
             newInfo.dataDir = p.applicationInfo.dataDir;
             newInfo.sourceDir = p.applicationInfo.sourceDir;
+            if ((p.applicationInfo.flags & ApplicationInfo.FLAG_SYSTEM)==0)
+            {
+                //is not a system app
+                newInfo.isSystemPackage = false;
+            }
             res.add(newInfo);
         }
         return res; 
-    }
-    
-    private boolean checkForChange() {
-        ArrayList<AppsInstalledInfo> currentInfoList = getCurrentAppsInfo(false);
-        Cursor appsInstalledCur = null;
-    	for (AppsInstalledInfo info : currentInfoList) {
-    		info.prettyPrint();
-            String[] appsInstalledProj = new String[] {
-                    ManagementProvider.AppsInstalled.APP_NAME,
-                    ManagementProvider.AppsInstalled.VERSION_NAME,
-                    ManagementProvider.AppsInstalled.VERSION_CODE
-                    };
-            String appsInstalledSel = ManagementProvider.AppsInstalled.PACKAGE_NAME + " = \"" + info.pname + "\"";
-            appsInstalledCur = ManagementApplication.getContext().getContentResolver().query(
-                    ManagementProvider.AppsInstalled.CONTENT_URI,
-                    appsInstalledProj, appsInstalledSel, null, null);
-
-            if (appsInstalledCur != null && appsInstalledCur.moveToFirst() && appsInstalledCur.getCount() > 0) {
-                String curAppName = appsInstalledCur.getString(appsInstalledCur.getColumnIndex(
-                        ManagementProvider.AppsInstalled.APP_NAME));
-                String curVersionName = appsInstalledCur.getString(appsInstalledCur.getColumnIndex(
-                        ManagementProvider.AppsInstalled.VERSION_NAME));
-                int curVersionCode = appsInstalledCur.getInt(appsInstalledCur.getColumnIndex(
-                        ManagementProvider.AppsInstalled.VERSION_CODE));
-                if ( curAppName != info.appname || curVersionName != info.versionName
-                		|| curVersionCode != info.versionCode) {
-                    final ContentValues values = new ContentValues();
-                    values.put(ManagementProvider.AppsInstalled.APP_NAME, info.appname);
-                    values.put(ManagementProvider.AppsInstalled.VERSION_NAME, info.versionName);
-                    values.put(ManagementProvider.AppsInstalled.VERSION_CODE, info.versionCode);
-                    values.put(ManagementProvider.AppsInstalled.IS_SENT, ManagementProvider.IS_SENT_NO);
-                    
-                    ManagementApplication.getContext().getContentResolver().update(
-                            ManagementProvider.AppsInstalled.CONTENT_URI,
-                            values,
-                            ManagementProvider.AppsInstalled.PACKAGE_NAME + "=\"" + info.pname +"\"",
-                            null);
-                    Log.v(TAG, "update one");
-                }
-            } else {
-                final ContentValues values = new ContentValues();
-                values.put(ManagementProvider.AppsInstalled.PACKAGE_NAME, info.pname);
-                values.put(ManagementProvider.AppsInstalled.APP_NAME, info.appname);
-                values.put(ManagementProvider.AppsInstalled.VERSION_NAME, info.versionName);
-                values.put(ManagementProvider.AppsInstalled.VERSION_CODE, info.versionCode);
-                
-                ManagementApplication.getContext().getContentResolver().insert(
-                        ManagementProvider.AppsInstalled.CONTENT_URI, values);
-                Log.v(TAG, "insert one");
-            }
-            if (null != appsInstalledCur) {
-                appsInstalledCur.close();
-                appsInstalledCur = null;
-            }
-    	}
-
-        return true;
     }
 
     @Override
     public void startMonitoring() {
         // init the first data
-        checkForChange();
+        mCurrentInfoList = getCurrentAppsInfo();
         Log.v(TAG, "---->started");
     }
 
@@ -135,63 +86,21 @@ public class AppsInstalledMonitor extends Monitor {
 
     @Override
     public JSONArray extractDataForSend() {
-        checkForChange();
         try {
             JSONArray data = new JSONArray();
 
-            String[] AppsInstalledProj = new String[] {
-                    ManagementProvider.AppsInstalled.APP_NAME,
-                    ManagementProvider.AppsInstalled.PACKAGE_NAME,
-                    ManagementProvider.AppsInstalled.URL,
-                    ManagementProvider.AppsInstalled.VERSION_CODE,
-                    ManagementProvider.AppsInstalled.VERSION_NAME
-                    };
-            String AppsInstalledSel = ManagementProvider.AppsInstalled.IS_SENT
-                    + " = \"" + ManagementProvider.IS_SENT_NO + "\"";
-            Cursor appsInstalledCur = null;
-            appsInstalledCur = ManagementApplication.getContext().getContentResolver().query(
-                    ManagementProvider.AppsInstalled.CONTENT_URI,
-                    AppsInstalledProj, AppsInstalledSel, null, null);
+            for (AppsInstalledInfo info : mCurrentInfoList) {
+                info.prettyPrint();
 
-            if (appsInstalledCur == null) {
-                Log.v(TAG, "open browserHistory native failed");
-                return null;
-            }
-            if (appsInstalledCur.moveToFirst() && appsInstalledCur.getCount() > 0) {
-                while (appsInstalledCur.isAfterLast() == false) {
-                    String an = appsInstalledCur.getString(
-                            appsInstalledCur.getColumnIndex(ManagementProvider.AppsInstalled.APP_NAME));
-                    String pn = appsInstalledCur.getString(
-                            appsInstalledCur.getColumnIndex(ManagementProvider.AppsInstalled.PACKAGE_NAME));
-                    String url = appsInstalledCur.getString(
-                            appsInstalledCur.getColumnIndex(ManagementProvider.AppsInstalled.URL));
-                    int vc = appsInstalledCur.getInt(
-                            appsInstalledCur.getColumnIndex(ManagementProvider.AppsInstalled.VERSION_CODE));
-                    String vn = appsInstalledCur.getString(
-                            appsInstalledCur.getColumnIndex(ManagementProvider.AppsInstalled.VERSION_NAME));
-                    JSONObject raw = new JSONObject();
-                    raw.put(ManagementProvider.AppsInstalled.APP_NAME, an);
-                    raw.put(ManagementProvider.AppsInstalled.PACKAGE_NAME, pn);
-                    raw.put(ManagementProvider.AppsInstalled.URL, url);
-                    raw.put(ManagementProvider.AppsInstalled.VERSION_CODE, vc);
-                    raw.put(ManagementProvider.AppsInstalled.VERSION_NAME, vn);
+                JSONObject raw = new JSONObject();
+                raw.put(ManagementProvider.AppsInstalled.APP_NAME, info.appname);
+                raw.put(ManagementProvider.AppsInstalled.PACKAGE_NAME, info.pname);
+                raw.put(ManagementProvider.AppsInstalled.VERSION_CODE, info.versionCode);
+                raw.put(ManagementProvider.AppsInstalled.VERSION_NAME, info.versionName);
+                raw.put(ManagementProvider.AppsInstalled.IS_SYSTEM_PACKAGE, info.isSystemPackage);
 
-                    data.put(raw);
-                    appsInstalledCur.moveToNext();
-                }
+                data.put(raw);
             }
-            if (null != appsInstalledCur) {
-                appsInstalledCur.close();
-            }
-            
-            final ContentValues values = new ContentValues();
-            values.put(ManagementProvider.AppsInstalled.IS_SENT, ManagementProvider.IS_SENT_YES);
-            ManagementApplication.getContext().getContentResolver().update(
-                    ManagementProvider.AppsInstalled.CONTENT_URI,
-                    values,
-                    ManagementProvider.AppsInstalled.IS_SENT + "=\"" + ManagementProvider.IS_SENT_NO +"\"",
-                    null);
-            
             return data;
         } catch (JSONException e) {
             // TODO Auto-generated catch block
@@ -203,21 +112,8 @@ public class AppsInstalledMonitor extends Monitor {
 
     @Override
     public void updateStatusAfterSend(JSONArray failedList) {
-    	if (null != failedList && failedList.length() != 0) {
-    		for (int i = 0; i < failedList.length(); ++i) {
-    			JSONObject obj = failedList.optJSONObject(i);
-    			if (null != obj) {
-    				String pname = obj.optString(ManagementProvider.AppsInstalled.PACKAGE_NAME);
-    		        final ContentValues values = new ContentValues();
-    		        values.put(ManagementProvider.AppsInstalled.IS_SENT, ManagementProvider.IS_SENT_NO);
-    		        ManagementApplication.getContext().getContentResolver().update(
-    		        		ManagementProvider.AppsInstalled.CONTENT_URI,
-    		                values,
-    		                ManagementProvider.AppsInstalled.PACKAGE_NAME + "=\"" + pname +"\"",
-    		                null);
-    			}
-    		}
-    	}
+        // do nothing
+    	return;
     }
 
 }
