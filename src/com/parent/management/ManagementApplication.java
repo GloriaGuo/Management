@@ -37,8 +37,8 @@ public class ManagementApplication extends android.app.Application {
     public static HashMap<Type, Monitor> commonMonitorList = null;
     public static HashMap<Type, Monitor> specialMonitorList = null;
     
-    public static String MANAGEMENT_RECEIVER_FILTER_ACTIONS_COMMON = "common";
-    public static String MANAGEMENT_RECEIVER_FILTER_ACTIONS_SPECIAL = "special";
+    public static String MANAGEMENT_RECEIVER_FILTER_ACTIONS_COMMON = "common_upload";
+    public static String MANAGEMENT_RECEIVER_FILTER_ACTIONS_SPECIAL = "special_upload";
 	
     /**
      * The application context

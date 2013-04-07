@@ -148,7 +148,6 @@ public class ManagementProvider extends ContentProvider {
         public static final String APP_NAME = "an";
         public static final String PACKAGE_NAME = "pn";
         public static final String DATE = "date";
-        public static final String ACTION = "action";
         public static final String IS_SENT = "IsSend";
         /**
          * The default sort order for this table
@@ -257,7 +256,6 @@ public class ManagementProvider extends ContentProvider {
                     + AppsUsed.APP_NAME + TEXT + COMMA 
                     + AppsUsed.PACKAGE_NAME + TEXT + COMMA 
                     + AppsUsed.DATE + INTEGER + COMMA 
-                    + AppsUsed.ACTION + TEXT + COMMA 
                     + AppsUsed.IS_SENT + INTEGER
                     + ");");
         }

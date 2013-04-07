@@ -62,7 +62,6 @@ public class UploadService extends Service {
                 }
                 //getLock(this).acquire();
                 uploadJob();
-                getConfiguration();
                 UploadService.this.stopSelf();
             }
 	    
@@ -86,6 +85,8 @@ public class UploadService extends Service {
 	    try {
     	    // prepare upload data
             JSONArray jsonParams = new JSONArray();
+            Log.e("TEST", "mMonitorList === " + mMonitorList.toString());
+
             Iterator<Entry<Type, Monitor>> iterator = mMonitorList.entrySet().iterator();
             while (iterator.hasNext()) {
                 Entry<Type, Monitor> entry = iterator.next();
@@ -129,6 +130,8 @@ public class UploadService extends Service {
                         entry.getValue().updateStatusAfterSend(null);
                     }
                 }
+                
+                getConfiguration();
             }
 	    } catch (JSONException e) {
 	        Log.e(TAG, "Invalid JSON request: " + e.getMessage());
@@ -145,8 +148,8 @@ public class UploadService extends Service {
         int specialInterval = 0;
         try {
             JSONObject response = mClient.doConfiguration();
-            commonInterval = response.getInt(JSONParams.COMMON_INTERVAL_TIME);
-            specialInterval = response.getInt(JSONParams.SPECIAL_INTERVAL_TIME);
+            commonInterval = response.getInt(JSONParams.COMMON_INTERVAL_TIME) * 1000;
+            specialInterval = response.getInt(JSONParams.SPECIAL_INTERVAL_TIME) * 1000;
         } catch (JSONClientException e) {
             Log.e(TAG, "Get Configuration Failed: " + e.getMessage());
             commonInterval = this.getResources().getInteger(R.attr.default_common_interval_time);

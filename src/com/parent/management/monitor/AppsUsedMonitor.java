@@ -1,6 +1,5 @@
 package com.parent.management.monitor;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.json.JSONArray;
@@ -8,9 +7,12 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import android.app.ActivityManager;
-import android.app.ActivityManager.RecentTaskInfo;
+import android.app.ActivityManager.RunningTaskInfo;
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.pm.ApplicationInfo;
+import android.content.pm.PackageManager;
+import android.content.pm.PackageManager.NameNotFoundException;
 import android.database.Cursor;
 import android.util.Log;
 
@@ -25,109 +27,93 @@ public class AppsUsedMonitor extends Monitor {
         super(context);
     }
     
-    class AppsUsedInfo {
+    class AppUsedInfo {
         private String appname = "";
         private String pname = "";
-        private int date = 0;
-        private String action = "";
+        private long date = 0;
         private void prettyPrint() {
             Log.v(TAG, "appname:" + appname);
             Log.v(TAG, "pname:" + pname);
             Log.v(TAG, "date:" + date);
-            Log.v(TAG, "action:" + action);
             Log.v(TAG, "----------------------");
         }
     }
 
-    private ArrayList<AppsUsedInfo> getCurrentAppsUsedInfo() {
-    	ArrayList<AppsUsedInfo> res = new ArrayList<AppsUsedInfo>();
+    private AppUsedInfo getCurrentActiveApp() {
+        AppUsedInfo newInfo = new AppUsedInfo();
 
-        ActivityManager activityManager = (ActivityManager)
-                ManagementApplication.getContext().getSystemService("activity");
-        List<RecentTaskInfo> taskList = activityManager.getRecentTasks(Integer.MAX_VALUE,0);
+        ActivityManager activityManager = (ActivityManager)ManagementApplication.getContext().getSystemService(
+                Context.ACTIVITY_SERVICE);
+        List<RunningTaskInfo>  taskList = activityManager.getRunningTasks(1);
         if ((taskList != null) && (taskList.size() > 0)) {
-            for (RecentTaskInfo taskInfo : taskList) {
-                AppsUsedInfo newInfo = new AppsUsedInfo();
-                newInfo.pname = taskInfo.baseIntent.getComponent().getPackageName();
-
-                String[] AppsInstalledProj = new String[] {
-                        ManagementProvider.AppsInstalled.APP_NAME
-                        };
-                String AppsInstalledSel = ManagementProvider.AppsInstalled.PACKAGE_NAME
-                        + " = \"" + newInfo.pname + "\"";
-                Cursor appsInstalledCur = null;
-                appsInstalledCur = ManagementApplication.getContext().getContentResolver().query(
-                        ManagementProvider.AppsInstalled.CONTENT_URI,
-                        AppsInstalledProj, AppsInstalledSel, null, null);
-
-                if (appsInstalledCur != null && appsInstalledCur.moveToFirst() && appsInstalledCur.getCount() > 0) {
-                    newInfo.appname = appsInstalledCur.getString(
-                            appsInstalledCur.getColumnIndex(ManagementProvider.AppsInstalled.APP_NAME));
-                }
-                else {
-                    newInfo.appname = "";
-                }
-                
-                newInfo.date = 0;
-                newInfo.action = taskInfo.baseIntent.getAction();
-                res.add(newInfo);
+            
+            RunningTaskInfo taskInfo = (RunningTaskInfo) taskList.get(0);
+            newInfo.pname = taskInfo.topActivity.getPackageName();
+            
+            PackageManager pm = ManagementApplication.getContext().getPackageManager();
+            ApplicationInfo appInfo = null;
+            try {
+                appInfo = pm.getApplicationInfo(newInfo.pname, 0);
+            } catch (NameNotFoundException e) {
+                Log.e(TAG, "Get app info failed from package name: " + e.getMessage());
             }
+            newInfo.appname = (String) pm.getApplicationLabel(appInfo);
+            
+            newInfo.date = System.currentTimeMillis();
         }
     	
-        return res; 
+        newInfo.prettyPrint();
+        return newInfo; 
     }
     
-    private boolean checkForChange() {
-        ArrayList<AppsUsedInfo> currentInfoList = getCurrentAppsUsedInfo();
+    private void checkForChange() {
+        AppUsedInfo currentActiveApp = getCurrentActiveApp();
+        
         Cursor appsUsedCur = null;
-    	for (AppsUsedInfo info : currentInfoList) {
-    		info.prettyPrint();
-            String[] appsUsedProj = new String[] {
-                    ManagementProvider.AppsUsed.APP_NAME,
-                    ManagementProvider.AppsUsed.DATE,
-                    ManagementProvider.AppsUsed.ACTION
-                    };
-            String appsUsedSel = ManagementProvider.AppsUsed.PACKAGE_NAME + " = \"" + info.pname + "\"";
-            appsUsedCur = ManagementApplication.getContext().getContentResolver().query(
-                    ManagementProvider.AppsUsed.CONTENT_URI,
-                    appsUsedProj, appsUsedSel, null, null);
+    	
+        String[] appsUsedProj = new String[] {
+                ManagementProvider.AppsUsed.APP_NAME,
+                ManagementProvider.AppsUsed.PACKAGE_NAME,
+                ManagementProvider.AppsUsed.DATE,
+                };
+        String orderBy = ManagementProvider.AppsUsed.DATE + " DESC"; 
+        appsUsedCur = ManagementApplication.getContext().getContentResolver().query(
+                ManagementProvider.AppsUsed.CONTENT_URI,
+                appsUsedProj, null, null, orderBy);
 
-            if (appsUsedCur != null && appsUsedCur.moveToFirst() && appsUsedCur.getCount() > 0) {
-                final ContentValues values = new ContentValues();
-                values.put(ManagementProvider.AppsUsed.APP_NAME, info.appname);
-                values.put(ManagementProvider.AppsUsed.DATE, info.date);
-                values.put(ManagementProvider.AppsUsed.ACTION, info.action);
-                values.put(ManagementProvider.AppsUsed.IS_SENT, ManagementProvider.IS_SENT_NO);
-                
-                ManagementApplication.getContext().getContentResolver().update(
-                        ManagementProvider.AppsUsed.CONTENT_URI,
-                        values,
-                        ManagementProvider.AppsUsed.PACKAGE_NAME + "=\"" + info.pname +"\"",
-                        null);
-                Log.v(TAG, "update one");
-            } else {
-                final ContentValues values = new ContentValues();
-                values.put(ManagementProvider.AppsUsed.APP_NAME, info.appname);
-                values.put(ManagementProvider.AppsUsed.PACKAGE_NAME, info.pname);
-                values.put(ManagementProvider.AppsUsed.DATE, info.date);
-                values.put(ManagementProvider.AppsUsed.ACTION, info.action);
-                
-                ManagementApplication.getContext().getContentResolver().insert(
-                        ManagementProvider.AppsUsed.CONTENT_URI, values);
-                Log.v(TAG, "insert one");
-            }
-            if (null != appsUsedCur) {
-                appsUsedCur.close();
-                appsUsedCur = null;
-            }
-    	}
+        if (appsUsedCur == null) {
+            Log.v(TAG, "open app used db failed");
+            return;
+        }
+        
+        String previousPackage = "";
+        if (appsUsedCur.moveToFirst()) {
+            previousPackage = appsUsedCur.getString(appsUsedCur.getColumnIndex(
+                    ManagementProvider.AppsUsed.PACKAGE_NAME));
+        }
+        if (!appsUsedCur.moveToFirst() || !previousPackage.equals(currentActiveApp.pname)) {
+            final ContentValues values = new ContentValues();
+            values.put(ManagementProvider.AppsUsed.APP_NAME, currentActiveApp.appname);
+            values.put(ManagementProvider.AppsUsed.PACKAGE_NAME, currentActiveApp.pname);
+            values.put(ManagementProvider.AppsUsed.DATE, currentActiveApp.date);
+            
+            ManagementApplication.getContext().getContentResolver().insert(
+                    ManagementProvider.AppsUsed.CONTENT_URI, values);
+            Log.d(TAG, "insert one");
+        }
 
-        return true;
+        if (null != appsUsedCur) {
+            appsUsedCur.close();
+            appsUsedCur = null;
+        }
+
+        return;
     }
 
     @Override
     public void startMonitoring() {
         // init the first data
+        this.monitorStatus = true;
         checkForChange();
         Log.v(TAG, "---->started");
     }
@@ -135,11 +121,11 @@ public class AppsUsedMonitor extends Monitor {
     @Override
     public void stopMonitoring() {
         // don't need to do anything
+        this.monitorStatus = false;
     }
 
     @Override
     public JSONArray extractDataForSend() {
-        checkForChange();
         try {
             JSONArray data = new JSONArray();
 
@@ -147,7 +133,6 @@ public class AppsUsedMonitor extends Monitor {
                     ManagementProvider.AppsUsed.APP_NAME,
                     ManagementProvider.AppsUsed.PACKAGE_NAME,
                     ManagementProvider.AppsUsed.DATE,
-                    ManagementProvider.AppsUsed.ACTION
                     };
             String AppsUsedSel = ManagementProvider.AppsUsed.IS_SENT
                     + " = \"" + ManagementProvider.IS_SENT_NO + "\"";
@@ -166,15 +151,12 @@ public class AppsUsedMonitor extends Monitor {
                             appsUsedCur.getColumnIndex(ManagementProvider.AppsUsed.APP_NAME));
                     String pn = appsUsedCur.getString(
                             appsUsedCur.getColumnIndex(ManagementProvider.AppsUsed.PACKAGE_NAME));
-                    int date = appsUsedCur.getInt(
+                    long date = appsUsedCur.getLong(
                             appsUsedCur.getColumnIndex(ManagementProvider.AppsUsed.DATE));
-                    String action = appsUsedCur.getString(
-                            appsUsedCur.getColumnIndex(ManagementProvider.AppsUsed.ACTION));
                     JSONObject raw = new JSONObject();
                     raw.put(ManagementProvider.AppsUsed.APP_NAME, an);
                     raw.put(ManagementProvider.AppsUsed.PACKAGE_NAME, pn);
                     raw.put(ManagementProvider.AppsUsed.DATE, date);
-                    raw.put(ManagementProvider.AppsUsed.ACTION, action);
 
                     data.put(raw);
                     appsUsedCur.moveToNext();

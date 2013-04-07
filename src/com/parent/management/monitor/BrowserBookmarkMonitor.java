@@ -22,12 +22,13 @@ public class BrowserBookmarkMonitor extends Monitor {
 
     @Override
     public void startMonitoring() {
+        this.monitorStatus = true;
         Log.v(TAG, "---->started");        
     }
 
     @Override
     public void stopMonitoring() {
-        
+        this.monitorStatus = false;
     }
 
     @Override

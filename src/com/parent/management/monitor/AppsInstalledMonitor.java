@@ -26,12 +26,14 @@ public class AppsInstalledMonitor extends Monitor {
     @Override
     public void startMonitoring() {
         // init the first data
+        this.monitorStatus = true;
         Log.v(TAG, "---->started");
     }
 
     @Override
     public void stopMonitoring() {
         // don't need to do anything
+        this.monitorStatus = false;
     }
 
     @Override
