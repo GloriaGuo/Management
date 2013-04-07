@@ -56,7 +56,6 @@ public class AppsInstalledMonitor extends Monitor {
                 raw.put(ManagementProvider.AppsInstalled.IS_SYSTEM_PACKAGE, 
                         p.applicationInfo.flags & ApplicationInfo.FLAG_SYSTEM);
 
-                Log.d(TAG, "Installed app : " + raw.toString());
                 data.put(raw);
             }
             return data;

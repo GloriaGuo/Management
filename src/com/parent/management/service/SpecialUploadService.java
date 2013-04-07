@@ -3,7 +3,6 @@ package com.parent.management.service;
 import java.util.HashMap;
 
 import android.content.Intent;
-import android.util.Log;
 
 import com.parent.management.ManagementApplication;
 import com.parent.management.monitor.Monitor;
@@ -14,7 +13,6 @@ public class SpecialUploadService extends UploadService {
     @Override
     public void onCreate()
     {
-        Log.e("TEST", "----> mMonitorList === " + mMonitorList);
         if (mMonitorList == null) {
             mMonitorList = new HashMap<Type, Monitor>();
             mMonitorList.putAll(ManagementApplication.specialMonitorList);

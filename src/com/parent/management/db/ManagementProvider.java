@@ -194,7 +194,7 @@ public class ManagementProvider extends ContentProvider {
 
 			try {
 			    createBrowserHistoryTable(db);
-                createBrowserBookmarkTable(db);
+//                createBrowserBookmarkTable(db);
 			    createGpsTable(db);
 //			    createAppsInstalledTable(db);
                 createAppsUsedTable(db);

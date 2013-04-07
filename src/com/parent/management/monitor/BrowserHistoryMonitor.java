@@ -15,7 +15,6 @@ import android.util.Log;
 
 import com.parent.management.ManagementApplication;
 import com.parent.management.db.ManagementProvider;
-import com.parent.management.db.ManagementProvider.BrowserBookmark;
 import com.parent.management.db.ManagementProvider.BrowserHistory;
 
 public class BrowserHistoryMonitor extends Monitor {
@@ -23,8 +22,6 @@ public class BrowserHistoryMonitor extends Monitor {
             BrowserHistoryMonitor.class.getSimpleName();
 
 	private BrowserDBObserver contentObserver = null;
-	private final int BROWSER_COLUMNS_BOOKMARK = 1;
-    private final int BROWSER_COLUMNS_HISTORY = 0;
 
 	public BrowserHistoryMonitor(Context context) {
 		super(context);
@@ -53,9 +50,8 @@ public class BrowserHistoryMonitor extends Monitor {
 	    String url;
 	    int visitCount;
 	    long lastVisit;
-	    int type;
 	    private void prettyPrint() {
-            Log.v(TAG, "id=" + id + ";title=" + title + ";url=" + url + ";count=" + visitCount + ";last=" + lastVisit + ";type=" + type);
+            Log.v(TAG, "id=" + id + ";title=" + title + ";url=" + url + ";count=" + visitCount + ";last=" + lastVisit);
 	    }
 	}
 	
@@ -78,10 +74,11 @@ public class BrowserHistoryMonitor extends Monitor {
                 Browser.BookmarkColumns.TITLE,
                 Browser.BookmarkColumns.URL,
                 Browser.BookmarkColumns.VISITS,
-                Browser.BookmarkColumns.DATE,
-                Browser.BookmarkColumns.BOOKMARK };
+                Browser.BookmarkColumns.DATE };
+        String browserHistorySel = Browser.BookmarkColumns.BOOKMARK + " = 0";
+        String orderBy = Browser.BookmarkColumns.VISITS + " DESC"; 
         Cursor browserCur = ManagementApplication.getContext().getContentResolver().query(
-                Browser.BOOKMARKS_URI, browserProj, null, null, null);
+                Browser.BOOKMARKS_URI, browserProj, browserHistorySel, null, orderBy);
         
         if (browserCur == null) {
             Log.v(TAG, "open browser db failed");
@@ -95,20 +92,9 @@ public class BrowserHistoryMonitor extends Monitor {
                 browserInfo.url = browserCur.getString(browserCur.getColumnIndex(Browser.BookmarkColumns.URL));
                 browserInfo.visitCount = browserCur.getInt(browserCur.getColumnIndex(Browser.BookmarkColumns.VISITS));
                 browserInfo.lastVisit = browserCur.getLong(browserCur.getColumnIndex(Browser.BookmarkColumns.DATE));
-                browserInfo.type = browserCur.getInt(browserCur.getColumnIndex(Browser.BookmarkColumns.BOOKMARK));
 
-                if (BROWSER_COLUMNS_BOOKMARK == browserInfo.type) {
-                    if (!updateBrowserBookmarkDB(browserInfo)) {
-                        break;
-                    }
-                } 
-                else if (BROWSER_COLUMNS_HISTORY == browserInfo.type) {
-                    if (!updateBrowserHistoryDB(browserInfo)) {
-                        break;
-                    }
-                }
-                else {
-                    Log.v(TAG, "unknown browser db type:" + browserInfo.type);
+                if (!updateBrowserHistoryDB(browserInfo)) {
+                    break;
                 }
                 browserCur.moveToNext();
             }
@@ -122,10 +108,6 @@ public class BrowserHistoryMonitor extends Monitor {
         return updateLocalBrowserDB(browserInfo, BrowserHistory.TABLE_NAME, BrowserHistory.CONTENT_URI);
     }
 
-    private boolean updateBrowserBookmarkDB(BrowserInfo browserInfo) {
-        return updateLocalBrowserDB(browserInfo, BrowserBookmark.TABLE_NAME, BrowserBookmark.CONTENT_URI);
-    }
-    
     private boolean updateLocalBrowserDB(final BrowserInfo browserInfo, final String table, final Uri uri) {
         String[] browserLocalDBProj = new String[] { ManagementProvider.BrowserDB.ID,
                 ManagementProvider.BrowserDB.VISIT_COUNT};
