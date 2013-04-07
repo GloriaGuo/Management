@@ -34,7 +34,11 @@ public class ManagementApplication extends android.app.Application {
     
     public static final boolean DEBUG = true;
     
-    public static HashMap<Type, Monitor> monitorList = null;
+    public static HashMap<Type, Monitor> commonMonitorList = null;
+    public static HashMap<Type, Monitor> specialMonitorList = null;
+    
+    public static String MANAGEMENT_RECEIVER_FILTER_ACTIONS_COMMON = "common";
+    public static String MANAGEMENT_RECEIVER_FILTER_ACTIONS_SPECIAL = "special";
 	
     /**
      * The application context
@@ -45,7 +49,8 @@ public class ManagementApplication extends android.app.Application {
      */
     private static ManagementConfiguration mConfiguration = null;
     
-    private static PendingIntent mPendingIntent = null;
+    private static PendingIntent mCommonPendingIntent = null;
+    private static PendingIntent mSpecialPendingIntent = null;
     
     /**
      * @return the application tag (used in application logs)
@@ -66,8 +71,12 @@ public class ManagementApplication extends android.app.Application {
      * Gets the PendingIntent
      * @return the current PendingIntent
      */
-    public static PendingIntent getPendingIntent() {
-        return mPendingIntent;
+    public static PendingIntent getPendingIntent(String action) {
+        if (action.equals(MANAGEMENT_RECEIVER_FILTER_ACTIONS_COMMON)) {
+            return mCommonPendingIntent;
+        } else {
+            return mSpecialPendingIntent;
+        }
     }
     
     public static Context getContext() {
@@ -93,8 +102,15 @@ public class ManagementApplication extends android.app.Application {
         mConfiguration = new ManagementConfiguration(mContext);
         mInternalPath = mContext.getDir(".management",Context.MODE_PRIVATE).getAbsolutePath();
 
-        mPendingIntent = PendingIntent.getBroadcast(
-                mContext, 0, new Intent(mContext, ManagementReceiver.class), PendingIntent.FLAG_CANCEL_CURRENT);
+        Intent commonIntent = new Intent(mContext, ManagementReceiver.class);
+        commonIntent.setAction(MANAGEMENT_RECEIVER_FILTER_ACTIONS_COMMON);
+        mCommonPendingIntent = PendingIntent.getBroadcast(
+                mContext, 0, commonIntent, PendingIntent.FLAG_CANCEL_CURRENT);
+        
+        Intent specialIntent = new Intent(mContext, ManagementReceiver.class);
+        specialIntent.setAction(MANAGEMENT_RECEIVER_FILTER_ACTIONS_SPECIAL);
+        mSpecialPendingIntent = PendingIntent.getBroadcast(
+                mContext, 0, specialIntent, PendingIntent.FLAG_CANCEL_CURRENT);
         
         mConfiguration.registerPreferenceChangeListener(this.mSettingsListener);
     }
@@ -132,17 +148,34 @@ public class ManagementApplication extends android.app.Application {
                 public void onSharedPreferenceChanged(
                     final SharedPreferences sharedPreferences, final String key) {
                     ManagementApplication.getConfiguration();
-                    if (key.equals(ManagementConfiguration.PREFERENCE_KEY_INTERVAL_TIME)) {
-                        Log.d(mApplicationTag, "----> interval time changed.");
+                    if (key.equals(ManagementConfiguration.PREFERENCE_KEY_COMMON_INTERVAL_TIME)) {
+                        Log.d(mApplicationTag, "----> common interval time changed.");
                         AlarmManager mAlarmManager = (AlarmManager)ManagementApplication.getContext().
                                 getSystemService("alarm");
-                        mAlarmManager.cancel(ManagementApplication.getPendingIntent());
+                        mAlarmManager.cancel(ManagementApplication.getPendingIntent(
+                                ManagementApplication.MANAGEMENT_RECEIVER_FILTER_ACTIONS_COMMON));
                         mAlarmManager.setRepeating(
                                 AlarmManager.ELAPSED_REALTIME_WAKEUP, 
-                                ManagementApplication.getConfiguration().getIntervalTime() + SystemClock.elapsedRealtime(), 
-                                ManagementApplication.getConfiguration().getIntervalTime(),
-                                ManagementApplication.getPendingIntent());
-                    } 
+                                ManagementApplication.getConfiguration().getCommonIntervalTime() + 
+                                        SystemClock.elapsedRealtime(), 
+                                ManagementApplication.getConfiguration().getCommonIntervalTime(),
+                                ManagementApplication.getPendingIntent(
+                                        ManagementApplication.MANAGEMENT_RECEIVER_FILTER_ACTIONS_COMMON));
+                    }
+                    if (key.equals(ManagementConfiguration.PREFERENCE_KEY_SPECIAL_INTERVAL_TIME)) {
+                        Log.d(mApplicationTag, "----> special interval time changed.");
+                        AlarmManager mAlarmManager = (AlarmManager)ManagementApplication.getContext().
+                                getSystemService("alarm");
+                        mAlarmManager.cancel(ManagementApplication.getPendingIntent(
+                                ManagementApplication.MANAGEMENT_RECEIVER_FILTER_ACTIONS_SPECIAL));
+                        mAlarmManager.setRepeating(
+                                AlarmManager.ELAPSED_REALTIME_WAKEUP, 
+                                ManagementApplication.getConfiguration().getSpecialIntervalTime() + 
+                                        SystemClock.elapsedRealtime(), 
+                                ManagementApplication.getConfiguration().getSpecialIntervalTime(),
+                                ManagementApplication.getPendingIntent(
+                                        ManagementApplication.MANAGEMENT_RECEIVER_FILTER_ACTIONS_SPECIAL));
+                    }
                 }
             };
 

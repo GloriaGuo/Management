@@ -176,6 +176,8 @@ public class MainActivity extends Activity {
         	Boolean result = msg.getData().getBoolean("result");
         	
         	Log.d(TAG, "Registration result: " + result);
+        	ManagementApplication.getConfiguration().setIsRegisted(result);
+        	
         	if (MainActivity.this.mProgressDialog != null) {
                 MainActivity.this.mProgressDialog.dismiss();
             }

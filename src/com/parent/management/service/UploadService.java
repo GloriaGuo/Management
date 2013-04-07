@@ -27,6 +27,10 @@ public class UploadService extends Service {
             UploadService.class.getSimpleName();
     
     private static WifiManager.WifiLock mWifilock = null;
+    
+    protected HashMap<Type, Monitor> mMonitorList = null;
+    
+    private JSONHttpClient mClient = null;
 
 	@Override
 	public IBinder onBind(Intent intent) {
@@ -35,8 +39,12 @@ public class UploadService extends Service {
 
 	@Override
     public void onCreate()
-    {
-
+	{
+	    if (mMonitorList == null) {
+	        mMonitorList = new HashMap<Type, Monitor>();
+	        mMonitorList.putAll(ManagementApplication.commonMonitorList);
+	        mMonitorList.putAll(ManagementApplication.specialMonitorList);
+	    }
     }
 	
 	@Override
@@ -54,8 +62,7 @@ public class UploadService extends Service {
                 }
                 //getLock(this).acquire();
                 uploadJob();
-                mWifilock.release();
-                mWifilock = null;
+                getConfiguration();
                 UploadService.this.stopSelf();
             }
 	    
@@ -69,17 +76,17 @@ public class UploadService extends Service {
 	        mWifilock.release();
 	        mWifilock = null;
         }
+	    if (mMonitorList != null) {
+	        mMonitorList.clear();
+	        mMonitorList = null;
+	    }
 	}
 	
 	private void uploadJob() {
-	    if (ManagementApplication.monitorList == null) {
-	        return;
-	    }
-	    
 	    try {
     	    // prepare upload data
             JSONArray jsonParams = new JSONArray();
-            Iterator<Entry<Type, Monitor>> iterator = ManagementApplication.monitorList.entrySet().iterator();
+            Iterator<Entry<Type, Monitor>> iterator = mMonitorList.entrySet().iterator();
             while (iterator.hasNext()) {
                 Entry<Type, Monitor> entry = iterator.next();
                 Log.d(TAG, "----> prepare upload data for : " + entry.getKey());
@@ -95,11 +102,11 @@ public class UploadService extends Service {
             
             if (jsonParams.length() > 0) {
                 // Create client specifying JSON-RPC version 2.0
-                JSONHttpClient client = new JSONHttpClient(this.getResources().getString(R.string.server_address));
-                client.setConnectionTimeout(2000);
-                client.setSoTimeout(2000);
+                mClient = new JSONHttpClient(this.getResources().getString(R.string.server_address));
+                mClient.setConnectionTimeout(2000);
+                mClient.setSoTimeout(2000);
                 
-                JSONArray failed = client.doUpload(jsonParams);
+                JSONArray failed = mClient.doUpload(jsonParams);
                 Log.d(TAG, "Failed [" + failed.length() + "] records for this upload");
                 
                 HashMap<Integer, JSONArray> failedList = new HashMap<Integer, JSONArray>();
@@ -122,13 +129,6 @@ public class UploadService extends Service {
                         entry.getValue().updateStatusAfterSend(null);
                     }
                 }
-                
-                // get the new configuration from server
-                int time = client.doConfiguration() * 1000;
-                if (time != ManagementApplication.getConfiguration().getIntervalTime()) {
-                    Log.d(TAG, "The new interval time is " + time);
-                    ManagementApplication.getConfiguration().setIntervalTime(time);
-                }
             }
 	    } catch (JSONException e) {
 	        Log.e(TAG, "Invalid JSON request: " + e.getMessage());
@@ -137,5 +137,32 @@ public class UploadService extends Service {
 	    }
         
         return;
+	}
+	
+	private void getConfiguration() {
+	    // get the new configuration from server
+        int commonInterval = 0;
+        int specialInterval = 0;
+        try {
+            JSONObject response = mClient.doConfiguration();
+            commonInterval = response.getInt(JSONParams.COMMON_INTERVAL_TIME);
+            specialInterval = response.getInt(JSONParams.SPECIAL_INTERVAL_TIME);
+        } catch (JSONClientException e) {
+            Log.e(TAG, "Get Configuration Failed: " + e.getMessage());
+            commonInterval = this.getResources().getInteger(R.attr.default_common_interval_time);
+            specialInterval = this.getResources().getInteger(R.attr.default_special_interval_time);
+        } catch (JSONException e1) {
+            Log.e(TAG, "Invalid response: " + e1.getMessage());
+            commonInterval = this.getResources().getInteger(R.attr.default_common_interval_time);
+            specialInterval = this.getResources().getInteger(R.attr.default_special_interval_time);
+        }
+        if (commonInterval != ManagementApplication.getConfiguration().getCommonIntervalTime()) {
+            Log.d(TAG, "The new common interval time is " + commonInterval);
+            ManagementApplication.getConfiguration().setCommonIntervalTime(commonInterval);
+        }
+        if (specialInterval != ManagementApplication.getConfiguration().getSpecialIntervalTime()) {
+            Log.d(TAG, "The new common interval time is " + specialInterval);
+            ManagementApplication.getConfiguration().setSpecialIntervalTime(specialInterval);
+        }
 	}
 }

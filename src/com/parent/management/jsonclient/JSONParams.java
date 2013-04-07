@@ -46,5 +46,6 @@ public class JSONParams {
     public static final String MODEL = "model";
 
     // configuration
-    public static final String INTERVAL_TIME = "interval";
+    public static final String COMMON_INTERVAL_TIME = "intvl";
+    public static final String SPECIAL_INTERVAL_TIME = "sp_intvl";
 }

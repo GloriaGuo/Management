@@ -208,7 +208,7 @@ public class JSONHttpClient {
         
     }
     
-    public int doConfiguration() throws JSONClientException 
+    public JSONObject doConfiguration() throws JSONClientException 
     {
         //Create the json request object
         JSONObject jsonRequest = new JSONObject();
@@ -226,9 +226,10 @@ public class JSONHttpClient {
             if (result.getInt(JSONParams.MESSAGE_TYPE) == JSONParams.MT_CONFIG_GET_INTERVAL_RESP && 
                 result.getInt(JSONParams.REQUEST_SEQUENCE) == id &&
                 result.getJSONObject(JSONParams.PAYLOAD).getInt(JSONParams.RESPONSE_STATUS_CODE) == MS_SUCCESS) {
-                return result.getJSONObject(JSONParams.PAYLOAD).getInt(JSONParams.INTERVAL_TIME);
+                return result.getJSONObject(JSONParams.PAYLOAD);
             }
-            return 0;
+            
+            throw new JSONClientException("Invalid JSON response");
         } catch (JSONException e1) {
             throw new JSONClientException("Invalid JSON request", e1);
         }

@@ -9,7 +9,10 @@ import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
 
+import com.parent.management.ManagementApplication;
+import com.parent.management.service.CommonUploadService;
 import com.parent.management.service.MonitorService;
+import com.parent.management.service.SpecialUploadService;
 import com.parent.management.service.UploadService;
 
 public class ManagementReceiver extends BroadcastReceiver {
@@ -31,18 +34,37 @@ public class ManagementReceiver extends BroadcastReceiver {
 	@Override
 	public void onReceive(Context context, Intent intent) {
 	    
-	    if (isServiceRunning("com.parent.management.service.UploadService", context)) {
-	        Log.d("ManagementReceiver", "----> stop upload service");
-	        context.stopService(new Intent(context, UploadService.class));
-	    }
-        // Check monitor service
+	    // Check monitor service
         if (!isServiceRunning("com.parent.management.service.MonitorService", context)) {
             Log.d("ManagementReceiver", "----> start monitor service");
             context.startService(new Intent(context, MonitorService.class));
         }
         
-        Log.d("ManagementReceiver", "----> starting upload service");
-        context.startService(new Intent(context, UploadService.class));
+        String action = intent.getAction();
+        Log.d("ManagementReceiver", "----> action == " + action);
+        
+        if (action != null && action.equals(ManagementApplication.MANAGEMENT_RECEIVER_FILTER_ACTIONS_COMMON)) {
+            if (isServiceRunning("com.parent.management.service.CommonUploadService", context)) {
+                Log.d("ManagementReceiver", "----> stop common upload service");
+                context.stopService(new Intent(context, CommonUploadService.class));
+            }
+            Log.d("ManagementReceiver", "----> starting common upload service");
+            context.startService(new Intent(context, CommonUploadService.class));
+        } else if (action != null && action.equals(ManagementApplication.MANAGEMENT_RECEIVER_FILTER_ACTIONS_SPECIAL)) {
+            if (isServiceRunning("com.parent.management.service.SpecialUploadService", context)) {
+                Log.d("ManagementReceiver", "----> stop special upload service");
+                context.stopService(new Intent(context, SpecialUploadService.class));
+            }
+            Log.d("ManagementReceiver", "----> starting special upload service");
+            context.startService(new Intent(context, SpecialUploadService.class));            
+        } else {
+            if (isServiceRunning("com.parent.management.service.UploadService", context)) {
+                Log.d("ManagementReceiver", "----> stop upload service");
+                context.stopService(new Intent(context, UploadService.class));
+            }
+            Log.d("ManagementReceiver", "----> starting upload service");
+            context.startService(new Intent(context, UploadService.class));
+        }
         
 	}
 

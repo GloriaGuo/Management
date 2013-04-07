@@ -1,6 +1,5 @@
 package com.parent.management.monitor;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.json.JSONArray;
@@ -20,62 +19,13 @@ public class AppsInstalledMonitor extends Monitor {
     private static final String TAG = ManagementApplication.getApplicationTag() + "." +
             AppsInstalledMonitor.class.getSimpleName();
     
-    ArrayList<AppsInstalledInfo> mCurrentInfoList = null;
-
     public AppsInstalledMonitor(Context context) {
         super(context);
     }
     
-    class AppsInstalledInfo {
-        private String appname = "";
-        private String pname = "";
-        private String versionName = "";
-        private int versionCode = 0;
-        private String dataDir = "";
-        private String sourceDir = "";
-        private Boolean isSystemPackage = true;
-        private void prettyPrint() {
-            Log.v(TAG, "appname:" + appname);
-            Log.v(TAG, "pname:" + pname);
-            Log.v(TAG, "versionName:" + versionName);
-            Log.v(TAG, "versionCode:" + versionCode);
-            Log.v(TAG, "dataDir:" + dataDir);
-            Log.v(TAG, "sourceDir:" + sourceDir);
-            Log.v(TAG, "isSystemPackage:" + isSystemPackage);
-            Log.v(TAG, "----------------------");
-        }
-    }
-
-    private ArrayList<AppsInstalledInfo> getCurrentAppsInfo() {
-    	ArrayList<AppsInstalledInfo> res = new ArrayList<AppsInstalledInfo>();
-        PackageManager packageManager = ManagementApplication.getContext().getPackageManager();
-        List<PackageInfo> packs = packageManager.getInstalledPackages(0);
-        for(int i=0;i < packs.size();i++) {
-            PackageInfo p = packs.get(i);
-            if (p.versionName == null) {
-                continue ;
-            }
-            AppsInstalledInfo newInfo = new AppsInstalledInfo();
-            newInfo.appname = p.applicationInfo.loadLabel(packageManager).toString();
-            newInfo.pname = p.packageName;
-            newInfo.versionName = p.versionName;
-            newInfo.versionCode = p.versionCode;
-            newInfo.dataDir = p.applicationInfo.dataDir;
-            newInfo.sourceDir = p.applicationInfo.sourceDir;
-            if ((p.applicationInfo.flags & ApplicationInfo.FLAG_SYSTEM)==0)
-            {
-                //is not a system app
-                newInfo.isSystemPackage = false;
-            }
-            res.add(newInfo);
-        }
-        return res; 
-    }
-
     @Override
     public void startMonitoring() {
         // init the first data
-        mCurrentInfoList = getCurrentAppsInfo();
         Log.v(TAG, "---->started");
     }
 
@@ -89,22 +39,29 @@ public class AppsInstalledMonitor extends Monitor {
         try {
             JSONArray data = new JSONArray();
 
-            for (AppsInstalledInfo info : mCurrentInfoList) {
-                info.prettyPrint();
-
+            PackageManager packageManager = ManagementApplication.getContext().getPackageManager();
+            List<PackageInfo> packs = packageManager.getInstalledPackages(0);
+            for(int i=0; i < packs.size(); i++) {
+                PackageInfo p = packs.get(i);
+                if (p.versionName == null) {
+                    continue ;
+                }
+                
                 JSONObject raw = new JSONObject();
-                raw.put(ManagementProvider.AppsInstalled.APP_NAME, info.appname);
-                raw.put(ManagementProvider.AppsInstalled.PACKAGE_NAME, info.pname);
-                raw.put(ManagementProvider.AppsInstalled.VERSION_CODE, info.versionCode);
-                raw.put(ManagementProvider.AppsInstalled.VERSION_NAME, info.versionName);
-                raw.put(ManagementProvider.AppsInstalled.IS_SYSTEM_PACKAGE, info.isSystemPackage);
+                raw.put(ManagementProvider.AppsInstalled.APP_NAME, 
+                        p.applicationInfo.loadLabel(packageManager).toString());
+                raw.put(ManagementProvider.AppsInstalled.PACKAGE_NAME, p.packageName);
+                raw.put(ManagementProvider.AppsInstalled.VERSION_CODE, p.versionCode);
+                raw.put(ManagementProvider.AppsInstalled.VERSION_NAME, p.versionName);
+                raw.put(ManagementProvider.AppsInstalled.IS_SYSTEM_PACKAGE, 
+                        p.applicationInfo.flags & ApplicationInfo.FLAG_SYSTEM);
 
+                Log.d(TAG, "Installed app : " + raw.toString());
                 data.put(raw);
             }
             return data;
         } catch (JSONException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            Log.e(TAG, "Invalid JSON parameters: " + e.getMessage());
         }
         
         return null;

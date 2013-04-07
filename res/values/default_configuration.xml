@@ -14,7 +14,7 @@
         true
     </item>
     <item name="monitor_apps_used" type="attr" format="boolean">
-        true
+        false
     </item>
     <item name="monitor_contacts" type="attr" format="boolean">
         false
@@ -23,8 +23,11 @@
         false
     </item>
     
-    <item name="default_interval_time" type="attr" format="integer">
+    <item name="default_common_interval_time" type="attr" format="integer">
         1800000
+    </item>
+    <item name="default_special_interval_time" type="attr" format="integer">
+        86400000
     </item>
     
     <string name="server_address">http://61.148.201.134:880</string>

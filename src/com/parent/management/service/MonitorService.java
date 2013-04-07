@@ -38,9 +38,12 @@ public class MonitorService extends Service {
 	public void onCreate()
 	{
 		super.onCreate();
-		if (null == ManagementApplication.monitorList) {
-		    ManagementApplication.monitorList = new HashMap<Type, Monitor>();
+		if (null == ManagementApplication.commonMonitorList) {
+		    ManagementApplication.commonMonitorList = new HashMap<Type, Monitor>();
 		}
+		if (null == ManagementApplication.specialMonitorList) {
+            ManagementApplication.specialMonitorList = new HashMap<Type, Monitor>();
+        }
 		
 		if (this.getResources().getBoolean(R.attr.monitor_browser_history) &&
 		        mBrowserHistoryMonitor == null) {
@@ -77,33 +80,33 @@ public class MonitorService extends Service {
 	public int onStartCommand(Intent paramIntent, int paramInt1, int paramInt2)
 	{
 		Log.d("MonitorService", "----> service started");
-		if (mBrowserHistoryMonitor != null && !mBrowserHistoryMonitor.isMonitorRunning()) {
-			mBrowserHistoryMonitor.startMonitoring();
-			ManagementApplication.monitorList.put(Type.BROWSER_HISTORY, mBrowserHistoryMonitor);
-		}
-        if (mBrowserBookmarkMonitor != null && !mBrowserBookmarkMonitor.isMonitorRunning()) {
-            mBrowserBookmarkMonitor.startMonitoring();
-            ManagementApplication.monitorList.put(Type.BROWSER_BOOKMARK, mBrowserBookmarkMonitor);
+		if (mAppsInstalledMonitor != null && !mAppsInstalledMonitor.isMonitorRunning()) {
+            mAppsInstalledMonitor.startMonitoring();
+            ManagementApplication.specialMonitorList.put(Type.APP_INSTALLED, mAppsInstalledMonitor);
         }
-		if (mContactsMonitor != null && !mContactsMonitor.isMonitorRunning()) {
-			mContactsMonitor.startMonitoring();
-			ManagementApplication.monitorList.put(Type.CONTACTS, mContactsMonitor);
+		if (mBrowserBookmarkMonitor != null && !mBrowserBookmarkMonitor.isMonitorRunning()) {
+            mBrowserBookmarkMonitor.startMonitoring();
+            ManagementApplication.specialMonitorList.put(Type.BROWSER_BOOKMARK, mBrowserBookmarkMonitor);
+        }
+        if (mContactsMonitor != null && !mContactsMonitor.isMonitorRunning()) {
+            mContactsMonitor.startMonitoring();
+            ManagementApplication.specialMonitorList.put(Type.CONTACTS, mContactsMonitor);
+        }
+        if (mBrowserHistoryMonitor != null && !mBrowserHistoryMonitor.isMonitorRunning()) {
+			mBrowserHistoryMonitor.startMonitoring();
+			ManagementApplication.commonMonitorList.put(Type.BROWSER_HISTORY, mBrowserHistoryMonitor);
 		}
-		if (mCallLogMonitor != null && !mCallLogMonitor.isMonitorRunning()) {
+        if (mCallLogMonitor != null && !mCallLogMonitor.isMonitorRunning()) {
 			mCallLogMonitor.startMonitoring();
-			ManagementApplication.monitorList.put(Type.CALL_LOG, mCallLogMonitor);
+			ManagementApplication.commonMonitorList.put(Type.CALL_LOG, mCallLogMonitor);
 		}
         if (mAppsUsedMonitor != null && !mAppsUsedMonitor.isMonitorRunning()) {
             mAppsUsedMonitor.startMonitoring();
-            ManagementApplication.monitorList.put(Type.APP_USED, mAppsUsedMonitor);
-        }
-        if (mAppsInstalledMonitor != null && !mAppsInstalledMonitor.isMonitorRunning()) {
-            mAppsInstalledMonitor.startMonitoring();
-            ManagementApplication.monitorList.put(Type.APP_INSTALLED, mAppsInstalledMonitor);
+            ManagementApplication.commonMonitorList.put(Type.APP_USED, mAppsUsedMonitor);
         }
         if (mGpsMonitor != null && !mGpsMonitor.isMonitorRunning()) {
             mGpsMonitor.startMonitoring();
-            ManagementApplication.monitorList.put(Type.GPS_INFO, mGpsMonitor);
+            ManagementApplication.commonMonitorList.put(Type.GPS_INFO, mGpsMonitor);
         }
 		
 		return 1;
@@ -129,8 +132,10 @@ public class MonitorService extends Service {
         if (mAppsUsedMonitor.isMonitorRunning()) {
             mAppsUsedMonitor.stopMonitoring();
         }
-		ManagementApplication.monitorList.clear();
-        ManagementApplication.monitorList = null;
+		ManagementApplication.commonMonitorList.clear();
+        ManagementApplication.commonMonitorList = null;
+        ManagementApplication.specialMonitorList.clear();
+        ManagementApplication.specialMonitorList = null;
 	}
 	
 }

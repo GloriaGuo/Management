@@ -47,6 +47,8 @@
         
         <service android:name="com.parent.management.service.MonitorService" />
         <service android:name="com.parent.management.service.UploadService" />
+        <service android:name="com.parent.management.service.CommonUploadService" />
+                <service android:name="com.parent.management.service.SpecialUploadService" />
         
         <!-- RECEIVERS -->
         

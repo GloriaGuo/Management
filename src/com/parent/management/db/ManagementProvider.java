@@ -123,7 +123,7 @@ public class ManagementProvider extends ContentProvider {
         public static final String PACKAGE_NAME = "pn";
         public static final String VERSION_CODE = "vcode";
         public static final String VERSION_NAME = "vname";
-        public static final String IS_SYSTEM_PACKAGE = "IsSystem";
+        public static final String IS_SYSTEM_PACKAGE = "is_system";
         public static final String IS_SENT = "IsSend";
         /**
          * The default sort order for this table
