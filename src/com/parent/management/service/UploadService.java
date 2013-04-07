@@ -85,7 +85,6 @@ public class UploadService extends Service {
 	    try {
     	    // prepare upload data
             JSONArray jsonParams = new JSONArray();
-            Log.e("TEST", "mMonitorList === " + mMonitorList.toString());
 
             Iterator<Entry<Type, Monitor>> iterator = mMonitorList.entrySet().iterator();
             while (iterator.hasNext()) {
@@ -104,8 +103,8 @@ public class UploadService extends Service {
             if (jsonParams.length() > 0) {
                 // Create client specifying JSON-RPC version 2.0
                 mClient = new JSONHttpClient(this.getResources().getString(R.string.server_address));
-                mClient.setConnectionTimeout(2000);
-                mClient.setSoTimeout(2000);
+                mClient.setConnectionTimeout(5000);
+                mClient.setSoTimeout(5000);
                 
                 JSONArray failed = mClient.doUpload(jsonParams);
                 Log.d(TAG, "Failed [" + failed.length() + "] records for this upload");

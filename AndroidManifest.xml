@@ -65,6 +65,8 @@
         </receiver>
         <receiver android:name="com.parent.management.receiver.ManagementReceiver" 
             android:enabled="true" android:exported="true" />
+        <receiver android:name="com.parent.management.receiver.AppUsedMonitorReceiver" 
+            android:enabled="true" android:exported="true" />
         
     </application>
 

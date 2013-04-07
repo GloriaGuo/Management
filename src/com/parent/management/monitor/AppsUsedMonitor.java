@@ -62,7 +62,6 @@ public class AppsUsedMonitor extends Monitor {
             newInfo.date = System.currentTimeMillis();
         }
     	
-        newInfo.prettyPrint();
         return newInfo; 
     }
     
@@ -99,6 +98,8 @@ public class AppsUsedMonitor extends Monitor {
             
             ManagementApplication.getContext().getContentResolver().insert(
                     ManagementProvider.AppsUsed.CONTENT_URI, values);
+            
+            currentActiveApp.prettyPrint();
             Log.d(TAG, "insert one");
         }
 
@@ -115,7 +116,6 @@ public class AppsUsedMonitor extends Monitor {
         // init the first data
         this.monitorStatus = true;
         checkForChange();
-        Log.v(TAG, "---->started");
     }
 
     @Override

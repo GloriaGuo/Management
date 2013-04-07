@@ -34,7 +34,6 @@ public class BrowserHistoryMonitor extends Monitor {
 		this.contentResolver.registerContentObserver(this.contentUri, true, this.contentObserver);
 	    this.monitorStatus = true;
         checkForChange();
-        Log.v(TAG, "---->started");
 	}
 
 	@Override

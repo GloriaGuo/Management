@@ -27,7 +27,6 @@ public class AppsInstalledMonitor extends Monitor {
     public void startMonitoring() {
         // init the first data
         this.monitorStatus = true;
-        Log.v(TAG, "---->started");
     }
 
     @Override

@@ -8,7 +8,6 @@ import android.content.Context;
 import android.database.ContentObserver;
 import android.os.Handler;
 import android.provider.ContactsContract;
-import android.util.Log;
 
 public class ContactsMonitor extends Monitor {
 
@@ -24,14 +23,12 @@ public class ContactsMonitor extends Monitor {
 	public void startMonitoring() {
 		this.contentResolver.registerContentObserver(this.contentUri, true, this.contentObserver);
 	    this.monitorStatus = true;
-	    Log.d("ContactsMonitor", "----> startMonitoring");
 	}
 
 	@Override
 	public void stopMonitoring() {
 		this.contentResolver.unregisterContentObserver(this.contentObserver);
 	    this.monitorStatus = false;
-	    Log.d("ContactsMonitor", "----> stopMonitoring");
 	}
 	
 	private class ContactsObserver extends ContentObserver {

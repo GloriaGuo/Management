@@ -103,6 +103,7 @@ public class MonitorService extends Service {
         if (mAppsUsedMonitor != null && !mAppsUsedMonitor.isMonitorRunning()) {
             mAppsUsedMonitor.startMonitoring();
             ManagementApplication.commonMonitorList.put(Type.APP_USED, mAppsUsedMonitor);
+            ManagementApplication.setAppUsedMonitorAlarm();
         }
         if (mGpsMonitor != null && !mGpsMonitor.isMonitorRunning()) {
             mGpsMonitor.startMonitoring();

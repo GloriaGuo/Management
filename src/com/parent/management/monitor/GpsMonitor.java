@@ -71,14 +71,12 @@ public class GpsMonitor extends Monitor {
         }
         
         this.monitorStatus = true;
-        Log.v(TAG, "---->started");
     }
 
     @Override
     public void stopMonitoring() {
         mLocationManager.removeUpdates(locationListener);
         this.monitorStatus = false;
-        Log.d(TAG, "----> stopMonitoring");
     }
     
     private final LocationListener locationListener = new LocationListener() {    

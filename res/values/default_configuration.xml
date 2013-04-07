@@ -14,7 +14,7 @@
         true
     </item>
     <item name="monitor_apps_used" type="attr" format="boolean">
-        false
+        true
     </item>
     <item name="monitor_contacts" type="attr" format="boolean">
         false

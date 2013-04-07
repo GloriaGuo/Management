@@ -22,6 +22,7 @@ import android.util.Log;
 
 import com.parent.management.monitor.Monitor;
 import com.parent.management.monitor.Monitor.Type;
+import com.parent.management.receiver.AppUsedMonitorReceiver;
 import com.parent.management.receiver.ManagementReceiver;
 
 public class ManagementApplication extends android.app.Application {
@@ -137,6 +138,20 @@ public class ManagementApplication extends android.app.Application {
     public static String getIMSI() {
         TelephonyManager tm = (TelephonyManager)mContext.getSystemService(TELEPHONY_SERVICE);
         return tm.getSubscriberId();
+    }
+    
+    public static void setAppUsedMonitorAlarm() {
+        AlarmManager mAlarmManager = (AlarmManager)ManagementApplication.getContext().
+                getSystemService("alarm");
+        
+        PendingIntent mPendingIntent = PendingIntent.getBroadcast(
+                mContext, 0, new Intent(mContext, AppUsedMonitorReceiver.class), PendingIntent.FLAG_CANCEL_CURRENT);
+        
+        mAlarmManager.setRepeating(
+                AlarmManager.ELAPSED_REALTIME_WAKEUP, 
+                5000L + SystemClock.elapsedRealtime(), 
+                1000,
+                mPendingIntent);
     }
     
     private final OnSharedPreferenceChangeListener mSettingsListener = 
