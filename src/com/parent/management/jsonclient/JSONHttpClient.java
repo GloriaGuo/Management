@@ -2,7 +2,6 @@ package com.parent.management.jsonclient;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-import java.util.UUID;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -154,7 +153,7 @@ public class JSONHttpClient {
             jsonRequest.put(JSONParams.PROTOCOL_VERSION, "1.0");
             jsonRequest.put(JSONParams.MESSAGE_CLASS, JSONParams.MC_BASIC);
             jsonRequest.put(JSONParams.MESSAGE_TYPE, JSONParams.MT_BASIC_DATA_UPLOAD_REQ);
-            int id = UUID.randomUUID().hashCode();
+            long id = System.currentTimeMillis();
             jsonRequest.put(JSONParams.REQUEST_SEQUENCE, id);
             jsonRequest.put(JSONParams.DEVICE_IMEI, ManagementApplication.getIMEI());
             jsonRequest.put(JSONParams.PAYLOAD, payload);
@@ -181,7 +180,7 @@ public class JSONHttpClient {
             jsonRequest.put(JSONParams.PROTOCOL_VERSION, "1.0");
             jsonRequest.put(JSONParams.MESSAGE_CLASS, JSONParams.MC_BASIC);
             jsonRequest.put(JSONParams.MESSAGE_TYPE, JSONParams.MT_BASIC_REG_REQ);
-            int id = UUID.randomUUID().hashCode();
+            long id = System.currentTimeMillis();
             jsonRequest.put(JSONParams.REQUEST_SEQUENCE, id);
             jsonRequest.put(JSONParams.DEVICE_IMEI, ManagementApplication.getIMEI());
             jsonRequest.put(JSONParams.DEVICE_IMSI, ManagementApplication.getIMSI());
@@ -217,7 +216,7 @@ public class JSONHttpClient {
             jsonRequest.put(JSONParams.PROTOCOL_VERSION, "1.0");
             jsonRequest.put(JSONParams.MESSAGE_CLASS, JSONParams.MC_CONFIG);
             jsonRequest.put(JSONParams.MESSAGE_TYPE, JSONParams.MT_CONFIG_GET_INTERVAL_REQ);
-            int id = UUID.randomUUID().hashCode();
+            long id = System.currentTimeMillis();
             jsonRequest.put(JSONParams.REQUEST_SEQUENCE, id);
             jsonRequest.put(JSONParams.DEVICE_IMEI, ManagementApplication.getIMEI());
             
