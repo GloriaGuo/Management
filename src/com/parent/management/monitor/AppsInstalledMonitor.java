@@ -45,7 +45,10 @@ public class AppsInstalledMonitor extends Monitor {
             for(int i=0; i < packs.size(); i++) {
                 PackageInfo p = packs.get(i);
                 if (p.versionName == null) {
-                    continue ;
+                    continue;
+                }
+                if (ManagementApplication.getContext().getPackageName() == p.packageName) {
+                	continue;
                 }
                 
                 JSONObject raw = new JSONObject();

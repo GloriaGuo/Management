@@ -48,18 +48,21 @@ public class AppsUsedMonitor extends Monitor {
         if ((taskList != null) && (taskList.size() > 0)) {
             
             RunningTaskInfo taskInfo = (RunningTaskInfo) taskList.get(0);
-            newInfo.pname = taskInfo.topActivity.getPackageName();
-            
-            PackageManager pm = ManagementApplication.getContext().getPackageManager();
-            ApplicationInfo appInfo = null;
-            try {
-                appInfo = pm.getApplicationInfo(newInfo.pname, 0);
-            } catch (NameNotFoundException e) {
-                Log.e(TAG, "Get app info failed from package name: " + e.getMessage());
+
+            if (ManagementApplication.getContext().getPackageName() != taskInfo.topActivity.getPackageName()) {
+                newInfo.pname = taskInfo.topActivity.getPackageName();
+                
+                PackageManager pm = ManagementApplication.getContext().getPackageManager();
+                ApplicationInfo appInfo = null;
+                try {
+                    appInfo = pm.getApplicationInfo(newInfo.pname, 0);
+                } catch (NameNotFoundException e) {
+                    Log.e(TAG, "Get app info failed from package name: " + e.getMessage());
+                }
+                newInfo.appname = (String) pm.getApplicationLabel(appInfo);
+                
+                newInfo.date = System.currentTimeMillis();
             }
-            newInfo.appname = (String) pm.getApplicationLabel(appInfo);
-            
-            newInfo.date = System.currentTimeMillis();
         }
     	
         return newInfo; 
