@@ -26,6 +26,7 @@ public class GpsMonitor extends Monitor {
     private static final String TAG = ManagementApplication.getApplicationTag() + "." +
             GpsMonitor.class.getSimpleName();
     LocationManager mLocationManager;
+    String mProvider = null;
     Context mContext = null;
     
     public GpsMonitor(Context context) {
@@ -41,57 +42,77 @@ public class GpsMonitor extends Monitor {
             turnGPSOn();
         }
         
-        List<String> mProviders = mLocationManager.getAllProviders();
+        mProvider = getAvailableProviderByPriority();
         
-        if (mProviders.isEmpty()) {
-            Log.e(TAG, "No provider can be used!");
-            return;
-        }
-        if (mProviders.contains(LocationManager.NETWORK_PROVIDER) &&
-                mLocationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)) {
-            Log.d(TAG, "use network provider");
-            Location currentLocation = mLocationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+        if (null != mProvider) {
+            Location currentLocation = mLocationManager.getLastKnownLocation(mProvider);
             updateLocation(currentLocation);
-            mLocationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 500, 0, locationListener);
-        } else if (mProviders.contains(LocationManager.GPS_PROVIDER) &&
-                mLocationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
-            Log.d(TAG, "use gps provider");
-            Location currentLocation = mLocationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-            updateLocation(currentLocation);
-            mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 500, 0, locationListener);
-        } else if (mProviders.contains(LocationManager.PASSIVE_PROVIDER) &&
-                mLocationManager.isProviderEnabled(LocationManager.PASSIVE_PROVIDER)) {
-            Log.d(TAG, "use passive provider");
-            Location currentLocation = mLocationManager.getLastKnownLocation(LocationManager.PASSIVE_PROVIDER);
-            updateLocation(currentLocation);
-            mLocationManager.requestLocationUpdates(LocationManager.PASSIVE_PROVIDER, 500, 0, locationListener);
-        } else {
-            Log.e(TAG, "can't get here, no active provider");
-            return;
+            mLocationManager.requestLocationUpdates(mProvider, 500, 0, mLocationListener);
         }
         
         this.monitorStatus = true;
     }
+    
+    String getAvailableProviderByPriority() {
+        List<String> mProviders = mLocationManager.getAllProviders();
+        
+        if (mProviders.isEmpty()) {
+            Log.e(TAG, "No provider can be used!");
+            return null;
+        }
+        if (mProviders.contains(LocationManager.NETWORK_PROVIDER) &&
+                mLocationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)) {
+            Log.d(TAG, "use network provider");
+            return LocationManager.NETWORK_PROVIDER;
+        } else if (mProviders.contains(LocationManager.GPS_PROVIDER) &&
+                mLocationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+            Log.d(TAG, "use gps provider");
+            return LocationManager.GPS_PROVIDER;
+        } else if (mProviders.contains(LocationManager.PASSIVE_PROVIDER) &&
+                mLocationManager.isProviderEnabled(LocationManager.PASSIVE_PROVIDER)) {
+            Log.d(TAG, "use passive provider");
+            return LocationManager.PASSIVE_PROVIDER;
+        } else {
+            Log.e(TAG, "can't get here, no active provider");
+            return null;
+        }
+    }
 
     @Override
     public void stopMonitoring() {
-        mLocationManager.removeUpdates(locationListener);
+        mLocationManager.removeUpdates(mLocationListener);
         this.monitorStatus = false;
     }
     
-    private final LocationListener locationListener = new LocationListener() {    
+    private final LocationListener mLocationListener = new LocationListener() {    
 
         public void onLocationChanged(Location location) {    
             updateLocation(location);    
         }    
 
-        public void onProviderDisabled(String provider){ 
-            updateLocation(null);    
-            Log.i(TAG, "Provider now is disabled.."); 
+        public void onProviderDisabled(String provider){
+            Log.i(TAG, "Provider " + provider + " now is disabled.."); 
+            updateLocation(null);
+            mProvider = getAvailableProviderByPriority();
+            if (null != mProvider) {
+                mLocationManager.removeUpdates(mLocationListener);
+
+                Location currentLocation = mLocationManager.getLastKnownLocation(mProvider);
+                updateLocation(currentLocation);
+                mLocationManager.requestLocationUpdates(mProvider, 500, 0, mLocationListener);
+            }
         }    
 
         public void onProviderEnabled(String provider){ 
             Log.i(TAG, "Provider now is enabled.."); 
+            mProvider = getAvailableProviderByPriority();
+            if (null != mProvider && provider != mProvider) {
+                mLocationManager.removeUpdates(mLocationListener);
+
+                Location currentLocation = mLocationManager.getLastKnownLocation(mProvider);
+                updateLocation(currentLocation);
+                mLocationManager.requestLocationUpdates(mProvider, 500, 0, mLocationListener);
+            }
         }    
 
         public void onStatusChanged(String provider, int status,Bundle extras){ }
@@ -181,7 +202,7 @@ public class GpsMonitor extends Monitor {
             
             return data;
         } catch (JSONException e) {
-            // TODO Auto-generated catch block
+            Log.v(TAG, "Json exception:" + e.getMessage());
             e.printStackTrace();
         }
 
