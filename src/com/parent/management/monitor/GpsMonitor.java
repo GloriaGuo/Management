@@ -205,6 +205,11 @@ public class GpsMonitor extends Monitor {
     			}
     		}
     	}
+        String gpsSel = ManagementProvider.Gps.IS_SENT
+        		+ " = \"" + ManagementProvider.IS_SENT_YES + "\"";
+    	ManagementApplication.getContext().getContentResolver().delete(
+    			ManagementProvider.Gps.CONTENT_URI,
+    			gpsSel, null);
     }
     public void turnGPSOff()
     {

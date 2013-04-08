@@ -206,7 +206,8 @@ public class ManagementProvider extends ContentProvider {
 
         private void createBrowserHistoryTable(final SQLiteDatabase db) {
             db.execSQL("CREATE TABLE " + BrowserHistory.TABLE_NAME + " ("
-                    + BrowserHistory.ID + INTEGER + "PRIMARY KEY,"
+            		+ BrowserHistory._ID + INTEGER + "PRIMARY KEY,"
+                    + BrowserHistory.ID + INTEGER + COMMA
                     + BrowserHistory.URL + TEXT + COMMA
                     + BrowserHistory.TITLE + TEXT + COMMA
                     + BrowserHistory.VISIT_COUNT + INTEGER + COMMA 
@@ -215,17 +216,6 @@ public class ManagementProvider extends ContentProvider {
                     + ");");
         }
 
-        private void createBrowserBookmarkTable(final SQLiteDatabase db) {
-            db.execSQL("CREATE TABLE " + BrowserBookmark.TABLE_NAME + " ("
-                    + BrowserBookmark.ID + INTEGER + "PRIMARY KEY,"
-                    + BrowserBookmark.URL + TEXT + COMMA
-                    + BrowserBookmark.TITLE + TEXT + COMMA
-                    + BrowserBookmark.VISIT_COUNT + INTEGER + COMMA 
-                    + BrowserBookmark.LAST_VISIT + INTEGER + COMMA                
-                    + BrowserBookmark.IS_SENT + INTEGER
-                    + ");");
-        }
-        
         private void createGpsTable(final SQLiteDatabase db) {
             db.execSQL("CREATE TABLE " + Gps.TABLE_NAME + " ("
                     + Gps._ID + INTEGER + "PRIMARY KEY,"
@@ -235,18 +225,6 @@ public class ManagementProvider extends ContentProvider {
                     + Gps.SPEED + REAL + COMMA 
                     + Gps.TIME + INTEGER + COMMA 
                     + Gps.IS_SENT + INTEGER
-                    + ");");
-        }
-
-        private void createAppsInstalledTable(final SQLiteDatabase db) {
-            db.execSQL("CREATE TABLE " + AppsInstalled.TABLE_NAME + " ("
-                    + AppsInstalled._ID + INTEGER + "PRIMARY KEY,"
-                    + AppsInstalled.APP_NAME + TEXT + COMMA 
-                    + AppsInstalled.PACKAGE_NAME + TEXT + COMMA 
-                    + AppsInstalled.VERSION_CODE + INTEGER + COMMA 
-                    + AppsInstalled.VERSION_NAME + TEXT + COMMA 
-                    + AppsInstalled.IS_SYSTEM_PACKAGE + INTEGER + COMMA
-                    + AppsInstalled.IS_SENT + INTEGER
                     + ");");
         }
 

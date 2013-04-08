@@ -68,6 +68,7 @@ public class BrowserHistoryMonitor extends Monitor {
 	}
 
     private void checkForChange() {
+    	long lastVisitOverallTmp = ManagementApplication.getConfiguration().getLastVisitBrowserHistory();
         String[] browserProj = new String[] {
                 Browser.BookmarkColumns._ID,
                 Browser.BookmarkColumns.TITLE,
@@ -91,15 +92,21 @@ public class BrowserHistoryMonitor extends Monitor {
                 browserInfo.url = browserCur.getString(browserCur.getColumnIndex(Browser.BookmarkColumns.URL));
                 browserInfo.visitCount = browserCur.getInt(browserCur.getColumnIndex(Browser.BookmarkColumns.VISITS));
                 browserInfo.lastVisit = browserCur.getLong(browserCur.getColumnIndex(Browser.BookmarkColumns.DATE));
-
-                if (!updateBrowserHistoryDB(browserInfo)) {
-                    break;
+                if (lastVisitOverallTmp < browserInfo.lastVisit) {
+                	lastVisitOverallTmp = browserInfo.lastVisit;
+                    if (!updateBrowserHistoryDB(browserInfo)) {
+                        break;
+                    }
                 }
+
                 browserCur.moveToNext();
             }
         }
         if (null != browserCur) {
             browserCur.close();
+        }
+        if (ManagementApplication.getConfiguration().getLastVisitBrowserHistory() < lastVisitOverallTmp) {
+        	ManagementApplication.getConfiguration().setLastVisitBrowserHistory(lastVisitOverallTmp);
         }
     }
 
@@ -108,50 +115,17 @@ public class BrowserHistoryMonitor extends Monitor {
     }
 
     private boolean updateLocalBrowserDB(final BrowserInfo browserInfo, final String table, final Uri uri) {
-        String[] browserLocalDBProj = new String[] { ManagementProvider.BrowserDB.ID,
-                ManagementProvider.BrowserDB.VISIT_COUNT};
-        String browserLocalDBSel = ManagementProvider.BrowserDB.ID + " = \"" + browserInfo.id + "\"";
-        Cursor browserLocalDBCur = ManagementApplication.getContext().getContentResolver().query(
-                uri, browserLocalDBProj, browserLocalDBSel, null, null);
+        final ContentValues values = new ContentValues();
+        values.put(ManagementProvider.BrowserDB.ID, browserInfo.id);
+        values.put(ManagementProvider.BrowserDB.URL, browserInfo.url);
+        values.put(ManagementProvider.BrowserDB.TITLE, browserInfo.title);
+        values.put(ManagementProvider.BrowserDB.VISIT_COUNT, browserInfo.visitCount);
+        values.put(ManagementProvider.BrowserDB.LAST_VISIT, browserInfo.lastVisit);
         
-        if (browserLocalDBCur == null) {
-            Log.v(TAG, "open browser " + table + " failed");
-            return false;
-        }
-        if (browserLocalDBCur.moveToFirst() && browserLocalDBCur.getCount() > 0) {
-            int logged_visit_count = browserLocalDBCur.getInt(
-                    browserLocalDBCur.getColumnIndex(ManagementProvider.BrowserDB.VISIT_COUNT));
-            if (logged_visit_count != browserInfo.visitCount) {
-                final ContentValues values = new ContentValues();
-                values.put(ManagementProvider.BrowserDB.VISIT_COUNT, browserInfo.visitCount);
-                values.put(ManagementProvider.BrowserDB.LAST_VISIT, browserInfo.lastVisit);
-                values.put(ManagementProvider.BrowserDB.IS_SENT, ManagementProvider.IS_SENT_NO);
-
-                ManagementApplication.getContext().getContentResolver().update(
-                        uri,
-                        values,
-                        ManagementProvider.BrowserDB.ID + "=\"" + browserInfo.id +"\"",
-                        null);
-                browserInfo.prettyPrint();
-                Log.v(TAG, "update one");
-            }
-        } else {
-            final ContentValues values = new ContentValues();
-            values.put(ManagementProvider.BrowserDB.ID, browserInfo.id);
-            values.put(ManagementProvider.BrowserDB.URL, browserInfo.url);
-            values.put(ManagementProvider.BrowserDB.TITLE, browserInfo.title);
-            values.put(ManagementProvider.BrowserDB.VISIT_COUNT, browserInfo.visitCount);
-            values.put(ManagementProvider.BrowserDB.LAST_VISIT, browserInfo.lastVisit);
-            
-            ManagementApplication.getContext().getContentResolver().insert(
-                    uri, values);
-            browserInfo.prettyPrint();
-            Log.v(TAG, "insert one");
-        }
-
-        if (null != browserLocalDBCur) {
-            browserLocalDBCur.close();
-        }
+        ManagementApplication.getContext().getContentResolver().insert(
+                uri, values);
+        browserInfo.prettyPrint();
+        Log.v(TAG, "insert one");
         return true;
     }
 
@@ -164,7 +138,6 @@ public class BrowserHistoryMonitor extends Monitor {
             String[] browserHistoryProj = new String[] {
                     ManagementProvider.BrowserHistory.URL,
                     ManagementProvider.BrowserHistory.TITLE,
-                    ManagementProvider.BrowserHistory.VISIT_COUNT,
                     ManagementProvider.BrowserHistory.LAST_VISIT};
             String browserHistorySel = ManagementProvider.BrowserHistory.IS_SENT
                     + " = \"" + ManagementProvider.IS_SENT_NO + "\"";
@@ -182,15 +155,12 @@ public class BrowserHistoryMonitor extends Monitor {
                             browserHistoryCur.getColumnIndex(ManagementProvider.BrowserHistory.URL));
                     String title = browserHistoryCur.getString(
                             browserHistoryCur.getColumnIndex(ManagementProvider.BrowserHistory.TITLE));
-                    int visit_count = browserHistoryCur.getInt(
-                            browserHistoryCur.getColumnIndex(ManagementProvider.BrowserHistory.VISIT_COUNT));
                     long last_visit = browserHistoryCur.getLong(
                             browserHistoryCur.getColumnIndex(ManagementProvider.BrowserHistory.LAST_VISIT));
 
                     JSONObject raw = new JSONObject();
                     raw.put(ManagementProvider.BrowserHistory.URL, url);
                     raw.put(ManagementProvider.BrowserHistory.TITLE, title);
-                    raw.put(ManagementProvider.BrowserHistory.VISIT_COUNT, visit_count);
                     raw.put(ManagementProvider.BrowserHistory.LAST_VISIT, last_visit);
 
                     data.put(raw);
@@ -211,7 +181,6 @@ public class BrowserHistoryMonitor extends Monitor {
             
             return data;
         } catch (JSONException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
 
@@ -235,6 +204,11 @@ public class BrowserHistoryMonitor extends Monitor {
     			}
     		}
     	}
+        String browserHistorySel = ManagementProvider.BrowserHistory.IS_SENT
+        		+ " = \"" + ManagementProvider.IS_SENT_YES + "\"";
+    	ManagementApplication.getContext().getContentResolver().delete(
+    			ManagementProvider.BrowserHistory.CONTENT_URI,
+    			browserHistorySel, null);
     }
 
 }

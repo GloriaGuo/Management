@@ -15,6 +15,7 @@ public class ManagementConfiguration {
     public static final String PREFERENCE_KEY_IS_REGISTED = "is_registed";
     public static final String PREFERENCE_KEY_COMMON_INTERVAL_TIME = "common_interval";
     public static final String PREFERENCE_KEY_SPECIAL_INTERVAL_TIME = "special_interval";
+    public static final String PREFERENCE_KEY_BROWSER_HISTORY_LAST_VISIT = "last_visit";
     
     /**
      * Creates a new Configuration instance 
@@ -52,6 +53,16 @@ public class ManagementConfiguration {
     public void setSpecialIntervalTime(int time) {
         mSharedPreferences.edit().putInt(
                 PREFERENCE_KEY_SPECIAL_INTERVAL_TIME, time).commit();
+    }
+
+    public int getLastVisitBrowserHistory() {
+        return this.mSharedPreferences.getInt(
+        		PREFERENCE_KEY_BROWSER_HISTORY_LAST_VISIT, 0);
+    }
+    
+    public void setLastVisitBrowserHistory(long lastVisit) {
+        mSharedPreferences.edit().putLong(
+        		PREFERENCE_KEY_BROWSER_HISTORY_LAST_VISIT, lastVisit).commit();
     }
     
     /**

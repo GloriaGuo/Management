@@ -202,6 +202,11 @@ public class AppsUsedMonitor extends Monitor {
     			}
     		}
     	}
+        String appsUsedSel = ManagementProvider.AppsUsed.IS_SENT
+        		+ " = \"" + ManagementProvider.IS_SENT_YES + "\"";
+    	ManagementApplication.getContext().getContentResolver().delete(
+    			ManagementProvider.AppsUsed.CONTENT_URI,
+    			appsUsedSel, null);
     }
 
 }
