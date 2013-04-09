@@ -1,10 +1,10 @@
 package com.parent.management.receiver;
 
-import com.parent.management.monitor.AppsUsedMonitor;
-
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+
+import com.parent.management.monitor.AppsUsedMonitor;
 
 public class AppUsedMonitorReceiver extends BroadcastReceiver {
     

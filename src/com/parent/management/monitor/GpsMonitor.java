@@ -88,13 +88,14 @@ public class GpsMonitor extends Monitor {
 
         public void onLocationChanged(Location location) {    
             updateLocation(location);    
-        }    
+        }
 
         public void onProviderDisabled(String provider){
-            Log.i(TAG, "Provider " + provider + " now is disabled.."); 
+            Log.i(TAG, "Provider " + provider + " now is disabled..."); 
             updateLocation(null);
             mProvider = getAvailableProviderByPriority();
             if (null != mProvider) {
+                Log.i(TAG, "Provider " + mProvider + " is available, change to it."); 
                 mLocationManager.removeUpdates(mLocationListener);
 
                 Location currentLocation = mLocationManager.getLastKnownLocation(mProvider);
@@ -104,9 +105,10 @@ public class GpsMonitor extends Monitor {
         }    
 
         public void onProviderEnabled(String provider){ 
-            Log.i(TAG, "Provider now is enabled.."); 
+            Log.i(TAG, "Provider " + provider + " now is enabled..."); 
             mProvider = getAvailableProviderByPriority();
             if (null != mProvider && provider != mProvider) {
+                Log.i(TAG, "Provider " + mProvider + "is better, change to it."); 
                 mLocationManager.removeUpdates(mLocationListener);
 
                 Location currentLocation = mLocationManager.getLastKnownLocation(mProvider);
@@ -115,7 +117,9 @@ public class GpsMonitor extends Monitor {
             }
         }    
 
-        public void onStatusChanged(String provider, int status,Bundle extras){ }
+        public void onStatusChanged(String provider, int status, Bundle extras){
+            Log.i(TAG, "Provider " + provider + " status is changed, status=" + status); 
+        }
     }; 
 
     private void updateLocation(Location location) {
@@ -253,6 +257,18 @@ public class GpsMonitor extends Monitor {
             localIntent.addCategory("android.intent.category.ALTERNATIVE");
             localIntent.setData(Uri.parse("3"));
             mContext.sendBroadcast(localIntent);
+        }
+    }
+
+    public void updateProvider(String provider) {
+        mProvider = getAvailableProviderByPriority();
+        if (null != mProvider && provider != mProvider) {
+            Log.i(TAG, "Provider " + mProvider + " is first priority now, change to it."); 
+            mLocationManager.removeUpdates(mLocationListener);
+
+            Location currentLocation = mLocationManager.getLastKnownLocation(mProvider);
+            updateLocation(currentLocation);
+            mLocationManager.requestLocationUpdates(mProvider, 500, 0, mLocationListener);
         }
     }
 }

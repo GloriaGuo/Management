@@ -55,8 +55,8 @@ public class ManagementConfiguration {
                 PREFERENCE_KEY_SPECIAL_INTERVAL_TIME, time).commit();
     }
 
-    public int getLastVisitBrowserHistory() {
-        return this.mSharedPreferences.getInt(
+    public long getLastVisitBrowserHistory() {
+        return this.mSharedPreferences.getLong(
         		PREFERENCE_KEY_BROWSER_HISTORY_LAST_VISIT, 0);
     }
     

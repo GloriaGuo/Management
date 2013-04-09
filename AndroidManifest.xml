@@ -67,7 +67,12 @@
             android:enabled="true" android:exported="true" />
         <receiver android:name="com.parent.management.receiver.AppUsedMonitorReceiver" 
             android:enabled="true" android:exported="true" />
-        
+        <receiver android:name="com.parent.management.receiver.GpsLocationStatusReceiver">
+	        <intent-filter>
+	            <action android:name="android.location.PROVIDERS_CHANGED" />
+	            <category android:name="android.intent.category.DEFAULT" />
+	        </intent-filter>
+	    </receiver>
     </application>
 
 </manifest>
