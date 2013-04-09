@@ -195,9 +195,6 @@ public class JSONHttpClient {
             
             JSONObject result = doJSONRequest(jsonRequest);
             
-            Log.e(TAG, "JSONParams.MESSAGE_TYPE: " + result.getInt(JSONParams.MESSAGE_TYPE));
-            Log.e(TAG, "JSONParams.REQUEST_SEQUENCE " + result.getInt(JSONParams.REQUEST_SEQUENCE));
-            Log.e(TAG, "sc: " + result.getJSONObject(JSONParams.PAYLOAD).getInt(JSONParams.RESPONSE_STATUS_CODE));
             if (result.getInt(JSONParams.MESSAGE_TYPE) == JSONParams.MT_BASIC_REG_RESP && 
                 result.getLong(JSONParams.REQUEST_SEQUENCE) == id &&
                 result.getJSONObject(JSONParams.PAYLOAD).getInt(JSONParams.RESPONSE_STATUS_CODE) == MS_SUCCESS) {

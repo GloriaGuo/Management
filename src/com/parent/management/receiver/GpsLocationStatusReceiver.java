@@ -16,9 +16,11 @@ public class GpsLocationStatusReceiver extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
-        Log.i(TAG, "Provider status is changed. update provider.");
-        GpsMonitor gpsMonitor = (GpsMonitor) ManagementApplication.commonMonitorList.get(Monitor.Type.GPS_INFO);
-        gpsMonitor.updateProvider(null);
+        if (ManagementApplication.commonMonitorList != null) {
+            Log.i(TAG, "Provider status is changed. update provider.");
+            GpsMonitor gpsMonitor = (GpsMonitor) ManagementApplication.commonMonitorList.get(Monitor.Type.GPS_INFO);
+            gpsMonitor.updateProvider(null);
+        }
     }
 
 }

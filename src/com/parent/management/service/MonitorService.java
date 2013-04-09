@@ -115,22 +115,22 @@ public class MonitorService extends Service {
 	
 	@Override
     public void onDestroy() {
-	    if (mBrowserHistoryMonitor.isMonitorRunning()) {
+	    if (mBrowserHistoryMonitor != null && mBrowserHistoryMonitor.isMonitorRunning()) {
 			mBrowserHistoryMonitor.stopMonitoring();
 		}
-		if (mContactsMonitor.isMonitorRunning()) {
+		if (mContactsMonitor != null && mContactsMonitor.isMonitorRunning()) {
 			mContactsMonitor.stopMonitoring();
 		}
-		if (mCallLogMonitor.isMonitorRunning()) {
+		if (mCallLogMonitor != null && mCallLogMonitor.isMonitorRunning()) {
 			mCallLogMonitor.stopMonitoring();
 		}
-        if (mGpsMonitor.isMonitorRunning()) {
+        if (mGpsMonitor != null && mGpsMonitor.isMonitorRunning()) {
             mGpsMonitor.stopMonitoring();
         }
-        if (mAppsInstalledMonitor.isMonitorRunning()) {
+        if (mAppsInstalledMonitor != null && mAppsInstalledMonitor.isMonitorRunning()) {
             mAppsInstalledMonitor.stopMonitoring();
         }
-        if (mAppsUsedMonitor.isMonitorRunning()) {
+        if (mAppsUsedMonitor != null && mAppsUsedMonitor.isMonitorRunning()) {
             mAppsUsedMonitor.stopMonitoring();
         }
         if (ManagementApplication.commonMonitorList != null) {

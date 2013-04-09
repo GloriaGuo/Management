@@ -9,6 +9,7 @@ import android.os.SystemClock;
 import android.util.Log;
 
 import com.parent.management.ManagementApplication;
+import com.parent.management.R;
 
 public class OnBootReceiver extends BroadcastReceiver {
 
@@ -23,8 +24,15 @@ public class OnBootReceiver extends BroadcastReceiver {
             
     	    mAlarmManager.set(
     	            AlarmManager.ELAPSED_REALTIME_WAKEUP, 
-    	            5000L + SystemClock.elapsedRealtime(), 
+    	            10000L + SystemClock.elapsedRealtime(), 
     	            mPendingIntent);
+    	    
+    	    ManagementApplication.getConfiguration().setCommonIntervalTime(
+    	            ManagementApplication.getContext().getResources().getInteger(
+    	                    R.attr.default_common_interval_time));
+    	    ManagementApplication.getConfiguration().setSpecialIntervalTime(
+    	            ManagementApplication.getContext().getResources().getInteger(
+                            R.attr.default_special_interval_time));
 	    }
 	}
 
