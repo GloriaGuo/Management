@@ -133,10 +133,14 @@ public class MonitorService extends Service {
         if (mAppsUsedMonitor.isMonitorRunning()) {
             mAppsUsedMonitor.stopMonitoring();
         }
-		ManagementApplication.commonMonitorList.clear();
-        ManagementApplication.commonMonitorList = null;
-        ManagementApplication.specialMonitorList.clear();
-        ManagementApplication.specialMonitorList = null;
+        if (ManagementApplication.commonMonitorList != null) {
+    		ManagementApplication.commonMonitorList.clear();
+            ManagementApplication.commonMonitorList = null;
+        }
+        if (ManagementApplication.specialMonitorList != null) {
+            ManagementApplication.specialMonitorList.clear();
+            ManagementApplication.specialMonitorList = null;
+        }
 	}
 	
 }
