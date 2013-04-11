@@ -161,7 +161,7 @@ public class ManagementApplication extends android.app.Application {
                  */
                 @Override
                 public void onSharedPreferenceChanged(
-                    final SharedPreferences sharedPreferences, final String key) {
+                        final SharedPreferences sharedPreferences, final String key) {
                     ManagementApplication.getConfiguration();
                     if (key.equals(ManagementConfiguration.PREFERENCE_KEY_COMMON_INTERVAL_TIME)) {
                         Log.d(mApplicationTag, "----> common interval time changed.");

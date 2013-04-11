@@ -4,10 +4,14 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import com.parent.management.ManagementApplication;
+
 import android.content.Context;
 import android.database.ContentObserver;
+import android.database.Cursor;
 import android.os.Handler;
 import android.provider.ContactsContract;
+import android.util.Log;
 
 public class ContactsMonitor extends Monitor {
 
@@ -42,6 +46,34 @@ public class ContactsMonitor extends Monitor {
 			// TODO
 		}
 		
+	}
+	
+	private void updateDB() {
+        Cursor cursor = ManagementApplication.getContext().getContentResolver().query(ContactsContract.Contacts.CONTENT_URI,null, null, null, null); 
+        while (cursor.moveToNext()) { 
+           String contactId = cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts._ID)); 
+           String contactName = cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME));
+           Log.v("SHAUN", "contact name" + contactName);
+           String hasPhone = cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts.HAS_PHONE_NUMBER)); 
+           if (Integer.parseInt(hasPhone) > 0) { 
+               // You know it has a number so now query it like this
+               Cursor phones = ManagementApplication.getContext().getContentResolver().query(
+                       ContactsContract.CommonDataKinds.Phone.CONTENT_URI, null,
+                       ContactsContract.CommonDataKinds.Phone.CONTACT_ID +" = "+ contactId,
+                       null,
+                       null); 
+               while (phones.moveToNext()) { 
+                   String phoneNumber = phones.getString(phones.getColumnIndex(
+                           ContactsContract.CommonDataKinds.Phone.NUMBER));  
+                   Log.v("SHAUN", "phone number: " + phoneNumber);               
+               } 
+               phones.close(); 
+           }
+           int timesContacted = cursor.getInt(cursor.getColumnIndex(ContactsContract.Contacts.TIMES_CONTACTED));
+           Log.v("SHAUN", "times contacted:" + timesContacted);
+           Log.v("SHAUN", "--------------------");
+        }
+        cursor.close(); 
 	}
 
     @Override
