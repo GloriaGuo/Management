@@ -9,7 +9,8 @@ package com.parent.management;
 
 public final class R {
     public static final class attr {
-        public static final int default_interval_time=0x7f010007;
+        public static final int default_common_interval_time=0x7f010007;
+        public static final int default_special_interval_time=0x7f010008;
         public static final int monitor_apps_installed=0x7f010003;
         public static final int monitor_apps_used=0x7f010004;
         public static final int monitor_browser_bookmark=0x7f010001;
@@ -50,7 +51,11 @@ public final class R {
         public static final int account_text=0x7f040003;
         public static final int alert_dialog_message_empty_account=0x7f04000b;
         public static final int alert_dialog_message_empty_check_code=0x7f04000c;
+        public static final int alert_dialog_message_enable_gps=0x7f040010;
         public static final int alert_dialog_message_regist_failed=0x7f04000e;
+        public static final int alert_dialog_negative_button_enable_gps=0x7f040012;
+        public static final int alert_dialog_positive_button=0x7f04000f;
+        public static final int alert_dialog_positive_button_enable_gps=0x7f040011;
         public static final int app_name=0x7f040001;
         public static final int check_code_text=0x7f040004;
         public static final int error_dialog_title=0x7f04000a;

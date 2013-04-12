@@ -54,6 +54,14 @@ public class GpsMonitor extends Monitor {
 //        mLocationManager.requestLocationUpdates(500, 0, mLocationListener);
 //        
 //        this.monitorStatus = true;
+        
+//        mLocationManager = new ManagementLocationManager(
+//                mContext,
+//                ManagementLocationManager.LOCATION_GPS | ManagementLocationManager.LOCATION_NETWORK);
+//        
+//        mLocationManager.requestLocationUpdates(1000, 0, mLocationListener);
+        
+        this.monitorStatus = true;
     }
     
     @Override

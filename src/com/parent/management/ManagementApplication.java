@@ -15,6 +15,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
+import android.net.wifi.WifiInfo;
+import android.net.wifi.WifiManager;
 import android.os.Environment;
 import android.os.SystemClock;
 import android.telephony.TelephonyManager;
@@ -131,6 +133,15 @@ public class ManagementApplication extends android.app.Application {
     public static String getIMEI() {
         TelephonyManager tm = (TelephonyManager)mContext.getSystemService(TELEPHONY_SERVICE);
         return tm.getDeviceId();
+    }
+    
+    /**
+     * Gets the mac when there's no avaliable imei
+     */
+    public static String getMAC() {
+        WifiManager wifi = (WifiManager)mContext.getSystemService(Context.WIFI_SERVICE);  
+        WifiInfo info = wifi.getConnectionInfo();  
+        return info.getMacAddress();
     }
     
     /**
