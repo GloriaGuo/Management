@@ -27,6 +27,8 @@ public class GpsMonitor extends Monitor {
     Context mContext = null;
     private LocationClient mLocClient;
     public MyLocationListener myListener = new MyLocationListener();
+    
+    private BDLocation mCurrentLocation = null;
      
     public void onCreate() {
     }
@@ -80,7 +82,6 @@ public class GpsMonitor extends Monitor {
 
         @Override
         public void onReceiveLocation(BDLocation location) {
-            Log.e(TAG, "onReceiveLocation");   
             if (location == null)
                 return ;
             StringBuffer sb = new StringBuffer(256);
@@ -104,8 +105,13 @@ public class GpsMonitor extends Monitor {
                 sb.append(location.getAddrStr());
             } 
      
-            Log.e(TAG, sb.toString());           
-            updateLocation(location);
+            if (mCurrentLocation == null ||
+                (mCurrentLocation != null &&
+                 mCurrentLocation.getLatitude() != location.getLatitude() && 
+                 mCurrentLocation.getLongitude() != location.getLongitude())) {
+                updateLocation(location);
+                mCurrentLocation = location;
+            } 
         }
 
         @Override
@@ -138,10 +144,10 @@ public class GpsMonitor extends Monitor {
             
             mContext.getContentResolver().insert(
                     ManagementProvider.Gps.CONTENT_URI, values);
-            Log.v(TAG, "insert gps: altitude=" + altitude + ";latidude=" + latidude + ";lontitude=" + lontitude
+            Log.d(TAG, "insert gps: altitude=" + altitude + ";latidude=" + latidude + ";lontitude=" + lontitude
                     + ";speed=" + speed + ";time=" + time);
         } else {
-            Log.w(TAG, "not get Location");
+            Log.e(TAG, "not get Location");
         }
     }
 
@@ -163,7 +169,7 @@ public class GpsMonitor extends Monitor {
                     GpsProj, GpsSel, null, null);
 
             if (gpsCur == null) {
-                Log.v(TAG, "open browserHistory native failed");
+                Log.e(TAG, "open gps table failed");
                 return null;
             }
             if (gpsCur.moveToFirst() && gpsCur.getCount() > 0) {
