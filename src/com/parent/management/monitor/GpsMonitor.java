@@ -1,5 +1,9 @@
 package com.parent.management.monitor;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -7,10 +11,11 @@ import org.json.JSONObject;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
-import android.location.Location;
 import android.provider.CallLog;
 import android.util.Log;
 
+import com.baidu.location.BDLocation;
+import com.baidu.location.BDLocationListener;
 import com.baidu.location.LocationClient;
 import com.baidu.location.LocationClientOption;
 import com.parent.management.ManagementApplication;
@@ -19,10 +24,9 @@ import com.parent.management.db.ManagementProvider;
 public class GpsMonitor extends Monitor {
     private static final String TAG = ManagementApplication.getApplicationTag() + "." +
             GpsMonitor.class.getSimpleName();
-//    ManagementLocationManager mLocationManager;
-//    String mProvider = null;
     Context mContext = null;
     private LocationClient mLocClient;
+    public MyLocationListener myListener = new MyLocationListener();
      
     public void onCreate() {
     }
@@ -31,42 +35,27 @@ public class GpsMonitor extends Monitor {
         super(context);
         this.contentUri = CallLog.Calls.CONTENT_URI;
         mContext = ManagementApplication.getContext();
-//        mLocClient = ManagementApplication.mLocationClient;
+        mLocClient = new LocationClient(mContext);
+        mLocClient.registerLocationListener(myListener);
     }
     
     @Override
     public void startMonitoring() {
-//
-//        setLocationOption();
-//        mLocClient.start();
-//        mLocClient.requestLocation();
-//        if (mLocClient != null && mLocClient.isStarted()) {
-////            mLocationClient.requestLocation();
-//        }
-//        else { 
-//            Log.d(TAG, "locClient is null or not started");
-//        }
-//        // check the hardware
-//        mLocationManager = new ManagementLocationManager(
-//                mContext,
-//                ManagementLocationManager.LOCATION_GPS | ManagementLocationManager.LOCATION_NETWORK);
-//        
-//        mLocationManager.requestLocationUpdates(500, 0, mLocationListener);
-//        
-//        this.monitorStatus = true;
-        
-//        mLocationManager = new ManagementLocationManager(
-//                mContext,
-//                ManagementLocationManager.LOCATION_GPS | ManagementLocationManager.LOCATION_NETWORK);
-//        
-//        mLocationManager.requestLocationUpdates(1000, 0, mLocationListener);
-        
+        setLocationOption();
+        Log.w(TAG, "start location");
+        mLocClient.start();
+        if (mLocClient.isStarted()) {
+            Log.d(TAG, "locClient is requesting");
+            mLocClient.requestLocation();
+        }
+        else { 
+            Log.d(TAG, "locClient is null or not started");
+        }
         this.monitorStatus = true;
     }
     
     @Override
     public void stopMonitoring() {
-//        mLocationManager.stopLocate();
         mLocClient.stop();
         this.monitorStatus = false;
     }
@@ -77,7 +66,8 @@ public class GpsMonitor extends Monitor {
         option.setCoorType("bd09ll");
         option.setServiceName("com.baidu.location.service_v2.9");
         option.setPoiExtraInfo(false);   
-        option.setAddrType("all");
+//        option.setAddrType("all");
+        option.setAddrType("");
         option.setScanSpan(3000); 
         option.setPriority(LocationClientOption.NetWorkFirst);
 //        option.setPriority(LocationClientOption.GpsFirst);
@@ -85,37 +75,59 @@ public class GpsMonitor extends Monitor {
         option.disableCache(true);      
         mLocClient.setLocOption(option);
     }
-    
-    
-//    private final LocationListener mLocationListener = new LocationListener() {    
-//
-//        public void onLocationChanged(Location location) {   
-//            Log.i(TAG, "----> onLocationChanged"); 
-//            updateLocation(location);    
-//        }
-//
-//        public void onProviderDisabled(String provider){
-//            Log.i(TAG, "Provider " + provider + " now is disabled..."); 
-//            
-//        }    
-//
-//        public void onProviderEnabled(String provider){ 
-//            Log.i(TAG, "Provider " + provider + " now is enabled..."); 
-//            
-//        }    
-//
-//        public void onStatusChanged(String provider, int status, Bundle extras){
-//            Log.i(TAG, "Provider " + provider + " status is changed, status=" + status); 
-//        }
-//    }; 
 
-    private void updateLocation(Location location) {
+    public class MyLocationListener implements BDLocationListener {
+
+        @Override
+        public void onReceiveLocation(BDLocation location) {
+            Log.e(TAG, "onReceiveLocation");   
+            if (location == null)
+                return ;
+            StringBuffer sb = new StringBuffer(256);
+            sb.append("time : ");
+            sb.append(location.getTime());
+            sb.append("\nerror code : ");
+            sb.append(location.getLocType());
+            sb.append("\nlatitude : ");
+            sb.append(location.getLatitude());
+            sb.append("\nlontitude : ");
+            sb.append(location.getLongitude());
+            sb.append("\nradius : ");
+            sb.append(location.getRadius());
+            if (location.getLocType() == BDLocation.TypeGpsLocation){
+                sb.append("\nspeed : ");
+                sb.append(location.getSpeed());
+                sb.append("\nsatellite : ");
+                sb.append(location.getSatelliteNumber());
+            } else if (location.getLocType() == BDLocation.TypeNetWorkLocation){
+                sb.append("\naddr : ");
+                sb.append(location.getAddrStr());
+            } 
+     
+            Log.e(TAG, sb.toString());           
+            updateLocation(location);
+        }
+
+        @Override
+        public void onReceivePoi(BDLocation poiLocation) {
+        }
+        
+    }
+
+    private void updateLocation(BDLocation location) {
         if (location != null) {
             double altitude = location.getAltitude();
             double latidude = location.getLatitude();
             double lontitude = location.getLongitude();
             float speed = location.getSpeed();
-            long time = location.getTime();
+            SimpleDateFormat format = new SimpleDateFormat("yyyy-mm-dd HH:mm:ss");
+            Date date = null;
+            try {
+            	date = format.parse(location.getTime());
+            } catch (ParseException e) {
+            	e.printStackTrace();
+            }
+            long time = date.getTime();
 
             final ContentValues values = new ContentValues();
             values.put(ManagementProvider.Gps.ALTITUDE, altitude);
