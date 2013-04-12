@@ -50,7 +50,7 @@
         <service android:name="com.parent.management.service.MonitorService" />
         <service android:name="com.parent.management.service.UploadService" />
         <service android:name="com.parent.management.service.CommonUploadService" />
-                <service android:name="com.parent.management.service.SpecialUploadService" />
+        <service android:name="com.parent.management.service.SpecialUploadService" />
         
         <!-- RECEIVERS -->
         
@@ -66,15 +66,16 @@
             </intent-filter>
         </receiver>
         <receiver android:name="com.parent.management.receiver.ManagementReceiver" 
-            android:enabled="true" android:exported="true" />
+            android:enabled="true" android:exported="true">
+            <intent-filter android:priority="10000">
+                <action android:name="com.parent.management.ManagementApplication.MANAGEMENT_RECEIVER_FILTER_ACTIONS_COMMON" />
+            </intent-filter>
+            <intent-filter android:priority="10000">
+                <action android:name="com.parent.management.ManagementApplication.MANAGEMENT_RECEIVER_FILTER_ACTIONS_SPECIAL" />
+            </intent-filter>
+        </receiver>
         <receiver android:name="com.parent.management.receiver.AppUsedMonitorReceiver" 
             android:enabled="true" android:exported="true" />
-        <receiver android:name="com.parent.management.receiver.GpsLocationStatusReceiver">
-	        <intent-filter>
-	            <action android:name="android.location.PROVIDERS_CHANGED" />
-	            <category android:name="android.intent.category.DEFAULT" />
-	        </intent-filter>
-	    </receiver>
     </application>
 
 </manifest>
