@@ -238,7 +238,8 @@ public class JSONHttpClient {
     
     private String getDevideId() {
         String uid;
-        if (ManagementApplication.getIMEI() == null) {
+        String imei = ManagementApplication.getIMEI();
+        if (imei == null || Integer.valueOf(imei) == 0) {
             if (ManagementApplication.getConfiguration().getUUid() != null) {
                 uid = ManagementApplication.getConfiguration().getUUid();
             } else {
