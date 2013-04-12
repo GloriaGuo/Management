@@ -19,7 +19,7 @@ public class GpsLocationStatusReceiver extends BroadcastReceiver {
         if (ManagementApplication.commonMonitorList != null) {
             Log.i(TAG, "Provider status is changed. update provider.");
             GpsMonitor gpsMonitor = (GpsMonitor) ManagementApplication.commonMonitorList.get(Monitor.Type.GPS_INFO);
-            gpsMonitor.updateProvider(null);
+//            gpsMonitor.updateProvider(null);
         }
     }
 

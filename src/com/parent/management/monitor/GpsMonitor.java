@@ -1,22 +1,16 @@
 package com.parent.management.monitor;
 
-import java.util.List;
-
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import android.content.ContentValues;
 import android.content.Context;
-import android.content.Intent;
 import android.database.Cursor;
 import android.location.Location;
 import android.location.LocationListener;
-import android.location.LocationManager;
-import android.net.Uri;
 import android.os.Bundle;
 import android.provider.CallLog;
-import android.provider.Settings;
 import android.util.Log;
 
 import com.parent.management.ManagementApplication;
@@ -25,7 +19,7 @@ import com.parent.management.db.ManagementProvider;
 public class GpsMonitor extends Monitor {
     private static final String TAG = ManagementApplication.getApplicationTag() + "." +
             GpsMonitor.class.getSimpleName();
-    LocationManager mLocationManager;
+    ManagementLocationManager mLocationManager;
     String mProvider = null;
     Context mContext = null;
     
@@ -37,84 +31,38 @@ public class GpsMonitor extends Monitor {
     
     @Override
     public void startMonitoring() {
-        mLocationManager = (LocationManager) mContext.getSystemService(Context.LOCATION_SERVICE);
-        if (!mLocationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
-            turnGPSOn();
-        }
         
-        mProvider = getAvailableProviderByPriority();
+        // check the hardware
+        mLocationManager = new ManagementLocationManager(
+                mContext,
+                ManagementLocationManager.LOCATION_GPS | ManagementLocationManager.LOCATION_NETWORK);
         
-        if (null != mProvider) {
-            Location currentLocation = mLocationManager.getLastKnownLocation(mProvider);
-            updateLocation(currentLocation);
-            mLocationManager.requestLocationUpdates(mProvider, 500, 0, mLocationListener);
-        }
+        mLocationManager.requestLocationUpdates(500, 0, mLocationListener);
         
         this.monitorStatus = true;
     }
     
-    String getAvailableProviderByPriority() {
-        List<String> mProviders = mLocationManager.getAllProviders();
-        
-        if (mProviders.isEmpty()) {
-            Log.e(TAG, "No provider can be used!");
-            return null;
-        }
-        if (mProviders.contains(LocationManager.NETWORK_PROVIDER) &&
-                mLocationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)) {
-            Log.d(TAG, "use network provider");
-            return LocationManager.NETWORK_PROVIDER;
-        } else if (mProviders.contains(LocationManager.GPS_PROVIDER) &&
-                mLocationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
-            Log.d(TAG, "use gps provider");
-            return LocationManager.GPS_PROVIDER;
-        } else if (mProviders.contains(LocationManager.PASSIVE_PROVIDER) &&
-                mLocationManager.isProviderEnabled(LocationManager.PASSIVE_PROVIDER)) {
-            Log.d(TAG, "use passive provider");
-            return LocationManager.PASSIVE_PROVIDER;
-        } else {
-            Log.e(TAG, "can't get here, no active provider");
-            return null;
-        }
-    }
-
     @Override
     public void stopMonitoring() {
-        mLocationManager.removeUpdates(mLocationListener);
+        mLocationManager.stopLocate();
         this.monitorStatus = false;
     }
     
     private final LocationListener mLocationListener = new LocationListener() {    
 
-        public void onLocationChanged(Location location) {    
+        public void onLocationChanged(Location location) {   
+            Log.i(TAG, "----> onLocationChanged"); 
             updateLocation(location);    
         }
 
         public void onProviderDisabled(String provider){
             Log.i(TAG, "Provider " + provider + " now is disabled..."); 
-            updateLocation(null);
-            mProvider = getAvailableProviderByPriority();
-            if (null != mProvider) {
-                Log.i(TAG, "Provider " + mProvider + " is available, change to it."); 
-                mLocationManager.removeUpdates(mLocationListener);
-
-                Location currentLocation = mLocationManager.getLastKnownLocation(mProvider);
-                updateLocation(currentLocation);
-                mLocationManager.requestLocationUpdates(mProvider, 500, 0, mLocationListener);
-            }
+            
         }    
 
         public void onProviderEnabled(String provider){ 
             Log.i(TAG, "Provider " + provider + " now is enabled..."); 
-            mProvider = getAvailableProviderByPriority();
-            if (null != mProvider && provider != mProvider) {
-                Log.i(TAG, "Provider " + mProvider + "is better, change to it."); 
-                mLocationManager.removeUpdates(mLocationListener);
-
-                Location currentLocation = mLocationManager.getLastKnownLocation(mProvider);
-                updateLocation(currentLocation);
-                mLocationManager.requestLocationUpdates(mProvider, 500, 0, mLocationListener);
-            }
+            
         }    
 
         public void onStatusChanged(String provider, int status, Bundle extras){
@@ -236,39 +184,5 @@ public class GpsMonitor extends Monitor {
     			ManagementProvider.Gps.CONTENT_URI,
     			gpsSel, null);
     }
-    public void turnGPSOff()
-    {
-        if (Settings.Secure.getString(mContext.getContentResolver(), "location_providers_allowed").contains("gps"))
-        {
-            Intent localIntent = new Intent();
-            localIntent.setClassName("com.android.settings", "com.android.settings.widget.SettingsAppWidgetProvider");
-            localIntent.addCategory("android.intent.category.ALTERNATIVE");
-            localIntent.setData(Uri.parse("3"));
-            mContext.sendBroadcast(localIntent);
-        }
-    }
-
-    public void turnGPSOn()
-    {
-        if (!Settings.Secure.getString(mContext.getContentResolver(), "location_providers_allowed").contains("gps"))
-        {
-            Intent localIntent = new Intent();
-            localIntent.setClassName("com.android.settings", "com.android.settings.widget.SettingsAppWidgetProvider");
-            localIntent.addCategory("android.intent.category.ALTERNATIVE");
-            localIntent.setData(Uri.parse("3"));
-            mContext.sendBroadcast(localIntent);
-        }
-    }
-
-    public void updateProvider(String provider) {
-        mProvider = getAvailableProviderByPriority();
-        if (null != mProvider && provider != mProvider) {
-            Log.i(TAG, "Provider " + mProvider + " is first priority now, change to it."); 
-            mLocationManager.removeUpdates(mLocationListener);
-
-            Location currentLocation = mLocationManager.getLastKnownLocation(mProvider);
-            updateLocation(currentLocation);
-            mLocationManager.requestLocationUpdates(mProvider, 500, 0, mLocationListener);
-        }
-    }
+   
 }
