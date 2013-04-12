@@ -182,8 +182,11 @@ public class JSONHttpClient {
             jsonRequest.put(JSONParams.MESSAGE_TYPE, JSONParams.MT_BASIC_REG_REQ);
             long id = System.currentTimeMillis();
             jsonRequest.put(JSONParams.REQUEST_SEQUENCE, id);
-            jsonRequest.put(JSONParams.DEVICE_IMEI, ManagementApplication.getIMEI());
-            jsonRequest.put(JSONParams.DEVICE_IMSI, ManagementApplication.getIMSI());
+            if (ManagementApplication.getIMEI() == null) {
+                jsonRequest.put(JSONParams.DEVICE_MAC, ManagementApplication.getMAC());
+            } else {
+                jsonRequest.put(JSONParams.DEVICE_IMEI, ManagementApplication.getIMEI());
+            }
             
             JSONObject jsonParams = new JSONObject();
             jsonParams.put(JSONParams.MANAGER_ACCOUNT, account);
@@ -191,6 +194,7 @@ public class JSONHttpClient {
             jsonParams.put(JSONParams.OS_TYPE, "Android");
             jsonParams.put(JSONParams.MODEL, android.os.Build.MODEL);
             jsonParams.put(JSONParams.OS_VERSION, android.os.Build.VERSION.RELEASE);
+            jsonParams.put(JSONParams.DEVICE_IMSI, ManagementApplication.getIMSI());
             jsonRequest.put(JSONParams.PAYLOAD, jsonParams);
             
             JSONObject result = doJSONRequest(jsonRequest);
