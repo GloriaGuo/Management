@@ -16,7 +16,8 @@ public class ManagementConfiguration {
     public static final String PREFERENCE_KEY_COMMON_INTERVAL_TIME = "common_interval";
     public static final String PREFERENCE_KEY_SPECIAL_INTERVAL_TIME = "special_interval";
     public static final String PREFERENCE_KEY_BROWSER_HISTORY_LAST_VISIT = "last_visit";
-    
+    public static final String PREFERENCE_KEY_DEVICE_UUID = "device_uuid";
+   
     /**
      * Creates a new Configuration instance 
      * @param appContext application context
@@ -63,6 +64,16 @@ public class ManagementConfiguration {
     public void setLastVisitBrowserHistory(long lastVisit) {
         mSharedPreferences.edit().putLong(
         		PREFERENCE_KEY_BROWSER_HISTORY_LAST_VISIT, lastVisit).commit();
+    }
+    
+    public String getUUid() {
+        return this.mSharedPreferences.getString(
+                PREFERENCE_KEY_DEVICE_UUID, null);
+    }
+    
+    public void setUUid(String uuid) {
+        mSharedPreferences.edit().putString(
+                PREFERENCE_KEY_DEVICE_UUID, uuid).commit();
     }
     
     /**
