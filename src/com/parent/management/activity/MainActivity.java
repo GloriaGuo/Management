@@ -22,10 +22,6 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
-import com.baidu.location.BDLocation;
-import com.baidu.location.BDLocationListener;
-import com.baidu.location.LocationClient;
-import com.baidu.location.LocationClientOption;
 import com.parent.management.ManagementApplication;
 import com.parent.management.R;
 import com.parent.management.jsonclient.JSONClientException;
@@ -44,22 +40,8 @@ public class MainActivity extends Activity {
     
     Handler handler = new MyHandler();
 
-    public BDLocationListener myListener = new MyLocationListener();
-    private LocationClient mLocClient;
-    
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
-        mLocClient = new LocationClient(this);
-        mLocClient.registerLocationListener(myListener);
-        setLocationOption();
-        mLocClient.start();
-        if (mLocClient != null && mLocClient.isStarted()) {
-            Log.d(TAG, "locClient is requesting");
-            mLocClient.requestLocation();
-        }
-        else { 
-            Log.d(TAG, "locClient is null or not started");
-        }
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main);
 		
@@ -100,87 +82,9 @@ public class MainActivity extends Activity {
                 }
             }
         });
-
 	}
 
-    public class MyLocationListener implements BDLocationListener {
-
-        @Override
-        public void onReceiveLocation(BDLocation location) {
-            Log.e(TAG, "onReceiveLocation");   
-            if (location == null)
-                return ;
-            StringBuffer sb = new StringBuffer(256);
-            sb.append("time : ");
-            sb.append(location.getTime());
-            sb.append("\nerror code : ");
-            sb.append(location.getLocType());
-            sb.append("\nlatitude : ");
-            sb.append(location.getLatitude());
-            sb.append("\nlontitude : ");
-            sb.append(location.getLongitude());
-            sb.append("\nradius : ");
-            sb.append(location.getRadius());
-            if (location.getLocType() == BDLocation.TypeGpsLocation){
-                sb.append("\nspeed : ");
-                sb.append(location.getSpeed());
-                sb.append("\nsatellite : ");
-                sb.append(location.getSatelliteNumber());
-            } else if (location.getLocType() == BDLocation.TypeNetWorkLocation){
-                sb.append("\naddr : ");
-                sb.append(location.getAddrStr());
-            } 
-     
-            Log.e(TAG, sb.toString());            
-        }
-
-        @Override
-        public void onReceivePoi(BDLocation poiLocation) {
-            if (poiLocation == null){
-                return ;
-            }
-            StringBuffer sb = new StringBuffer(256);
-            sb.append("Poi time : ");
-            sb.append(poiLocation.getTime());
-            sb.append("\nerror code : ");
-            sb.append(poiLocation.getLocType());
-            sb.append("\nlatitude : ");
-            sb.append(poiLocation.getLatitude());
-            sb.append("\nlontitude : ");
-            sb.append(poiLocation.getLongitude());
-            sb.append("\nradius : ");
-            sb.append(poiLocation.getRadius());
-            if (poiLocation.getLocType() == BDLocation.TypeNetWorkLocation){
-                sb.append("\naddr : ");
-                sb.append(poiLocation.getAddrStr());
-            } 
-            if(poiLocation.hasPoi()){
-                sb.append("\nPoi:");
-                sb.append(poiLocation.getPoi());
-            }else{              
-                sb.append("noPoi information");
-            }
-            Log.v(TAG, sb.toString());            
-        }
-        
-    }
-
-    private void setLocationOption(){
-        LocationClientOption option = new LocationClientOption();
-        option.setOpenGps(true); 
-        option.setCoorType("bd09ll");
-        option.setServiceName("com.baidu.location.service_v2.9");
-        option.setPoiExtraInfo(false);   
-        option.setAddrType("all");
-        option.setScanSpan(3000); 
-        option.setPriority(LocationClientOption.NetWorkFirst);
-//        option.setPriority(LocationClientOption.GpsFirst);
-        option.setPoiNumber(10);
-        option.disableCache(true);      
-        mLocClient.setLocOption(option);
-    }
-    
-	private void showGPSAlert() {
+    private void showGPSAlert() {
 	    AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setMessage(R.string.alert_dialog_message_enable_gps)
                 .setCancelable(false)
