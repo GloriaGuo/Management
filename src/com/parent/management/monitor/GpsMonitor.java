@@ -32,12 +32,11 @@ public class GpsMonitor extends Monitor {
     @Override
     public void startMonitoring() {
         
-        // check the hardware
         mLocationManager = new ManagementLocationManager(
                 mContext,
                 ManagementLocationManager.LOCATION_GPS | ManagementLocationManager.LOCATION_NETWORK);
         
-        mLocationManager.requestLocationUpdates(500, 0, mLocationListener);
+        mLocationManager.requestLocationUpdates(1000, 0, mLocationListener);
         
         this.monitorStatus = true;
     }
