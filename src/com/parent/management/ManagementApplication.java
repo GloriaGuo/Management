@@ -52,7 +52,8 @@ public class ManagementApplication extends android.app.Application {
     
     private static PendingIntent mCommonPendingIntent = null;
     private static PendingIntent mSpecialPendingIntent = null;
-    
+
+
     /**
      * @return the application tag (used in application logs)
      */

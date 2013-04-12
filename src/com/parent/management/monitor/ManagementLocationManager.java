@@ -6,7 +6,11 @@ import android.location.LocationListener;
 import android.net.Uri;
 import android.provider.Settings;
 
+import com.parent.management.ManagementApplication;
+
 public class ManagementLocationManager{
+    private static final String TAG = ManagementApplication.getApplicationTag() + "." +
+            ManagementLocationManager.class.getSimpleName();
 
     private Context mContext = null;
     private GpsLocationProvider mGpsProvider = null;

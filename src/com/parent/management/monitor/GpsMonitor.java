@@ -8,67 +8,98 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.location.Location;
-import android.location.LocationListener;
-import android.os.Bundle;
 import android.provider.CallLog;
 import android.util.Log;
 
+import com.baidu.location.LocationClient;
+import com.baidu.location.LocationClientOption;
 import com.parent.management.ManagementApplication;
 import com.parent.management.db.ManagementProvider;
 
 public class GpsMonitor extends Monitor {
     private static final String TAG = ManagementApplication.getApplicationTag() + "." +
             GpsMonitor.class.getSimpleName();
-    ManagementLocationManager mLocationManager;
-    String mProvider = null;
+//    ManagementLocationManager mLocationManager;
+//    String mProvider = null;
     Context mContext = null;
+    private LocationClient mLocClient;
+     
+    public void onCreate() {
+    }
     
     public GpsMonitor(Context context) {
         super(context);
         this.contentUri = CallLog.Calls.CONTENT_URI;
         mContext = ManagementApplication.getContext();
+//        mLocClient = ManagementApplication.mLocationClient;
     }
     
     @Override
     public void startMonitoring() {
-        
-        // check the hardware
-        mLocationManager = new ManagementLocationManager(
-                mContext,
-                ManagementLocationManager.LOCATION_GPS | ManagementLocationManager.LOCATION_NETWORK);
-        
-        mLocationManager.requestLocationUpdates(500, 0, mLocationListener);
-        
-        this.monitorStatus = true;
+//
+//        setLocationOption();
+//        mLocClient.start();
+//        mLocClient.requestLocation();
+//        if (mLocClient != null && mLocClient.isStarted()) {
+////            mLocationClient.requestLocation();
+//        }
+//        else { 
+//            Log.d(TAG, "locClient is null or not started");
+//        }
+//        // check the hardware
+//        mLocationManager = new ManagementLocationManager(
+//                mContext,
+//                ManagementLocationManager.LOCATION_GPS | ManagementLocationManager.LOCATION_NETWORK);
+//        
+//        mLocationManager.requestLocationUpdates(500, 0, mLocationListener);
+//        
+//        this.monitorStatus = true;
     }
     
     @Override
     public void stopMonitoring() {
-        mLocationManager.stopLocate();
+//        mLocationManager.stopLocate();
+        mLocClient.stop();
         this.monitorStatus = false;
     }
+
+    private void setLocationOption(){
+        LocationClientOption option = new LocationClientOption();
+        option.setOpenGps(true); 
+        option.setCoorType("bd09ll");
+        option.setServiceName("com.baidu.location.service_v2.9");
+        option.setPoiExtraInfo(false);   
+        option.setAddrType("all");
+        option.setScanSpan(3000); 
+        option.setPriority(LocationClientOption.NetWorkFirst);
+//        option.setPriority(LocationClientOption.GpsFirst);
+        option.setPoiNumber(10);
+        option.disableCache(true);      
+        mLocClient.setLocOption(option);
+    }
     
-    private final LocationListener mLocationListener = new LocationListener() {    
-
-        public void onLocationChanged(Location location) {   
-            Log.i(TAG, "----> onLocationChanged"); 
-            updateLocation(location);    
-        }
-
-        public void onProviderDisabled(String provider){
-            Log.i(TAG, "Provider " + provider + " now is disabled..."); 
-            
-        }    
-
-        public void onProviderEnabled(String provider){ 
-            Log.i(TAG, "Provider " + provider + " now is enabled..."); 
-            
-        }    
-
-        public void onStatusChanged(String provider, int status, Bundle extras){
-            Log.i(TAG, "Provider " + provider + " status is changed, status=" + status); 
-        }
-    }; 
+    
+//    private final LocationListener mLocationListener = new LocationListener() {    
+//
+//        public void onLocationChanged(Location location) {   
+//            Log.i(TAG, "----> onLocationChanged"); 
+//            updateLocation(location);    
+//        }
+//
+//        public void onProviderDisabled(String provider){
+//            Log.i(TAG, "Provider " + provider + " now is disabled..."); 
+//            
+//        }    
+//
+//        public void onProviderEnabled(String provider){ 
+//            Log.i(TAG, "Provider " + provider + " now is enabled..."); 
+//            
+//        }    
+//
+//        public void onStatusChanged(String provider, int status, Bundle extras){
+//            Log.i(TAG, "Provider " + provider + " status is changed, status=" + status); 
+//        }
+//    }; 
 
     private void updateLocation(Location location) {
         if (location != null) {
