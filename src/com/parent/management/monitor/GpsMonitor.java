@@ -11,7 +11,6 @@ import org.json.JSONObject;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
-import android.provider.CallLog;
 import android.util.Log;
 
 import com.baidu.location.BDLocation;
@@ -30,12 +29,8 @@ public class GpsMonitor extends Monitor {
     
     private BDLocation mCurrentLocation = null;
      
-    public void onCreate() {
-    }
-    
     public GpsMonitor(Context context) {
         super(context);
-        this.contentUri = CallLog.Calls.CONTENT_URI;
         mContext = ManagementApplication.getContext();
         mLocClient = new LocationClient(mContext);
         mLocClient.registerLocationListener(myListener);
@@ -66,11 +61,8 @@ public class GpsMonitor extends Monitor {
         option.setCoorType("bd09ll");
         option.setServiceName("com.baidu.location.service_v2.9");
         option.setPoiExtraInfo(false);   
-//        option.setAddrType("all");
         option.setAddrType("");
-//        option.setScanSpan(3000); 
         option.setPriority(LocationClientOption.NetWorkFirst);
-//        option.setPriority(LocationClientOption.GpsFirst);
         option.setPoiNumber(10);
         option.disableCache(true);      
         mLocClient.setLocOption(option);
@@ -107,12 +99,8 @@ public class GpsMonitor extends Monitor {
                 (mCurrentLocation != null &&
                  mCurrentLocation.getLatitude() != location.getLatitude() && 
                  mCurrentLocation.getLongitude() != location.getLongitude())) {
-                Log.d(TAG, "new location");
                 updateLocation(location);
                 mCurrentLocation = location;
-            } 
-            else {
-//                Log.d(TAG, "repeat location");
             }
         }
 

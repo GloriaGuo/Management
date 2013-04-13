@@ -176,8 +176,8 @@ public class ManagementApplication extends android.app.Application {
         
         mAlarmManager.setRepeating(
                 AlarmManager.ELAPSED_REALTIME_WAKEUP, 
-                5000L + SystemClock.elapsedRealtime(), 
-                1000,
+                10000L + SystemClock.elapsedRealtime(), 
+                5000,
                 mPendingIntent);
     }
     
