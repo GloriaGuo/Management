@@ -163,7 +163,7 @@ public class UploadService extends Service {
             ManagementApplication.getConfiguration().setCommonIntervalTime(commonInterval);
         }
         if (specialInterval != ManagementApplication.getConfiguration().getSpecialIntervalTime()) {
-            Log.d(TAG, "The new common interval time is " + specialInterval);
+            Log.d(TAG, "The new special interval time is " + specialInterval);
             ManagementApplication.getConfiguration().setSpecialIntervalTime(specialInterval);
         }
 	}
