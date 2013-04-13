@@ -82,8 +82,9 @@ public class MainActivity extends Activity {
                 }
             }
         });
-	}
 
+	}
+    
     private void showGPSAlert() {
 	    AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setMessage(R.string.alert_dialog_message_enable_gps)
@@ -185,6 +186,8 @@ public class MainActivity extends Activity {
                 // Launch services
                 ManagementApplication.getContext().sendBroadcast(
                         new Intent(ManagementApplication.getContext(), ManagementReceiver.class));
+
+                ManagementApplication.setGpsMonitorAlarm();
                 
                 ManagementApplication.getConfiguration().setCommonIntervalTime(
                         ManagementApplication.getContext().getResources().getInteger(

@@ -25,6 +25,7 @@ import android.util.Log;
 import com.parent.management.monitor.Monitor;
 import com.parent.management.monitor.Monitor.Type;
 import com.parent.management.receiver.AppUsedMonitorReceiver;
+import com.parent.management.receiver.GpsMonitorReceiver;
 import com.parent.management.receiver.ManagementReceiver;
 
 public class ManagementApplication extends android.app.Application {
@@ -158,6 +159,20 @@ public class ManagementApplication extends android.app.Application {
         
         PendingIntent mPendingIntent = PendingIntent.getBroadcast(
                 mContext, 0, new Intent(mContext, AppUsedMonitorReceiver.class), PendingIntent.FLAG_CANCEL_CURRENT);
+        
+        mAlarmManager.setRepeating(
+                AlarmManager.ELAPSED_REALTIME_WAKEUP, 
+                5000L + SystemClock.elapsedRealtime(), 
+                1000,
+                mPendingIntent);
+    }
+
+    public static void setGpsMonitorAlarm() {
+        AlarmManager mAlarmManager = (AlarmManager)ManagementApplication.getContext().
+                getSystemService("alarm");
+        
+        PendingIntent mPendingIntent = PendingIntent.getBroadcast(
+                mContext, 0, new Intent(mContext, GpsMonitorReceiver.class), PendingIntent.FLAG_CANCEL_CURRENT);
         
         mAlarmManager.setRepeating(
                 AlarmManager.ELAPSED_REALTIME_WAKEUP, 

@@ -108,6 +108,7 @@ public class MonitorService extends Service {
         if (mGpsMonitor != null && !mGpsMonitor.isMonitorRunning()) {
             mGpsMonitor.startMonitoring();
             ManagementApplication.commonMonitorList.put(Type.GPS_INFO, mGpsMonitor);
+//            ManagementApplication.setGpsMonitorAlarm();
         }
 		
 		return 1;
