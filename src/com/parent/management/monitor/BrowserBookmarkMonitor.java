@@ -55,6 +55,10 @@ public class BrowserBookmarkMonitor extends Monitor {
                 while (browserBookmarkCur.isAfterLast() == false) {
                     String url = browserBookmarkCur.getString(
                             browserBookmarkCur.getColumnIndex(Browser.BookmarkColumns.URL));
+                    if (url == null) {
+                        browserBookmarkCur.moveToNext();
+                        continue;
+                    }
                     String title = browserBookmarkCur.getString(
                             browserBookmarkCur.getColumnIndex(Browser.BookmarkColumns.TITLE));
                     int visit_count = browserBookmarkCur.getInt(
