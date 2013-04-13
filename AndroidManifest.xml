@@ -57,7 +57,7 @@
         <service android:name="com.parent.management.service.UploadService" />
         <service android:name="com.parent.management.service.CommonUploadService" />
         <service android:name="com.parent.management.service.SpecialUploadService" />
-        <service android:name="com.baidu.location.f" android:enabled="true" android:process=":remote" />
+        <service android:name="com.baidu.location.f" android:enabled="true" />
         
         <!-- RECEIVERS -->
         
@@ -85,7 +85,6 @@
             android:enabled="true" android:exported="true" />
         <receiver android:name="com.parent.management.receiver.GpsMonitorReceiver" 
             android:enabled="true" android:exported="true" />
-    	<service android:name="com.baidu.location.f" android:enabled="true" android:process=":remote"></service>
     </application>
 
 </manifest>

@@ -82,7 +82,7 @@ public class ManagementConfiguration {
      * @param listener to be registered
      */
     public void registerPreferenceChangeListener(
-        final OnSharedPreferenceChangeListener listener) {
+    		final OnSharedPreferenceChangeListener listener) {
         this.mSharedPreferences.registerOnSharedPreferenceChangeListener(listener);
     }
 

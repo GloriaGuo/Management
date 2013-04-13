@@ -19,7 +19,6 @@ import com.baidu.location.BDLocationListener;
 import com.baidu.location.LocationClient;
 import com.baidu.location.LocationClientOption;
 import com.parent.management.ManagementApplication;
-import com.parent.management.R;
 import com.parent.management.db.ManagementProvider;
 
 public class GpsMonitor extends Monitor {
@@ -45,13 +44,11 @@ public class GpsMonitor extends Monitor {
     @Override
     public void startMonitoring() {
         setLocationOption();
-        Log.w(TAG, "start location");
         if (!mLocClient.isStarted()) {
             Log.d(TAG, "start locClient");
             mLocClient.start();
         }
         else {
-            Log.d(TAG, "locClient is requesting");
             mLocClient.requestLocation();
         }
         this.monitorStatus = true;
@@ -71,7 +68,7 @@ public class GpsMonitor extends Monitor {
         option.setPoiExtraInfo(false);   
 //        option.setAddrType("all");
         option.setAddrType("");
-        option.setScanSpan(3000); 
+//        option.setScanSpan(3000); 
         option.setPriority(LocationClientOption.NetWorkFirst);
 //        option.setPriority(LocationClientOption.GpsFirst);
         option.setPoiNumber(10);
@@ -83,7 +80,6 @@ public class GpsMonitor extends Monitor {
 
         @Override
         public void onReceiveLocation(BDLocation location) {
-            Log.d(TAG, "onReceiveLocation");
             if (location == null)
                 return ;
             StringBuffer sb = new StringBuffer(256);
@@ -116,7 +112,7 @@ public class GpsMonitor extends Monitor {
                 mCurrentLocation = location;
             } 
             else {
-                Log.d(TAG, "repeat location");
+//                Log.d(TAG, "repeat location");
             }
         }
 

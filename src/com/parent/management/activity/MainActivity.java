@@ -187,8 +187,6 @@ public class MainActivity extends Activity {
                 ManagementApplication.getContext().sendBroadcast(
                         new Intent(ManagementApplication.getContext(), ManagementReceiver.class));
 
-                ManagementApplication.setGpsMonitorAlarm();
-                
                 ManagementApplication.getConfiguration().setCommonIntervalTime(
                         ManagementApplication.getContext().getResources().getInteger(
                                 R.attr.default_common_interval_time));
