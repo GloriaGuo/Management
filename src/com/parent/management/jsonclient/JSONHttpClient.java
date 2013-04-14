@@ -156,7 +156,19 @@ public class JSONHttpClient {
             jsonRequest.put(JSONParams.MESSAGE_TYPE, JSONParams.MT_BASIC_DATA_UPLOAD_REQ);
             long id = System.currentTimeMillis();
             jsonRequest.put(JSONParams.REQUEST_SEQUENCE, id);
-            jsonRequest.put(JSONParams.DEVICE_IMEI, getDevideId());
+            String imei = ManagementApplication.getIMEI();
+            if (imei == null || imei.equals("0")) {
+                String uid;
+                if (ManagementApplication.getConfiguration().getUUid() != null) {
+                    uid = ManagementApplication.getConfiguration().getUUid();
+                } else {
+                    uid = UUID.randomUUID().toString();
+                    ManagementApplication.getConfiguration().setUUid(uid);
+                }
+                jsonRequest.put(JSONParams.DEVICE_UUID, uid);
+            } else {
+                jsonRequest.put(JSONParams.DEVICE_IMEI, imei);
+            }
             jsonRequest.put(JSONParams.PAYLOAD, payload);
             
             JSONObject result = doJSONRequest(jsonRequest);
@@ -183,7 +195,19 @@ public class JSONHttpClient {
             jsonRequest.put(JSONParams.MESSAGE_TYPE, JSONParams.MT_BASIC_REG_REQ);
             long id = System.currentTimeMillis();
             jsonRequest.put(JSONParams.REQUEST_SEQUENCE, id);
-            jsonRequest.put(JSONParams.DEVICE_IMEI, getDevideId());
+            String imei = ManagementApplication.getIMEI();
+            if (imei == null || imei.equals("0")) {
+                String uid;
+                if (ManagementApplication.getConfiguration().getUUid() != null) {
+                    uid = ManagementApplication.getConfiguration().getUUid();
+                } else {
+                    uid = UUID.randomUUID().toString();
+                    ManagementApplication.getConfiguration().setUUid(uid);
+                }
+                jsonRequest.put(JSONParams.DEVICE_UUID, uid);
+            } else {
+                jsonRequest.put(JSONParams.DEVICE_IMEI, imei);
+            }
             
             JSONObject jsonParams = new JSONObject();
             jsonParams.put(JSONParams.MANAGER_ACCOUNT, account);
@@ -219,7 +243,19 @@ public class JSONHttpClient {
             jsonRequest.put(JSONParams.MESSAGE_TYPE, JSONParams.MT_CONFIG_GET_INTERVAL_REQ);
             long id = System.currentTimeMillis();
             jsonRequest.put(JSONParams.REQUEST_SEQUENCE, id);
-            jsonRequest.put(JSONParams.DEVICE_IMEI, getDevideId());
+            String imei = ManagementApplication.getIMEI();
+            if (imei == null || imei.equals("0")) {
+                String uid;
+                if (ManagementApplication.getConfiguration().getUUid() != null) {
+                    uid = ManagementApplication.getConfiguration().getUUid();
+                } else {
+                    uid = UUID.randomUUID().toString();
+                    ManagementApplication.getConfiguration().setUUid(uid);
+                }
+                jsonRequest.put(JSONParams.DEVICE_UUID, uid);
+            } else {
+                jsonRequest.put(JSONParams.DEVICE_IMEI, imei);
+            }
             
             JSONObject result = doJSONRequest(jsonRequest);
             
@@ -234,23 +270,6 @@ public class JSONHttpClient {
             throw new JSONClientException("Invalid JSON request", e1);
         }
         
-    }
-    
-    private String getDevideId() {
-        String uid;
-        String imei = ManagementApplication.getIMEI();
-        if (imei == null || imei.equals("0")) {
-            if (ManagementApplication.getConfiguration().getUUid() != null) {
-                uid = ManagementApplication.getConfiguration().getUUid();
-            } else {
-                uid = UUID.randomUUID().toString();
-                ManagementApplication.getConfiguration().setUUid(uid);
-            }
-        } else {
-            uid = ManagementApplication.getIMEI();
-        }
-        
-        return uid;
     }
     
 }

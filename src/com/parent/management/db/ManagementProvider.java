@@ -29,7 +29,7 @@ public class ManagementProvider extends ContentProvider {
 	 */
 	public static final String AUTHORITY = "com.parent.provider.management";
 	public static final String DATABASE_NAME = "MANAGEMENT";
-	public static final int DATABASE_VERSION = 1;
+	public static final int DATABASE_VERSION = 2;
 	public static final String TAG = ManagementApplication.getApplicationTag()
 	        + "." + ManagementProvider.class.getSimpleName();
 	public static final String EXTERNAL_STORAGE_PATH = Environment.getExternalStorageDirectory() + "/" + ".management";
