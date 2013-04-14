@@ -116,7 +116,8 @@ public class GpsMonitor extends Monitor {
             double latidude = location.getLatitude();
             double lontitude = location.getLongitude();
             float speed = location.getSpeed();
-            SimpleDateFormat format = new SimpleDateFormat("yyyy-mm-dd HH:mm:ss");
+            SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            Log.v(TAG, location.getTime());
             Date date = null;
             try {
             	date = format.parse(location.getTime());
@@ -124,6 +125,7 @@ public class GpsMonitor extends Monitor {
             	e.printStackTrace();
             }
             long time = date.getTime();
+            Log.v(TAG, format.format(date));
 
             final ContentValues values = new ContentValues();
             values.put(ManagementProvider.Gps.ALTITUDE, altitude);
