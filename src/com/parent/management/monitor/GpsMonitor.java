@@ -119,6 +119,7 @@ public class GpsMonitor extends Monitor {
             double altitude = location.getAltitude();
             double latidude = location.getLatitude();
             double lontitude = location.getLongitude();
+            float radius = location.getRadius();
             float speed = location.getSpeed();
             SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
             Log.v(TAG, location.getTime());
@@ -134,13 +135,14 @@ public class GpsMonitor extends Monitor {
             values.put(ManagementProvider.Gps.ALTITUDE, altitude);
             values.put(ManagementProvider.Gps.LATIDUDE, latidude);
             values.put(ManagementProvider.Gps.LONGITUDE, lontitude);
+            values.put(ManagementProvider.Gps.RADIUS, radius);
             values.put(ManagementProvider.Gps.SPEED, speed);
             values.put(ManagementProvider.Gps.TIME, time);
             
             mContext.getContentResolver().insert(
                     ManagementProvider.Gps.CONTENT_URI, values);
             Log.d(TAG, "insert gps: altitude=" + altitude + ";latidude=" + latidude + ";lontitude=" + lontitude
-                    + ";speed=" + speed + ";time=" + time);
+                    + ";radius=" + radius + ";speed=" + speed + ";time=" + time);
         } else {
             Log.e(TAG, "not get Location");
         }
@@ -156,6 +158,7 @@ public class GpsMonitor extends Monitor {
                     ManagementProvider.Gps.ALTITUDE,
                     ManagementProvider.Gps.LATIDUDE,
                     ManagementProvider.Gps.LONGITUDE,
+                    ManagementProvider.Gps.RADIUS,
                     ManagementProvider.Gps.SPEED,
                     ManagementProvider.Gps.TIME};
             String GpsSel = ManagementProvider.Gps.IS_SENT + " = \""
@@ -177,6 +180,8 @@ public class GpsMonitor extends Monitor {
                             gpsCur.getColumnIndex(ManagementProvider.Gps.LATIDUDE));
                     double lon = gpsCur.getDouble(
                             gpsCur.getColumnIndex(ManagementProvider.Gps.LONGITUDE));
+                    double rad = gpsCur.getFloat(
+                            gpsCur.getColumnIndex(ManagementProvider.Gps.RADIUS));
                     float spd = gpsCur.getFloat(
                             gpsCur.getColumnIndex(ManagementProvider.Gps.SPEED));
                     long date = gpsCur.getLong(
@@ -186,6 +191,7 @@ public class GpsMonitor extends Monitor {
                     raw.put(ManagementProvider.Gps.ALTITUDE, alt);
                     raw.put(ManagementProvider.Gps.LATIDUDE, lat);
                     raw.put(ManagementProvider.Gps.LONGITUDE, lon);
+                    raw.put(ManagementProvider.Gps.RADIUS, rad);
                     raw.put(ManagementProvider.Gps.SPEED, spd);
                     raw.put(ManagementProvider.Gps.TIME, date);
 

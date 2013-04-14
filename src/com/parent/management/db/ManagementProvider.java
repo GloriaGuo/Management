@@ -96,6 +96,7 @@ public class ManagementProvider extends ContentProvider {
         public static final String ALTITUDE = "alt";
         public static final String LATIDUDE = "lat";
         public static final String LONGITUDE = "lon";
+        public static final String RADIUS = "acc";
         public static final String SPEED = "spd";
         public static final String TIME = "date";
         public static final String IS_SENT = "IsSend";
@@ -220,6 +221,7 @@ public class ManagementProvider extends ContentProvider {
                     + Gps.ALTITUDE  + REAL + COMMA 
                     + Gps.LATIDUDE  + REAL + COMMA 
                     + Gps.LONGITUDE + REAL + COMMA 
+                    + Gps.RADIUS + REAL + COMMA 
                     + Gps.SPEED + REAL + COMMA 
                     + Gps.TIME + INTEGER + COMMA 
                     + Gps.IS_SENT + INTEGER
