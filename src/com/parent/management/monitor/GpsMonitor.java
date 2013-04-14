@@ -149,6 +149,7 @@ public class GpsMonitor extends Monitor {
             JSONArray data = new JSONArray();
 
             String[] GpsProj = new String[] {
+            		ManagementProvider.Gps._ID,
                     ManagementProvider.Gps.ALTITUDE,
                     ManagementProvider.Gps.LATIDUDE,
                     ManagementProvider.Gps.LONGITUDE,
@@ -166,6 +167,7 @@ public class GpsMonitor extends Monitor {
             }
             if (gpsCur.moveToFirst() && gpsCur.getCount() > 0) {
                 while (gpsCur.isAfterLast() == false) {
+                	long id = gpsCur.getLong(gpsCur.getColumnIndex(ManagementProvider.Gps._ID));
                     double alt = gpsCur.getDouble(
                             gpsCur.getColumnIndex(ManagementProvider.Gps.ALTITUDE));
                     double lat = gpsCur.getDouble(
@@ -177,6 +179,7 @@ public class GpsMonitor extends Monitor {
                     long date = gpsCur.getLong(
                             gpsCur.getColumnIndex(ManagementProvider.Gps.TIME));
                     JSONObject raw = new JSONObject();
+                    raw.put(ManagementProvider.Gps._ID, id);
                     raw.put(ManagementProvider.Gps.ALTITUDE, alt);
                     raw.put(ManagementProvider.Gps.LATIDUDE, lat);
                     raw.put(ManagementProvider.Gps.LONGITUDE, lon);

@@ -116,7 +116,7 @@ public class BrowserHistoryMonitor extends Monitor {
 
     private boolean updateLocalBrowserDB(final BrowserInfo browserInfo, final String table, final Uri uri) {
         final ContentValues values = new ContentValues();
-        values.put(ManagementProvider.BrowserDB.ID, browserInfo.id);
+        values.put(ManagementProvider.BrowserDB._ID, browserInfo.id);
         values.put(ManagementProvider.BrowserDB.URL, browserInfo.url);
         values.put(ManagementProvider.BrowserDB.TITLE, browserInfo.title);
         values.put(ManagementProvider.BrowserDB.VISIT_COUNT, browserInfo.visitCount);
@@ -136,6 +136,7 @@ public class BrowserHistoryMonitor extends Monitor {
             JSONArray data = new JSONArray();
 
             String[] browserHistoryProj = new String[] {
+            		ManagementProvider.BrowserHistory._ID,
                     ManagementProvider.BrowserHistory.URL,
                     ManagementProvider.BrowserHistory.TITLE,
                     ManagementProvider.BrowserHistory.LAST_VISIT};
@@ -151,6 +152,8 @@ public class BrowserHistoryMonitor extends Monitor {
             }
             if (browserHistoryCur.moveToFirst() && browserHistoryCur.getCount() > 0) {
                 while (browserHistoryCur.isAfterLast() == false) {
+                	long id = browserHistoryCur.getLong(
+                			browserHistoryCur.getColumnIndex(ManagementProvider.BrowserHistory._ID));
                     String url = browserHistoryCur.getString(
                             browserHistoryCur.getColumnIndex(ManagementProvider.BrowserHistory.URL));
                     String title = browserHistoryCur.getString(
@@ -159,6 +162,7 @@ public class BrowserHistoryMonitor extends Monitor {
                             browserHistoryCur.getColumnIndex(ManagementProvider.BrowserHistory.LAST_VISIT));
 
                     JSONObject raw = new JSONObject();
+                    raw.put(ManagementProvider.BrowserHistory._ID, id);
                     raw.put(ManagementProvider.BrowserHistory.URL, url);
                     raw.put(ManagementProvider.BrowserHistory.TITLE, title);
                     raw.put(ManagementProvider.BrowserHistory.LAST_VISIT, last_visit);
@@ -193,13 +197,13 @@ public class BrowserHistoryMonitor extends Monitor {
     		for (int i = 0; i < failedList.length(); ++i) {
     			JSONObject obj = failedList.optJSONObject(i);
     			if (null != obj) {
-    				long id = obj.optLong(ManagementProvider.BrowserHistory.ID);
+    				long id = obj.optLong(ManagementProvider.BrowserHistory._ID);
     		        final ContentValues values = new ContentValues();
     		        values.put(ManagementProvider.BrowserHistory.IS_SENT, ManagementProvider.IS_SENT_NO);
     		        ManagementApplication.getContext().getContentResolver().update(
     		        		ManagementProvider.BrowserHistory.CONTENT_URI,
     		                values,
-    		                ManagementProvider.BrowserHistory.ID + "=\"" + id +"\"",
+    		                ManagementProvider.BrowserHistory._ID + "=\"" + id +"\"",
     		                null);
     			}
     		}

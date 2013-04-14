@@ -44,7 +44,6 @@ public class ManagementProvider extends ContentProvider {
      * Browser wrapper class for content provider
      */
     public static class BrowserDB implements BaseColumns {
-        public static final String ID = "id";
         public static final String URL = "url";
         public static final String TITLE = "title";
         public static final String VISIT_COUNT = "vc";
@@ -54,7 +53,7 @@ public class ManagementProvider extends ContentProvider {
         /**
          * The default sort order for this table
          */
-        public static final String DEFAULT_SORT_ORDER = ID + " DESC";
+        public static final String DEFAULT_SORT_ORDER = _ID + " DESC";
     }
 
 	/**
@@ -207,7 +206,6 @@ public class ManagementProvider extends ContentProvider {
         private void createBrowserHistoryTable(final SQLiteDatabase db) {
             db.execSQL("CREATE TABLE " + BrowserHistory.TABLE_NAME + " ("
             		+ BrowserHistory._ID + INTEGER + "PRIMARY KEY,"
-                    + BrowserHistory.ID + INTEGER + COMMA
                     + BrowserHistory.URL + TEXT + COMMA
                     + BrowserHistory.TITLE + TEXT + COMMA
                     + BrowserHistory.VISIT_COUNT + INTEGER + COMMA 

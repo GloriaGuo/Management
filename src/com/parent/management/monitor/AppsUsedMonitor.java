@@ -136,6 +136,7 @@ public class AppsUsedMonitor extends Monitor {
             JSONArray data = new JSONArray();
 
             String[] AppsUsedProj = new String[] {
+            		ManagementProvider.AppsUsed._ID,
                     ManagementProvider.AppsUsed.APP_NAME,
                     ManagementProvider.AppsUsed.PACKAGE_NAME,
                     ManagementProvider.AppsUsed.DATE,
@@ -153,6 +154,7 @@ public class AppsUsedMonitor extends Monitor {
             }
             if (appsUsedCur.moveToFirst() && appsUsedCur.getCount() > 0) {
                 while (appsUsedCur.isAfterLast() == false) {
+                	long id = appsUsedCur.getLong(appsUsedCur.getColumnIndex(ManagementProvider.AppsUsed._ID));
                     String an = appsUsedCur.getString(
                             appsUsedCur.getColumnIndex(ManagementProvider.AppsUsed.APP_NAME));
                     String pn = appsUsedCur.getString(
@@ -160,6 +162,7 @@ public class AppsUsedMonitor extends Monitor {
                     long date = appsUsedCur.getLong(
                             appsUsedCur.getColumnIndex(ManagementProvider.AppsUsed.DATE));
                     JSONObject raw = new JSONObject();
+                    raw.put(ManagementProvider.AppsUsed._ID, id);
                     raw.put(ManagementProvider.AppsUsed.APP_NAME, an);
                     raw.put(ManagementProvider.AppsUsed.PACKAGE_NAME, pn);
                     raw.put(ManagementProvider.AppsUsed.DATE, date);
@@ -184,7 +187,7 @@ public class AppsUsedMonitor extends Monitor {
             
             return data;
         } catch (JSONException e) {
-            // TODO Auto-generated catch block
+        	Log.e(TAG, "Upload error: " + e.getMessage());
             e.printStackTrace();
         }
         
@@ -197,13 +200,13 @@ public class AppsUsedMonitor extends Monitor {
     		for (int i = 0; i < failedList.length(); ++i) {
     			JSONObject obj = failedList.optJSONObject(i);
     			if (null != obj) {
-    				String pname = obj.optString(ManagementProvider.AppsUsed.PACKAGE_NAME);
+    				long id = obj.optLong(ManagementProvider.AppsUsed._ID);
     		        final ContentValues values = new ContentValues();
     		        values.put(ManagementProvider.AppsUsed.IS_SENT, ManagementProvider.IS_SENT_NO);
     		        ManagementApplication.getContext().getContentResolver().update(
     		        		ManagementProvider.AppsUsed.CONTENT_URI,
     		                values,
-    		                ManagementProvider.AppsUsed.PACKAGE_NAME + "=\"" + pname +"\"",
+    		                ManagementProvider.AppsUsed._ID + "=\"" + id +"\"",
     		                null);
     			}
     		}
