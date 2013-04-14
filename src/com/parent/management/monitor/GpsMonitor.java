@@ -72,7 +72,8 @@ public class GpsMonitor extends Monitor {
 
         @Override
         public void onReceiveLocation(BDLocation location) {
-            if (location == null)
+            if (location == null ||
+                (location != null && location.getLatitude() == 0.00 && location.getLongitude() == 0.00))
                 return ;
             StringBuffer sb = new StringBuffer(256);
             sb.append("time : ");
@@ -99,8 +100,11 @@ public class GpsMonitor extends Monitor {
                 (mCurrentLocation != null &&
                  mCurrentLocation.getLatitude() != location.getLatitude() && 
                  mCurrentLocation.getLongitude() != location.getLongitude())) {
+                Log.d(TAG, "Get new location !");
                 updateLocation(location);
                 mCurrentLocation = location;
+            } else {
+                Log.d(TAG, "Get same location, ignore it...");
             }
         }
 
@@ -125,7 +129,6 @@ public class GpsMonitor extends Monitor {
             	e.printStackTrace();
             }
             long time = date.getTime();
-            Log.v(TAG, format.format(date));
 
             final ContentValues values = new ContentValues();
             values.put(ManagementProvider.Gps.ALTITUDE, altitude);
