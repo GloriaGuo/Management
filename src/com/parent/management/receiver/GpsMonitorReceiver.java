@@ -14,12 +14,13 @@ public class GpsMonitorReceiver extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
-        if (mGpsMonitor == null) {
+        if (null == mGpsMonitor) {
             if(null != ManagementApplication.commonMonitorList) {
                 mGpsMonitor = (GpsMonitor) ManagementApplication.commonMonitorList.get(Type.GPS_INFO);
             }
         }
-        
-        mGpsMonitor.startMonitoring();
+        if (null != mGpsMonitor) {
+            mGpsMonitor.startMonitoring();
+        }
     }
 }

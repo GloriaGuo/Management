@@ -116,7 +116,6 @@ public class BrowserHistoryMonitor extends Monitor {
 
     private boolean updateLocalBrowserDB(final BrowserInfo browserInfo, final String table, final Uri uri) {
         final ContentValues values = new ContentValues();
-        values.put(ManagementProvider.BrowserDB._ID, browserInfo.id);
         values.put(ManagementProvider.BrowserDB.URL, browserInfo.url);
         values.put(ManagementProvider.BrowserDB.TITLE, browserInfo.title);
         values.put(ManagementProvider.BrowserDB.VISIT_COUNT, browserInfo.visitCount);
