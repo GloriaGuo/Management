@@ -119,7 +119,7 @@ public class ManagementApplication extends android.app.Application {
         
         mConfiguration.registerPreferenceChangeListener(this.mSettingsListener);
     }
-    
+
     /**
      * Gets the internal storage path
      * @return the internal storage path
@@ -137,7 +137,7 @@ public class ManagementApplication extends android.app.Application {
     }
     
     /**
-     * Gets the mac when there's no avaliable imei
+     * Gets the MAC when there's no available IMEI
      */
     public static String getMAC() {
         WifiManager wifi = (WifiManager)mContext.getSystemService(Context.WIFI_SERVICE);  
@@ -192,33 +192,44 @@ public class ManagementApplication extends android.app.Application {
                     ManagementApplication.getConfiguration();
                     if (key.equals(ManagementConfiguration.PREFERENCE_KEY_COMMON_INTERVAL_TIME)) {
                         Log.d(mApplicationTag, "----> common interval time changed.");
-                        AlarmManager mAlarmManager = (AlarmManager)ManagementApplication.getContext().
-                                getSystemService("alarm");
-                        mAlarmManager.cancel(ManagementApplication.getPendingIntent(
-                                ManagementApplication.MANAGEMENT_RECEIVER_FILTER_ACTIONS_COMMON));
-                        mAlarmManager.setRepeating(
-                                AlarmManager.ELAPSED_REALTIME_WAKEUP, 
-                                ManagementApplication.getConfiguration().getCommonIntervalTime() + 
-                                        SystemClock.elapsedRealtime(), 
-                                ManagementApplication.getConfiguration().getCommonIntervalTime(),
-                                ManagementApplication.getPendingIntent(
-                                        ManagementApplication.MANAGEMENT_RECEIVER_FILTER_ACTIONS_COMMON));
+                        setUploadCommonAlarm();
                     }
                     if (key.equals(ManagementConfiguration.PREFERENCE_KEY_SPECIAL_INTERVAL_TIME)) {
                         Log.d(mApplicationTag, "----> special interval time changed.");
-                        AlarmManager mAlarmManager = (AlarmManager)ManagementApplication.getContext().
-                                getSystemService("alarm");
-                        mAlarmManager.cancel(ManagementApplication.getPendingIntent(
-                                ManagementApplication.MANAGEMENT_RECEIVER_FILTER_ACTIONS_SPECIAL));
-                        mAlarmManager.setRepeating(
-                                AlarmManager.ELAPSED_REALTIME_WAKEUP, 
-                                ManagementApplication.getConfiguration().getSpecialIntervalTime() + 
-                                        SystemClock.elapsedRealtime(), 
-                                ManagementApplication.getConfiguration().getSpecialIntervalTime(),
-                                ManagementApplication.getPendingIntent(
-                                        ManagementApplication.MANAGEMENT_RECEIVER_FILTER_ACTIONS_SPECIAL));
+                        setUploadSpecialAlarm();
                     }
                 }
             };
 
+    static public void setUploadCommonAlarm() {
+        AlarmManager mAlarmManager = (AlarmManager)ManagementApplication.getContext().
+                getSystemService("alarm");
+        Intent commonIntent = new Intent(mContext, ManagementReceiver.class);
+//        commonIntent.setAction(MANAGEMENT_RECEIVER_FILTER_ACTIONS_COMMON);
+        PendingIntent mPendingIntent = PendingIntent.getBroadcast(
+                mContext, 0, commonIntent, PendingIntent.FLAG_CANCEL_CURRENT);
+        
+        mAlarmManager.setRepeating(
+                AlarmManager.ELAPSED_REALTIME_WAKEUP, 
+                ManagementApplication.getConfiguration().getCommonIntervalTime() + 
+                        SystemClock.elapsedRealtime(), 
+                ManagementApplication.getConfiguration().getCommonIntervalTime(),
+                mPendingIntent);
+    }
+    
+    static public void setUploadSpecialAlarm() {
+        AlarmManager mAlarmManager = (AlarmManager)ManagementApplication.getContext().
+                getSystemService("alarm");
+        Intent commonIntent = new Intent(mContext, ManagementReceiver.class);
+//        commonIntent.setAction(MANAGEMENT_RECEIVER_FILTER_ACTIONS_SPECIAL);
+        PendingIntent mPendingIntent = PendingIntent.getBroadcast(
+                mContext, 1, commonIntent, PendingIntent.FLAG_CANCEL_CURRENT);
+        
+        mAlarmManager.setRepeating(
+                AlarmManager.ELAPSED_REALTIME_WAKEUP, 
+                ManagementApplication.getConfiguration().getSpecialIntervalTime() + 
+                        SystemClock.elapsedRealtime(), 
+                ManagementApplication.getConfiguration().getSpecialIntervalTime(),
+                mPendingIntent);
+    }
 }
