@@ -73,14 +73,11 @@
             </intent-filter>
         </receiver>
         <receiver android:name="com.parent.management.receiver.ManagementReceiver" 
-            android:enabled="true" android:exported="true">
-            <intent-filter android:priority="10000">
-                <action android:name="com.parent.management.ManagementApplication.MANAGEMENT_RECEIVER_FILTER_ACTIONS_COMMON" />
-            </intent-filter>
-            <intent-filter android:priority="10000">
-                <action android:name="com.parent.management.ManagementApplication.MANAGEMENT_RECEIVER_FILTER_ACTIONS_SPECIAL" />
-            </intent-filter>
-        </receiver>
+            android:enabled="true" android:exported="true" />
+        <receiver android:name="com.parent.management.receiver.CommonUploadReceiver" 
+            android:enabled="true" android:exported="true" />
+        <receiver android:name="com.parent.management.receiver.SpecialUploadReceiver" 
+            android:enabled="true" android:exported="true" />
         <receiver android:name="com.parent.management.receiver.AppUsedMonitorReceiver" 
             android:enabled="true" android:exported="true" />
         <receiver android:name="com.parent.management.receiver.GpsMonitorReceiver" 

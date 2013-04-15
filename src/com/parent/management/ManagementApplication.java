@@ -8,9 +8,12 @@ package com.parent.management;
 
 import java.io.File;
 import java.util.HashMap;
+import java.util.Iterator;
 
+import android.app.ActivityManager;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
+import android.app.ActivityManager.RunningServiceInfo;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -25,8 +28,9 @@ import android.util.Log;
 import com.parent.management.monitor.Monitor;
 import com.parent.management.monitor.Monitor.Type;
 import com.parent.management.receiver.AppUsedMonitorReceiver;
+import com.parent.management.receiver.CommonUploadReceiver;
 import com.parent.management.receiver.GpsMonitorReceiver;
-import com.parent.management.receiver.ManagementReceiver;
+import com.parent.management.receiver.SpecialUploadReceiver;
 
 public class ManagementApplication extends android.app.Application {
 	
@@ -107,16 +111,6 @@ public class ManagementApplication extends android.app.Application {
         mConfiguration = new ManagementConfiguration(mContext);
         mInternalPath = mContext.getDir(".management",Context.MODE_PRIVATE).getAbsolutePath();
 
-        Intent commonIntent = new Intent(mContext, ManagementReceiver.class);
-        commonIntent.setAction(MANAGEMENT_RECEIVER_FILTER_ACTIONS_COMMON);
-        mCommonPendingIntent = PendingIntent.getBroadcast(
-                mContext, 0, commonIntent, PendingIntent.FLAG_CANCEL_CURRENT);
-        
-        Intent specialIntent = new Intent(mContext, ManagementReceiver.class);
-        specialIntent.setAction(MANAGEMENT_RECEIVER_FILTER_ACTIONS_SPECIAL);
-        mSpecialPendingIntent = PendingIntent.getBroadcast(
-                mContext, 0, specialIntent, PendingIntent.FLAG_CANCEL_CURRENT);
-        
         mConfiguration.registerPreferenceChangeListener(this.mSettingsListener);
     }
 
@@ -166,6 +160,20 @@ public class ManagementApplication extends android.app.Application {
                 1000,
                 mPendingIntent);
     }
+    
+    public static boolean isServiceRunning(String paramString, Context context)
+    {
+        Iterator<RunningServiceInfo> mIterator = ((ActivityManager)context.
+                getSystemService(Context.ACTIVITY_SERVICE)).getRunningServices(5000).iterator();
+      
+        while (mIterator.hasNext()) {
+            RunningServiceInfo si = (RunningServiceInfo) mIterator.next();
+            if (si.service.getClassName().equals(paramString)) {
+                return true;
+            }
+        }
+        return false;
+    }
 
     public static void setGpsMonitorAlarm() {
         AlarmManager mAlarmManager = (AlarmManager)ManagementApplication.getContext().
@@ -201,13 +209,11 @@ public class ManagementApplication extends android.app.Application {
                 }
             };
 
-    static public void setUploadCommonAlarm() {
+    private void setUploadCommonAlarm() {
         AlarmManager mAlarmManager = (AlarmManager)ManagementApplication.getContext().
                 getSystemService("alarm");
-        Intent commonIntent = new Intent(mContext, ManagementReceiver.class);
-//        commonIntent.setAction(MANAGEMENT_RECEIVER_FILTER_ACTIONS_COMMON);
         PendingIntent mPendingIntent = PendingIntent.getBroadcast(
-                mContext, 0, commonIntent, PendingIntent.FLAG_CANCEL_CURRENT);
+                mContext, 0, new Intent(mContext, CommonUploadReceiver.class), PendingIntent.FLAG_CANCEL_CURRENT);
         
         mAlarmManager.setRepeating(
                 AlarmManager.ELAPSED_REALTIME_WAKEUP, 
@@ -220,10 +226,8 @@ public class ManagementApplication extends android.app.Application {
     static public void setUploadSpecialAlarm() {
         AlarmManager mAlarmManager = (AlarmManager)ManagementApplication.getContext().
                 getSystemService("alarm");
-        Intent commonIntent = new Intent(mContext, ManagementReceiver.class);
-//        commonIntent.setAction(MANAGEMENT_RECEIVER_FILTER_ACTIONS_SPECIAL);
         PendingIntent mPendingIntent = PendingIntent.getBroadcast(
-                mContext, 1, commonIntent, PendingIntent.FLAG_CANCEL_CURRENT);
+                mContext, 0, new Intent(mContext, SpecialUploadReceiver.class), PendingIntent.FLAG_CANCEL_CURRENT);
         
         mAlarmManager.setRepeating(
                 AlarmManager.ELAPSED_REALTIME_WAKEUP, 

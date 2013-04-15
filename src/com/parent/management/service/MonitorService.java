@@ -116,6 +116,7 @@ public class MonitorService extends Service {
 	
 	@Override
     public void onDestroy() {
+	    Log.e("MonitorService", "It shouldn't exit...");
 	    if (mBrowserHistoryMonitor != null && mBrowserHistoryMonitor.isMonitorRunning()) {
 			mBrowserHistoryMonitor.stopMonitoring();
 		}
