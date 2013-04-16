@@ -70,7 +70,8 @@ public class AppsUsedMonitor extends Monitor {
     
     private void checkForChange() {
         AppUsedInfo currentActiveApp = getCurrentActiveApp();
-        if (currentActiveApp.pname.equals(ManagementApplication.getContext().getPackageName())) {
+        if (currentActiveApp.pname.equals(ManagementApplication.getContext().getPackageName()) ||
+                currentActiveApp.pname.contains("launcher")) {
         	return;
         }
         

@@ -189,13 +189,6 @@ public class MainActivity extends Activity {
                 // Launch services
         	    launchServices();
                 
-                ManagementApplication.getConfiguration().setCommonIntervalTime(
-                        ManagementApplication.getContext().getResources().getInteger(
-                                R.attr.default_common_interval_time));
-                ManagementApplication.getConfiguration().setSpecialIntervalTime(
-                        ManagementApplication.getContext().getResources().getInteger(
-                                R.attr.default_special_interval_time));
-                
                 // check the GPS settings
                 LocationManager locationManager = (LocationManager) MainActivity.this.getSystemService(
                         Context.LOCATION_SERVICE);

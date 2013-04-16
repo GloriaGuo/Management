@@ -70,7 +70,8 @@ public class UploadService extends Service {
             }
 	    
 	    }).start();
-        return 1;
+	    
+        return START_STICKY;
     }
 	
 	@Override

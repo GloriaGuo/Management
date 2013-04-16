@@ -28,13 +28,6 @@ public class OnBootReceiver extends BroadcastReceiver {
     	            ManagementApplication.getContext().getResources().getInteger(
                             R.attr.default_check_alive_interval_time),
     	            mPendingIntent);
-    	    
-    	    ManagementApplication.getConfiguration().setCommonIntervalTime(
-    	            ManagementApplication.getContext().getResources().getInteger(
-    	                    R.attr.default_common_interval_time));
-    	    ManagementApplication.getConfiguration().setSpecialIntervalTime(
-    	            ManagementApplication.getContext().getResources().getInteger(
-                            R.attr.default_special_interval_time));
 	    }
 	}
 
