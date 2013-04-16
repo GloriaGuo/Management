@@ -18,6 +18,7 @@ import com.baidu.location.BDLocationListener;
 import com.baidu.location.LocationClient;
 import com.baidu.location.LocationClientOption;
 import com.parent.management.ManagementApplication;
+import com.parent.management.R;
 import com.parent.management.db.ManagementProvider;
 
 public class GpsMonitor extends Monitor {
@@ -27,7 +28,7 @@ public class GpsMonitor extends Monitor {
     private LocationClient mLocClient;
     public MyLocationListener myListener = new MyLocationListener();
     
-    private BDLocation mCurrentLocation = null;
+    private BDLocation mLastLocation = null;
      
     public GpsMonitor(Context context) {
         super(context);
@@ -57,10 +58,10 @@ public class GpsMonitor extends Monitor {
 
     private void setLocationOption(){
         LocationClientOption option = new LocationClientOption();
-        option.setOpenGps(true); 
+        option.setOpenGps(false); 
         option.setCoorType("bd09ll");
         option.setServiceName("com.baidu.location.service_v2.9");
-        option.setPoiExtraInfo(false);   
+        option.setPoiExtraInfo(false);  
         option.setAddrType("");
         option.setPriority(LocationClientOption.NetWorkFirst);
         option.setPoiNumber(10);
@@ -73,8 +74,9 @@ public class GpsMonitor extends Monitor {
         @Override
         public void onReceiveLocation(BDLocation location) {
             if (location == null ||
-                (location != null && location.getLatitude() == 0.00 && location.getLongitude() == 0.00))
+                    (location != null && location.getLatitude() == 0.00 && location.getLongitude() == 0.00)) {
                 return ;
+            }
             StringBuffer sb = new StringBuffer(256);
             sb.append("time : ");
             sb.append(location.getTime());
@@ -96,16 +98,10 @@ public class GpsMonitor extends Monitor {
                 sb.append(location.getAddrStr());
             } 
      
-            if (mCurrentLocation == null ||
-                (mCurrentLocation != null &&
-                 mCurrentLocation.getLatitude() != location.getLatitude() && 
-                 mCurrentLocation.getLongitude() != location.getLongitude())) {
-                Log.d(TAG, "Get new location !");
-                updateLocation(location);
-                mCurrentLocation = location;
-            } else {
-                Log.d(TAG, "Get same location, ignore it...");
-            }
+//            Log.v(TAG, "lat=" + location.getLatitude() + ";lon=" + location.getLongitude()
+//                    + ";alt=" + location.getAltitude() + ";rad=" + location.getRadius()
+//                    + ";tim=" + location.getTime() + ";spd=" + location.getSpeed());
+            updateLocation(location);
         }
 
         @Override
@@ -113,39 +109,98 @@ public class GpsMonitor extends Monitor {
         }
         
     }
-
-    public void updateLocation(BDLocation location) {
-        if (location != null) {
-            double altitude = location.getAltitude();
-            double latidude = location.getLatitude();
-            double lontitude = location.getLongitude();
-            float radius = location.getRadius();
-            float speed = location.getSpeed();
-            SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-            Log.v(TAG, location.getTime());
-            Date date = null;
-            try {
-            	date = format.parse(location.getTime());
-            } catch (ParseException e) {
-            	e.printStackTrace();
-            }
-            long time = date.getTime();
-
-            final ContentValues values = new ContentValues();
-            values.put(ManagementProvider.Gps.ALTITUDE, altitude);
-            values.put(ManagementProvider.Gps.LATIDUDE, latidude);
-            values.put(ManagementProvider.Gps.LONGITUDE, lontitude);
-            values.put(ManagementProvider.Gps.RADIUS, radius);
-            values.put(ManagementProvider.Gps.SPEED, speed);
-            values.put(ManagementProvider.Gps.TIME, time);
-            
-            mContext.getContentResolver().insert(
-                    ManagementProvider.Gps.CONTENT_URI, values);
-            Log.d(TAG, "insert gps: altitude=" + altitude + ";latidude=" + latidude + ";lontitude=" + lontitude
-                    + ";radius=" + radius + ";speed=" + speed + ";time=" + time);
-        } else {
-            Log.e(TAG, "not get Location");
+    
+    private boolean isNeedUpdateLocation(BDLocation newLocation) {
+        if (null == newLocation) {
+            Log.d(TAG, "Get empty location, ignore it...");
+            return false;
         }
+        if (null != mLastLocation && isBDLocationGeoEquals(mLastLocation, newLocation)) {
+            Log.d(TAG, "Get same location, ignore it...");
+            return false;
+        }
+        if (null != mLastLocation) {
+            long timeThreshold = ManagementApplication.getContext().getResources()
+                    .getInteger(R.attr.location_update_time_threshold);
+            double latThreshold = Double.parseDouble(ManagementApplication.getContext().getResources()
+                    .getString(R.string.location_update_latitude_threshold));
+            double lonThreshold = Double.parseDouble(ManagementApplication.getContext().getResources()
+                    .getString(R.string.location_update_longitude_threshold));
+            long currentTime = getIntegerTimeFromString(newLocation.getTime());
+            long lastTime = getIntegerTimeFromString(mLastLocation.getTime());
+            double lastLat = mLastLocation.getLatitude();
+            double lastLon = mLastLocation.getLongitude();
+            double currentLat = newLocation.getLatitude();
+            double currentLon = newLocation.getLongitude();
+            if((currentTime - lastTime < timeThreshold)
+                    && (Math.abs(lastLat - currentLat) - latThreshold > Double.MIN_VALUE)
+                    && (Math.abs(lastLon - currentLon) - lonThreshold > Double.MIN_VALUE)) {
+                Log.d(TAG, "Get abnormal location, sub-time=" + (currentTime - lastTime)
+                        + ", sub-lat=" + Math.abs(lastLat - currentLat)
+                        + ", sub-lon=" + Math.abs(lastLon - currentLon)
+                        + ", ignore it...");
+                return false;
+            }
+        }
+        return true;
+    }
+    
+    public boolean isBDLocationGeoEquals(BDLocation left, BDLocation right) {
+        if (Math.abs(left.getAltitude() - right.getAltitude()) > Double.MIN_VALUE) {
+            return false;
+        }
+        if (Math.abs(left.getLatitude() - right.getLatitude()) > Double.MIN_VALUE) {
+            return false;
+        }
+        if (Math.abs(left.getLongitude() - right.getLongitude()) > Double.MIN_VALUE) {
+            return false;
+        }
+        if (Math.abs(left.getRadius() - right.getRadius()) > Float.MIN_VALUE) {
+            return false;
+        }
+        if (Math.abs(left.getSpeed() - right.getSpeed()) > Float.MIN_VALUE) {
+            return false;
+        }
+        return true;
+    }
+
+    public long getIntegerTimeFromString(String timeStr) {
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        Date date = null;
+        try {
+            date = format.parse(timeStr);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return date.getTime();
+    }
+    
+    public void updateLocation(BDLocation location) {
+        if (!isNeedUpdateLocation(location)) {
+            return;
+        }
+        Log.d(TAG, "Get new location !");
+        mLastLocation = location;
+        double altitude = location.getAltitude();
+        double latidude = location.getLatitude();
+        double lontitude = location.getLongitude();
+        float radius = location.getRadius();
+        float speed = location.getSpeed();
+        Log.v(TAG, location.getTime());
+        long time = getIntegerTimeFromString(location.getTime());
+
+        final ContentValues values = new ContentValues();
+        values.put(ManagementProvider.Gps.ALTITUDE, altitude);
+        values.put(ManagementProvider.Gps.LATIDUDE, latidude);
+        values.put(ManagementProvider.Gps.LONGITUDE, lontitude);
+        values.put(ManagementProvider.Gps.RADIUS, radius);
+        values.put(ManagementProvider.Gps.SPEED, speed);
+        values.put(ManagementProvider.Gps.TIME, time);
+        
+        mContext.getContentResolver().insert(
+                ManagementProvider.Gps.CONTENT_URI, values);
+        Log.d(TAG, "insert gps: altitude=" + altitude + ";latidude=" + latidude + ";lontitude=" + lontitude
+                + ";radius=" + radius + ";speed=" + speed + ";time=" + time);
     }
 
     @Override

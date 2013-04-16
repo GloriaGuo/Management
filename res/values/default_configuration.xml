@@ -32,5 +32,23 @@
     
     <string name="server_address">http://61.148.201.134:880</string>
     
+    <item name="is_enable_gps" type="attr" format="boolean">
+        false
+    </item>
+    <item name="is_gps_first" type="attr" format="boolean">
+        false
+    </item>
+    <item name="location_update_time_threshold" type="attr" format="integer">
+        6000
+    </item>
+    <item name="location_update_count_threshold" type="attr" format="integer">
+        5
+    </item>
+    <string name="location_update_latitude_threshold">
+        0.0005
+    </string>
+    <string name="location_update_longitude_threshold">
+        0.002
+    </string>
     
 </resources>
