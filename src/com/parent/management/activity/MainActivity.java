@@ -1,7 +1,9 @@
 package com.parent.management.activity;
 
 import android.app.Activity;
+import android.app.AlarmManager;
 import android.app.AlertDialog;
+import android.app.PendingIntent;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -12,6 +14,7 @@ import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.os.SystemClock;
 import android.provider.Settings;
 import android.text.method.LinkMovementMethod;
 import android.text.util.Linkify;
@@ -184,9 +187,8 @@ public class MainActivity extends Activity {
         	
         	if (result) {
                 // Launch services
-                ManagementApplication.getContext().sendBroadcast(
-                        new Intent(ManagementApplication.getContext(), ManagementReceiver.class));
-
+        	    launchServices();
+                
                 ManagementApplication.getConfiguration().setCommonIntervalTime(
                         ManagementApplication.getContext().getResources().getInteger(
                                 R.attr.default_common_interval_time));
@@ -209,6 +211,28 @@ public class MainActivity extends Activity {
                 				R.string.alert_dialog_message_regist_failed));
             }
         }
+	}
+	
+	private void launchServices() {
+//      ManagementApplication.getContext().sendBroadcast(
+//      new Intent(ManagementApplication.getContext(), ManagementReceiver.class));
+	    
+	    AlarmManager mAlarmManager = (AlarmManager)ManagementApplication.getContext().getSystemService(
+                "alarm");
+        
+        PendingIntent mPendingIntent = PendingIntent.getBroadcast(
+                ManagementApplication.getContext(), 
+                0, 
+                new Intent(ManagementApplication.getContext(), ManagementReceiver.class), 
+                PendingIntent.FLAG_CANCEL_CURRENT);
+        
+        mAlarmManager.setRepeating(
+                AlarmManager.ELAPSED_REALTIME_WAKEUP, 
+                SystemClock.elapsedRealtime(),
+                ManagementApplication.getContext().getResources().getInteger(
+                        R.attr.default_check_alive_interval_time),
+                mPendingIntent);
+
 	}
 	
 }

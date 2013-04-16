@@ -23,6 +23,9 @@
         false
     </item>
     
+    <item name="default_check_alive_interval_time" type="attr" format="integer">
+        300000
+    </item>
     <item name="default_common_interval_time" type="attr" format="integer">
         60000
     </item>

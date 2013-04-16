@@ -20,14 +20,16 @@ public class ManagementReceiver extends BroadcastReceiver {
         if (!ManagementApplication.isServiceRunning("com.parent.management.service.MonitorService", context)) {
             Log.d(TAG, "----> start monitor service");
             context.startService(new Intent(context, MonitorService.class));
+            
+            if (ManagementApplication.isServiceRunning("com.parent.management.service.UploadService", context)) {
+                Log.d(TAG, "----> stop upload service");
+                context.stopService(new Intent(context, UploadService.class));
+            }
+            Log.d(TAG, "----> starting upload service");
+            context.startService(new Intent(context, UploadService.class));
+        } else {
+            Log.d(TAG, "----> Monitor service is still alive");
         }
-        
-        if (ManagementApplication.isServiceRunning("com.parent.management.service.UploadService", context)) {
-            Log.d(TAG, "----> stop upload service");
-            context.stopService(new Intent(context, UploadService.class));
-        }
-        Log.d(TAG, "----> starting upload service");
-        context.startService(new Intent(context, UploadService.class));
         
 	}
 
