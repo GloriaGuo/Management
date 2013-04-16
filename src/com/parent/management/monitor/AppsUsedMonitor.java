@@ -40,37 +40,50 @@ public class AppsUsedMonitor extends Monitor {
     }
 
     private AppUsedInfo getCurrentActiveApp() {
-        AppUsedInfo newInfo = new AppUsedInfo();
+        AppUsedInfo newInfo = null;
 
         ActivityManager activityManager = (ActivityManager)ManagementApplication.getContext().getSystemService(
                 Context.ACTIVITY_SERVICE);
         List<RunningTaskInfo>  taskList = activityManager.getRunningTasks(1);
+        
         if ((taskList != null) && (taskList.size() > 0)) {
-            
             RunningTaskInfo taskInfo = (RunningTaskInfo) taskList.get(0);
-
-            if (ManagementApplication.getContext().getPackageName() != taskInfo.topActivity.getPackageName()) {
-                newInfo.pname = taskInfo.topActivity.getPackageName();
-                
-                PackageManager pm = ManagementApplication.getContext().getPackageManager();
-                ApplicationInfo appInfo = null;
-                try {
-                    appInfo = pm.getApplicationInfo(newInfo.pname, 0);
-                } catch (NameNotFoundException e) {
-                    Log.e(TAG, "Get app info failed from package name: " + e.getMessage());
-                }
-                newInfo.appname = (String) pm.getApplicationLabel(appInfo);
-                
-                newInfo.date = System.currentTimeMillis();
+            if (isNeedFilterOut(taskInfo.topActivity.getPackageName())) {
+                return null;
             }
+            
+            newInfo = new AppUsedInfo();
+            newInfo.pname = taskInfo.topActivity.getPackageName();
+            
+            PackageManager pm = ManagementApplication.getContext().getPackageManager();
+            ApplicationInfo appInfo = null;
+            try {
+                appInfo = pm.getApplicationInfo(newInfo.pname, 0);
+            } catch (NameNotFoundException e) {
+                Log.e(TAG, "Get app info failed from package name: " + e.getMessage());
+            }
+            newInfo.appname = (String) pm.getApplicationLabel(appInfo);
+            
+            newInfo.date = System.currentTimeMillis();
         }
     	
         return newInfo; 
     }
     
+    private boolean isNeedFilterOut(String packageName) {
+        if (ManagementApplication.getContext().getPackageName() == packageName) {
+            return true;
+        }
+        if(packageName.toLowerCase().contains("launcher")) {
+            // TODO: should be configured in xml
+            return true;
+        }
+        return false;
+    }
+    
     private void checkForChange() {
         AppUsedInfo currentActiveApp = getCurrentActiveApp();
-        if (currentActiveApp.pname.equals(ManagementApplication.getContext().getPackageName())) {
+        if (null == currentActiveApp) {
         	return;
         }
         
