@@ -111,7 +111,7 @@ public class MonitorService extends Service {
             ManagementApplication.setGpsMonitorAlarm();
         }
 		
-		return 1;
+		return START_STICKY;
 	}
 	
 	@Override

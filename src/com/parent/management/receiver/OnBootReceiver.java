@@ -22,17 +22,12 @@ public class OnBootReceiver extends BroadcastReceiver {
     		PendingIntent mPendingIntent = PendingIntent.getBroadcast(
     		        context, 0, new Intent(context, ManagementReceiver.class), PendingIntent.FLAG_CANCEL_CURRENT);
             
-    	    mAlarmManager.set(
+    	    mAlarmManager.setRepeating(
     	            AlarmManager.ELAPSED_REALTIME_WAKEUP, 
-    	            10000L + SystemClock.elapsedRealtime(), 
+    	            10000L + SystemClock.elapsedRealtime(),
+    	            ManagementApplication.getContext().getResources().getInteger(
+                            R.attr.default_check_alive_interval_time),
     	            mPendingIntent);
-    	    
-    	    ManagementApplication.getConfiguration().setCommonIntervalTime(
-    	            ManagementApplication.getContext().getResources().getInteger(
-    	                    R.attr.default_common_interval_time));
-    	    ManagementApplication.getConfiguration().setSpecialIntervalTime(
-    	            ManagementApplication.getContext().getResources().getInteger(
-                            R.attr.default_special_interval_time));
 	    }
 	}
 

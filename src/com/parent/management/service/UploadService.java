@@ -42,8 +42,12 @@ public class UploadService extends Service {
 	{
 	    if (mMonitorList == null) {
 	        mMonitorList = new HashMap<Type, Monitor>();
-	        mMonitorList.putAll(ManagementApplication.commonMonitorList);
-	        mMonitorList.putAll(ManagementApplication.specialMonitorList);
+	        if (ManagementApplication.commonMonitorList != null) {
+	            mMonitorList.putAll(ManagementApplication.commonMonitorList);
+	        }
+	        if (ManagementApplication.specialMonitorList != null) {
+	            mMonitorList.putAll(ManagementApplication.specialMonitorList);
+	        }
 	    }
     }
 	
@@ -66,7 +70,8 @@ public class UploadService extends Service {
             }
 	    
 	    }).start();
-        return 1;
+	    
+        return START_STICKY;
     }
 	
 	@Override

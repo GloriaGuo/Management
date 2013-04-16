@@ -15,7 +15,9 @@ public class SpecialUploadService extends UploadService {
     {
         if (mMonitorList == null) {
             mMonitorList = new HashMap<Type, Monitor>();
-            mMonitorList.putAll(ManagementApplication.specialMonitorList);
+            if (ManagementApplication.specialMonitorList != null) { 
+                mMonitorList.putAll(ManagementApplication.specialMonitorList);
+            }
         }
     }
     

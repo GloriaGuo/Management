@@ -15,7 +15,9 @@ public class CommonUploadService extends UploadService {
     {
         if (mMonitorList == null) {
             mMonitorList = new HashMap<Type, Monitor>();
-            mMonitorList.putAll(ManagementApplication.commonMonitorList);
+            if (ManagementApplication.commonMonitorList != null) {
+                mMonitorList.putAll(ManagementApplication.commonMonitorList);
+            }
         }
     }
     

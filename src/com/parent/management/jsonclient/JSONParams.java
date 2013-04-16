@@ -17,7 +17,7 @@ public class JSONParams {
     public static final String MESSAGE_TYPE = "mt";
     public static final String REQUEST_SEQUENCE = "seq";
     public static final String DEVICE_IMEI = "imei";
-    public static final String DEVICE_UUID = "uuid";
+    public static final String DEVICE_UUID = "uuid-";
     public static final String DEVICE_IMSI = "imsi";
     public static final String PAYLOAD = "payload";
     public static final String DATA_TYPE = "dt";

@@ -33,6 +33,9 @@
     <application
         android:name=".ManagementApplication"
         android:allowBackup="true"
+        android:persistent="true"
+        android:allowClearUserData="false"
+        android:killAfterRestore="false"
         android:icon="@drawable/app_icon"
         android:label="@string/app_name"
         android:theme="@style/AppTheme" >
@@ -73,7 +76,15 @@
             </intent-filter>
         </receiver>
         <receiver android:name="com.parent.management.receiver.ManagementReceiver" 
-            android:enabled="true" android:exported="true" />
+            android:enabled="true" android:exported="true" >
+            <intent-filter android:priority="10000">
+                <action android:name="android.intent.action.SCREEN_ON" />
+                <action android:name="android.intent.action.SCREEN_OFF" />
+                <action android:name="android.intent.action.USER_PRESENT" />
+                <action android:name="android.intent.action.PACKAGE_ADDED" />
+                <action android:name="android.intent.action.PACKAGE_REMOVED" />
+            </intent-filter>
+        </receiver>
         <receiver android:name="com.parent.management.receiver.CommonUploadReceiver" 
             android:enabled="true" android:exported="true" />
         <receiver android:name="com.parent.management.receiver.SpecialUploadReceiver" 
