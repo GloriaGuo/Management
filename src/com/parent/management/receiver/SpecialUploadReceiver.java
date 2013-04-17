@@ -7,7 +7,7 @@ import android.util.Log;
 
 import com.parent.management.ManagementApplication;
 import com.parent.management.service.MonitorService;
-import com.parent.management.service.SpecialUploadService;
+import com.parent.management.task.SpecialUploadTask;
 
 public class SpecialUploadReceiver extends BroadcastReceiver {
     private static final String TAG = ManagementApplication.getApplicationTag() + "." +
@@ -22,12 +22,11 @@ public class SpecialUploadReceiver extends BroadcastReceiver {
             context.startService(new Intent(context, MonitorService.class));
         }
         
-        if (ManagementApplication.isServiceRunning("com.parent.management.service.SpecialUploadService", context)) {
-            Log.d(TAG, "----> stop special upload service");
-            context.stopService(new Intent(context, SpecialUploadService.class));
-        }
-        Log.d(TAG, "----> starting special upload service");
-        context.startService(new Intent(context, SpecialUploadService.class));            
+        // start upload task
+        SpecialUploadTask task = new SpecialUploadTask();
+        task.create();
+        task.start();
+        task.stop();           
     } 
 
 }

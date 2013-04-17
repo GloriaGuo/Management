@@ -223,7 +223,7 @@ public class ManagementApplication extends android.app.Application {
                 mPendingIntent);
     }
     
-    static public void setUploadSpecialAlarm() {
+    private void setUploadSpecialAlarm() {
         AlarmManager mAlarmManager = (AlarmManager)ManagementApplication.getContext().
                 getSystemService("alarm");
         PendingIntent mPendingIntent = PendingIntent.getBroadcast(

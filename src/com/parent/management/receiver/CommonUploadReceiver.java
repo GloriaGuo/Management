@@ -6,8 +6,8 @@ import android.content.Intent;
 import android.util.Log;
 
 import com.parent.management.ManagementApplication;
-import com.parent.management.service.CommonUploadService;
 import com.parent.management.service.MonitorService;
+import com.parent.management.task.CommonUploadTask;
 
 public class CommonUploadReceiver extends BroadcastReceiver {
     private static final String TAG = ManagementApplication.getApplicationTag() + "." +
@@ -22,11 +22,10 @@ public class CommonUploadReceiver extends BroadcastReceiver {
             context.startService(new Intent(context, MonitorService.class));
         }
         
-        if (ManagementApplication.isServiceRunning("com.parent.management.service.CommonUploadService", context)) {
-            Log.d(TAG, "----> stop common upload service");
-            context.stopService(new Intent(context, CommonUploadService.class));
-        }
-        Log.d(TAG, "----> starting common upload service");
-        context.startService(new Intent(context, CommonUploadService.class));
+        // start upload task
+        CommonUploadTask task = new CommonUploadTask();
+        task.create();
+        task.start();
+        task.stop();
     } 
 }

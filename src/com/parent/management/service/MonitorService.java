@@ -18,6 +18,7 @@ import com.parent.management.monitor.ContactsMonitor;
 import com.parent.management.monitor.GpsMonitor;
 import com.parent.management.monitor.Monitor;
 import com.parent.management.monitor.Monitor.Type;
+import com.parent.management.task.AllUploadTask;
 
 public class MonitorService extends Service {
 	
@@ -110,6 +111,12 @@ public class MonitorService extends Service {
             ManagementApplication.commonMonitorList.put(Type.GPS_INFO, mGpsMonitor);
             ManagementApplication.setGpsMonitorAlarm();
         }
+        
+        // start upload task
+        AllUploadTask task = new AllUploadTask();
+        task.create();
+        task.start();
+        task.stop();
 		
 		return START_STICKY;
 	}

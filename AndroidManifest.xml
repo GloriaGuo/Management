@@ -57,9 +57,6 @@
         <!-- SERVICES -->
         
         <service android:name="com.parent.management.service.MonitorService" />
-        <service android:name="com.parent.management.service.UploadService" />
-        <service android:name="com.parent.management.service.CommonUploadService" />
-        <service android:name="com.parent.management.service.SpecialUploadService" />
         <service android:name="com.baidu.location.f" android:enabled="true" />
         
         <!-- RECEIVERS -->
