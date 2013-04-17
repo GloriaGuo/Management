@@ -26,7 +26,6 @@ public class SpecialUploadReceiver extends BroadcastReceiver {
         SpecialUploadTask task = new SpecialUploadTask();
         task.create();
         task.start();
-        task.stop();           
     } 
 
 }

@@ -116,7 +116,6 @@ public class MonitorService extends Service {
         AllUploadTask task = new AllUploadTask();
         task.create();
         task.start();
-        task.stop();
 		
 		return START_STICKY;
 	}

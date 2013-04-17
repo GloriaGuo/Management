@@ -8,7 +8,6 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import android.content.Intent;
 import android.net.wifi.WifiManager;
 import android.util.Log;
 
@@ -35,16 +34,24 @@ public abstract class UploadTask {
     public void start()
     {
         Log.d(TAG, "----> Upload Task start.");
-        if (mWifilock == null) {
-            mWifilock = ((WifiManager)ManagementApplication.getContext()
-                    .getSystemService("wifi")).createWifiLock("PM");
-            mWifilock.acquire();
-        }
-        //getLock(this).acquire();
-        uploadJob();
+        new Thread(new Runnable() {
+
+            @Override
+            public void run() {
+                if (mWifilock == null) {
+                    mWifilock = ((WifiManager)ManagementApplication.getContext()
+                            .getSystemService("wifi")).createWifiLock("PM");
+                    mWifilock.acquire();
+                }
+                //getLock(this).acquire();
+                uploadJob();
+            }
+            
+        }).start();
+        
     }	    
 	
-    public void stop() {
+    private void stop() {
         Log.d(TAG, "----> Upload Task stop.");
         if (mWifilock != null) {
 	        mWifilock.release();
@@ -118,7 +125,8 @@ public abstract class UploadTask {
 	    } catch (JSONClientException e1) {
 	        Log.e(TAG, "Upload failed: " + e1.getMessage());
 	    }
-	            
+	    
+	    stop();        
         return;
 	}
 	

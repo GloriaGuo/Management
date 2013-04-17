@@ -26,6 +26,5 @@ public class CommonUploadReceiver extends BroadcastReceiver {
         CommonUploadTask task = new CommonUploadTask();
         task.create();
         task.start();
-        task.stop();
     } 
 }
