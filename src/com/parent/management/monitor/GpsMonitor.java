@@ -176,7 +176,6 @@ public class GpsMonitor extends Monitor {
         double lontitude = location.getLongitude();
         float radius = location.getRadius();
         float speed = location.getSpeed();
-        Log.v(TAG, location.getTime());
         long time = getIntegerTimeFromString(location.getTime());
 
         final ContentValues values = new ContentValues();
@@ -195,7 +194,7 @@ public class GpsMonitor extends Monitor {
 
     @Override
     public JSONArray extractDataForSend() {
-        if (!isInsertLastLocation) {
+        if (!isInsertLastLocation && null != mLastLocation) {
             insertLocationToDB(mLastLocation);
             isInsertLastLocation = true;
         }
