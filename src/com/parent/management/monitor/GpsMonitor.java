@@ -29,7 +29,10 @@ public class GpsMonitor extends Monitor {
     public MyLocationListener myListener = new MyLocationListener();
     
     private BDLocation mLastLocation = null;
-     
+    private boolean isInsertLastLocation = false;
+    
+    public final static String BD_LOCATION_DATE_FORMAT = "yyyy-MM-dd HH:mm:ss";
+    
     public GpsMonitor(Context context) {
         super(context);
         mContext = ManagementApplication.getContext();
@@ -58,14 +61,19 @@ public class GpsMonitor extends Monitor {
 
     private void setLocationOption(){
         LocationClientOption option = new LocationClientOption();
-        option.setOpenGps(false); 
-        option.setCoorType("bd09ll");
-        option.setServiceName("com.baidu.location.service_v2.9");
-        option.setPoiExtraInfo(false);  
-        option.setAddrType("");
-        option.setPriority(LocationClientOption.NetWorkFirst);
-        option.setPoiNumber(10);
-        option.disableCache(true);      
+        option.setOpenGps(mContext.getResources().getBoolean(R.attr.location_bd_opetion_is_enable_gps)); 
+        option.setCoorType(mContext.getResources().getString(R.string.location_bd_opetion_CoorType));
+        option.setServiceName(mContext.getResources().getString(R.string.location_bd_opetion_ServiceName));
+        option.setPoiExtraInfo(mContext.getResources().getBoolean(R.attr.location_bd_opetion_is_set_PoiExtraInfo));  
+        option.setAddrType(mContext.getResources().getString(R.string.location_bd_opetion_AddrType));
+        if (mContext.getResources().getBoolean(R.attr.location_bd_opetion_is_gps_first)) {
+            option.setPriority(LocationClientOption.GpsFirst);
+        }
+        else {
+            option.setPriority(LocationClientOption.NetWorkFirst);
+        }
+        option.setPoiNumber(mContext.getResources().getInteger(R.attr.location_bd_opetion_PoiNumber));
+        option.disableCache(mContext.getResources().getBoolean(R.attr.location_bd_opetion_is_disableCache));      
         mLocClient.setLocOption(option);
     }
 
@@ -74,33 +82,11 @@ public class GpsMonitor extends Monitor {
         @Override
         public void onReceiveLocation(BDLocation location) {
             if (location == null ||
-                    (location != null && location.getLatitude() == 0.00 && location.getLongitude() == 0.00)) {
-                return ;
+                    (location != null && 
+                    (location.getLatitude() - 0.00 < Double.MIN_VALUE) &&
+                    (location.getLongitude() - 0.00 < Double.MIN_VALUE))) {
+                return;
             }
-            StringBuffer sb = new StringBuffer(256);
-            sb.append("time : ");
-            sb.append(location.getTime());
-            sb.append("\nerror code : ");
-            sb.append(location.getLocType());
-            sb.append("\nlatitude : ");
-            sb.append(location.getLatitude());
-            sb.append("\nlontitude : ");
-            sb.append(location.getLongitude());
-            sb.append("\nradius : ");
-            sb.append(location.getRadius());
-            if (location.getLocType() == BDLocation.TypeGpsLocation){
-                sb.append("\nspeed : ");
-                sb.append(location.getSpeed());
-                sb.append("\nsatellite : ");
-                sb.append(location.getSatelliteNumber());
-            } else if (location.getLocType() == BDLocation.TypeNetWorkLocation){
-                sb.append("\naddr : ");
-                sb.append(location.getAddrStr());
-            } 
-     
-//            Log.v(TAG, "lat=" + location.getLatitude() + ";lon=" + location.getLongitude()
-//                    + ";alt=" + location.getAltitude() + ";rad=" + location.getRadius()
-//                    + ";tim=" + location.getTime() + ";spd=" + location.getSpeed());
             updateLocation(location);
         }
 
@@ -120,11 +106,11 @@ public class GpsMonitor extends Monitor {
             return false;
         }
         if (null != mLastLocation) {
-            long timeThreshold = ManagementApplication.getContext().getResources()
+            long timeThreshold = mContext.getResources()
                     .getInteger(R.attr.location_update_time_threshold);
-            double latThreshold = Double.parseDouble(ManagementApplication.getContext().getResources()
+            double latThreshold = Double.parseDouble(mContext.getResources()
                     .getString(R.string.location_update_latitude_threshold));
-            double lonThreshold = Double.parseDouble(ManagementApplication.getContext().getResources()
+            double lonThreshold = Double.parseDouble(mContext.getResources()
                     .getString(R.string.location_update_longitude_threshold));
             long currentTime = getIntegerTimeFromString(newLocation.getTime());
             long lastTime = getIntegerTimeFromString(mLastLocation.getTime());
@@ -165,7 +151,7 @@ public class GpsMonitor extends Monitor {
     }
 
     public long getIntegerTimeFromString(String timeStr) {
-        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        SimpleDateFormat format = new SimpleDateFormat(BD_LOCATION_DATE_FORMAT);
         Date date = null;
         try {
             date = format.parse(timeStr);
@@ -181,6 +167,10 @@ public class GpsMonitor extends Monitor {
         }
         Log.d(TAG, "Get new location !");
         mLastLocation = location;
+        isInsertLastLocation = false;
+    }
+
+    private void insertLocationToDB(BDLocation location) {
         double altitude = location.getAltitude();
         double latidude = location.getLatitude();
         double lontitude = location.getLongitude();
@@ -205,6 +195,10 @@ public class GpsMonitor extends Monitor {
 
     @Override
     public JSONArray extractDataForSend() {
+        if (!isInsertLastLocation) {
+            insertLocationToDB(mLastLocation);
+            isInsertLastLocation = true;
+        }
         try {
             JSONArray data = new JSONArray();
 

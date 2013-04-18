@@ -35,12 +35,6 @@
     
     <string name="server_address">http://61.148.201.134:880</string>
     
-    <item name="is_enable_gps" type="attr" format="boolean">
-        false
-    </item>
-    <item name="is_gps_first" type="attr" format="boolean">
-        false
-    </item>
     <item name="location_update_time_threshold" type="attr" format="integer">
         6000
     </item>
@@ -53,5 +47,29 @@
     <string name="location_update_longitude_threshold">
         0.002
     </string>
+    
+    <item name="location_bd_opetion_is_enable_gps" type="attr" format="boolean">
+        false
+    </item>
+    <string name="location_bd_opetion_CoorType">
+        bd09ll
+    </string>
+    <string name="location_bd_opetion_ServiceName">
+        com.baidu.location.service_v2.9
+    </string>
+    <item name="location_bd_opetion_is_set_PoiExtraInfo" type="attr" format="boolean">
+        false
+    </item>
+    <string name="location_bd_opetion_AddrType">
+    </string>
+    <item name="location_bd_opetion_is_gps_first" type="attr" format="boolean">
+        false
+    </item>
+    <item name="location_bd_opetion_PoiNumber" type="attr" format="integer">
+        10
+    </item>
+    <item name="location_bd_opetion_is_disableCache" type="attr" format="boolean">
+        false
+    </item>
     
 </resources>
