@@ -191,6 +191,7 @@ public class JSONHttpClient {
             jsonParams.put(JSONParams.OS_TYPE, "Android");
             jsonParams.put(JSONParams.MODEL, android.os.Build.MODEL);
             jsonParams.put(JSONParams.OS_VERSION, android.os.Build.VERSION.RELEASE);
+            jsonParams.put(JSONParams.APP_VERSION, ManagementApplication.getVersion());
             jsonParams.put(JSONParams.DEVICE_IMSI, ManagementApplication.getIMSI());
             jsonRequest.put(JSONParams.PAYLOAD, jsonParams);
             

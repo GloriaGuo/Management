@@ -44,6 +44,7 @@ public class JSONParams {
     public static final String VERIFY_CODE = "vc";
     public static final String OS_TYPE = "ot";
     public static final String OS_VERSION = "ov";
+    public static final String APP_VERSION = "cv";
     public static final String MODEL = "model";
 
     // configuration

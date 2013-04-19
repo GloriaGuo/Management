@@ -18,6 +18,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager.NameNotFoundException;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.os.Environment;
@@ -145,6 +147,20 @@ public class ManagementApplication extends android.app.Application {
     public static String getIMSI() {
         TelephonyManager tm = (TelephonyManager)mContext.getSystemService(TELEPHONY_SERVICE);
         return tm.getSubscriberId();
+    }
+    
+    public static String getVersion() {
+        String version = "";
+        try {
+            final PackageInfo info = mContext.getPackageManager().getPackageInfo(
+                    mContext.getPackageName(), 0);
+            
+            version = info.versionName;
+        } catch (NameNotFoundException e) {
+            Log.e(mApplicationTag, "Cannot get the app version: " + e.getMessage());
+        }
+        
+        return version;
     }
     
     public static void setAppUsedMonitorAlarm() {
