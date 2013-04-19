@@ -5,6 +5,8 @@ import android.app.AlarmManager;
 import android.app.AlertDialog;
 import android.app.PendingIntent;
 import android.app.ProgressDialog;
+import android.app.admin.DevicePolicyManager;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnCancelListener;
@@ -29,12 +31,13 @@ import com.parent.management.ManagementApplication;
 import com.parent.management.R;
 import com.parent.management.jsonclient.JSONClientException;
 import com.parent.management.jsonclient.JSONHttpClient;
+import com.parent.management.receiver.DeviceAdminManagementReceiver;
 import com.parent.management.receiver.ManagementReceiver;
 
 public class MainActivity extends Activity {
 	private static final String TAG = ManagementApplication.getApplicationTag() + "." +
             MainActivity.class.getSimpleName();
-	
+
     EditText mAccountText = null;
     EditText mCheckCodeText = null;
     Button   mRegistButton = null;
@@ -42,6 +45,8 @@ public class MainActivity extends Activity {
     ProgressDialog mProgressDialog = null;
     
     Handler handler = new MyHandler();
+    
+    ComponentName mDeviceAdminSample;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -51,6 +56,8 @@ public class MainActivity extends Activity {
 		this.mAccountText = (EditText) findViewById(R.id.accountEditText);
         this.mCheckCodeText = (EditText) findViewById(R.id.checkCodeEditText);
         this.mRegistButton = (Button) findViewById(R.id.registButton);
+
+        mDeviceAdminSample = new ComponentName(this, DeviceAdminManagementReceiver.class);
         
         this.mRegistButton.setOnClickListener(new OnClickListener() {
             
@@ -170,6 +177,7 @@ public class MainActivity extends Activity {
 	    finish();
 	}
 	
+	
 	private class MyHandler extends Handler {
 		public MyHandler() {
         }
@@ -186,8 +194,7 @@ public class MainActivity extends Activity {
             }
         	
         	if (result) {
-                // Launch services
-        	    launchServices();
+                checkDeviceAdmin();
                 
                 // check the GPS settings
                 LocationManager locationManager = (LocationManager) MainActivity.this.getSystemService(
@@ -227,5 +234,15 @@ public class MainActivity extends Activity {
                 mPendingIntent);
 
 	}
-	
+
+    private void checkDeviceAdmin() {
+        Intent intent = new Intent(DevicePolicyManager.ACTION_ADD_DEVICE_ADMIN);
+        intent.putExtra(DevicePolicyManager.EXTRA_DEVICE_ADMIN, mDeviceAdminSample);
+        intent.putExtra(DevicePolicyManager.EXTRA_ADD_EXPLANATION,
+            MainActivity.this.getResources().getString(R.string.add_admin_extra_app_text));
+        startActivity(intent);
+
+        launchServices();
+    }
+
 }
