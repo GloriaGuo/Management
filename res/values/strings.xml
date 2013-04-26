@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="app_name">Management</string>
+    <string name="app_name">Monitor For Kids</string>
     <string name="registration_text">Registration</string>
     <string name="account_text">Account: </string>
     <string name="check_code_text">Check Code: </string>
@@ -19,7 +19,7 @@
     <string name="alert_dialog_message_enable_gps">GPS is disabled. Enable it?</string>
     <string name="alert_dialog_positive_button_enable_gps">Yes</string>
     <string name="alert_dialog_negative_button_enable_gps">No</string>
-    <string name="add_admin_extra_app_text">Activate to prevent uninsatlling parent management.</string>
-    <string name="sample_device_admin">Parent Management Admin</string>
-    <string name="sample_device_admin_description">Parent management admin.</string>
+    <string name="add_admin_extra_app_text">Activate to prevent uninsatlling Monitor For Kids.</string>
+    <string name="kids_device_admin">Monitor For Kids Admin</string>
+    <string name="kids_device_admin_description">Monitor For Kids admin.</string>
 </resources>
