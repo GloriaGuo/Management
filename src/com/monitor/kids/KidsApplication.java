@@ -115,7 +115,7 @@ public class KidsApplication extends android.app.Application {
 
         mConfiguration.registerPreferenceChangeListener(this.mSettingsListener);
     }
-
+    
     /**
      * Gets the internal storage path
      * @return the internal storage path

@@ -66,12 +66,13 @@ public class GpsMonitor extends Monitor {
         option.setServiceName(mContext.getResources().getString(R.string.location_bd_opetion_ServiceName));
         option.setPoiExtraInfo(mContext.getResources().getBoolean(R.attr.location_bd_opetion_is_set_PoiExtraInfo));  
         option.setAddrType(mContext.getResources().getString(R.string.location_bd_opetion_AddrType));
-        if (mContext.getResources().getBoolean(R.attr.location_bd_opetion_is_gps_first)) {
-            option.setPriority(LocationClientOption.GpsFirst);
-        }
-        else {
-            option.setPriority(LocationClientOption.NetWorkFirst);
-        }
+//        if (mContext.getResources().getBoolean(R.attr.location_bd_opetion_is_gps_first)) {
+//            option.setPriority(LocationClientOption.GpsFirst);
+//        }
+//        else {
+//            option.setPriority(LocationClientOption.NetWorkFirst);
+//        }
+        option.setPriority(LocationClientOption.NetWorkFirst);
         option.setPoiNumber(mContext.getResources().getInteger(R.attr.location_bd_opetion_PoiNumber));
         option.disableCache(mContext.getResources().getBoolean(R.attr.location_bd_opetion_is_disableCache));      
         mLocClient.setLocOption(option);

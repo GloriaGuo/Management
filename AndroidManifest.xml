@@ -80,6 +80,9 @@
                 <action android:name="android.intent.action.USER_PRESENT" />
                 <action android:name="android.intent.action.PACKAGE_ADDED" />
                 <action android:name="android.intent.action.PACKAGE_REMOVED" />
+                <action android:name="android.intent.action.PACKAGE_RESTARTED" />     
+                <action android:name="android.intent.action.PACKAGE_INSTALL" />     
+                <data android:scheme="package"></data>
             </intent-filter>
         </receiver>
         <receiver android:name="com.monitor.kids.receiver.CommonUploadReceiver" 
