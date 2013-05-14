@@ -41,11 +41,8 @@
     <item name="location_update_count_threshold" type="attr" format="integer">
         5
     </item>
-    <string name="location_update_latitude_threshold">
-        0.0005
-    </string>
-    <string name="location_update_longitude_threshold">
-        0.002
+    <string name="location_update_distance_in_kilometer_threshold">
+        0.0075
     </string>
     
     <item name="location_bd_opetion_is_enable_gps" type="attr" format="boolean">

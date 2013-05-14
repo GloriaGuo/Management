@@ -49,6 +49,7 @@ public class GpsMonitor extends Monitor {
         }
         else {
             mLocClient.requestLocation();
+//            mLocClient.requestOfflineLocation();
         }
         this.monitorStatus = true;
     }
@@ -97,6 +98,26 @@ public class GpsMonitor extends Monitor {
         
     }
     
+    private final static double EARTH_RADIUS = 6378.137;
+    private static double rad(double d)
+    {
+       return d * Math.PI / 180.0;
+    }
+
+    public static double getDistance(double lat1, double lng1, double lat2, double lng2)
+    {
+       double radLat1 = rad(lat1);
+       double radLat2 = rad(lat2);
+       double a = radLat1 - radLat2;
+       double b = rad(lng1) - rad(lng2);
+
+       double s = 2 * Math.asin(Math.sqrt(Math.pow(Math.sin(a/2),2) +
+               Math.cos(radLat1)*Math.cos(radLat2)*Math.pow(Math.sin(b/2),2)));
+       s = s * EARTH_RADIUS;
+       s = Math.round(s * 10000) / 10000;
+       return s;
+    }
+    
     private boolean isNeedUpdateLocation(BDLocation newLocation) {
         if (null == newLocation) {
             Log.d(TAG, "Get empty location, ignore it...");
@@ -109,22 +130,19 @@ public class GpsMonitor extends Monitor {
         if (null != mLastLocation) {
             long timeThreshold = mContext.getResources()
                     .getInteger(R.attr.location_update_time_threshold);
-            double latThreshold = Double.parseDouble(mContext.getResources()
-                    .getString(R.string.location_update_latitude_threshold));
-            double lonThreshold = Double.parseDouble(mContext.getResources()
-                    .getString(R.string.location_update_longitude_threshold));
+            double distanceThreshold = Double.parseDouble(mContext.getResources()
+                    .getString(R.string.location_update_distance_in_kilometer_threshold));
             long currentTime = getIntegerTimeFromString(newLocation.getTime());
             long lastTime = getIntegerTimeFromString(mLastLocation.getTime());
-            double lastLat = mLastLocation.getLatitude();
-            double lastLon = mLastLocation.getLongitude();
-            double currentLat = newLocation.getLatitude();
-            double currentLon = newLocation.getLongitude();
+            double distance = getDistance(
+                    mLastLocation.getLatitude(),
+                    mLastLocation.getLongitude(),
+                    newLocation.getLatitude(),
+                    newLocation.getLongitude());
             if((currentTime - lastTime < timeThreshold)
-                    && (Math.abs(lastLat - currentLat) - latThreshold > Double.MIN_VALUE)
-                    && (Math.abs(lastLon - currentLon) - lonThreshold > Double.MIN_VALUE)) {
+                    && (distance - distanceThreshold > Double.MIN_VALUE)) {
                 Log.d(TAG, "Get abnormal location, sub-time=" + (currentTime - lastTime)
-                        + ", sub-lat=" + Math.abs(lastLat - currentLat)
-                        + ", sub-lon=" + Math.abs(lastLon - currentLon)
+                        + ", distance=" + distance
                         + ", ignore it...");
                 return false;
             }
