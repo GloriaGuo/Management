@@ -146,6 +146,9 @@ public class GpsMonitor extends Monitor {
                         + ", ignore it...");
                 return false;
             }
+            Log.d(TAG, "Get new location, sub-time=" + (currentTime - lastTime)
+                    + ", distance=" + distance
+                    + ", add it...");
         }
         return true;
     }
